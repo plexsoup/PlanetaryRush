@@ -1,0 +1,59 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Ship.gd" type="Script" id=1]
+[ext_resource path="res://effects/laser.tscn" type="PackedScene" id=2]
+[ext_resource path="res://ships.png" type="Texture" id=3]
+[ext_resource path="res://Weapons.gd" type="Script" id=4]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 21.115, 16.987 )
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 11.4041, 17.2838 )
+
+[node name="Ship" type="Area2D"]
+scale = Vector2( 0.25, 0.25 )
+script = ExtResource( 1 )
+BulletScene = ExtResource( 2 )
+
+[node name="Sprite" type="Sprite" parent="."]
+scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 3 )
+hframes = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 1 )
+
+[node name="Front" type="Area2D" parent="."]
+position = Vector2( 30.7396, 0.202248 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Front"]
+position = Vector2( 2.55907, -0.0896835 )
+shape = SubResource( 2 )
+
+[node name="FiringArc" type="Area2D" parent="."]
+position = Vector2( 61.1097, 0 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="FiringArc"]
+polygon = PoolVector2Array( -14.6054, -16.5883, 437.565, -274.673, 437.331, 270.258, -14.6511, 19.0276 )
+
+[node name="Weapons" type="Node2D" parent="."]
+script = ExtResource( 4 )
+BulletScene = ExtResource( 2 )
+
+[node name="ReloadTimer" type="Timer" parent="Weapons"]
+wait_time = 0.25
+one_shot = true
+
+[node name="Muzzles" type="Node2D" parent="Weapons"]
+
+[node name="Muzzle1" type="Position2D" parent="Weapons/Muzzles"]
+position = Vector2( 21.6198, -12.4828 )
+
+[node name="Muzzle2" type="Position2D" parent="Weapons/Muzzles"]
+position = Vector2( 21.6198, 11.4533 )
+
+[connection signal="body_entered" from="." to="." method="_on_Ship_body_entered"]
+[connection signal="area_entered" from="FiringArc" to="." method="_on_FiringArc_area_entered"]
+[connection signal="body_entered" from="FiringArc" to="." method="_on_FiringArc_body_entered"]
+[connection signal="timeout" from="Weapons/ReloadTimer" to="Weapons" method="_on_ReloadTimer_timeout"]

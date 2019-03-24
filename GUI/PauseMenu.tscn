@@ -1,0 +1,296 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://GUI/CyberTheme.tres" type="Theme" id=1]
+[ext_resource path="res://PauseMenu.gd" type="Script" id=2]
+[ext_resource path="res://GUI/OptionsDetails.tscn" type="PackedScene" id=3]
+[ext_resource path="res://godotIcon.png" type="Texture" id=4]
+[ext_resource path="res://GimpLogowilber-big.png" type="Texture" id=5]
+[ext_resource path="res://audacityIcon.png" type="Texture" id=6]
+[ext_resource path="res://inkscapeIcon.png" type="Texture" id=7]
+[ext_resource path="res://BlenderIcon.png" type="Texture" id=8]
+
+[node name="PauseMenu" type="Control"]
+pause_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 1 )
+script = ExtResource( 2 )
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -512.0
+margin_top = -300.0
+margin_right = 512.0
+margin_bottom = 300.0
+custom_constants/margin_right = 50
+custom_constants/margin_top = 50
+custom_constants/margin_left = 50
+custom_constants/margin_bottom = 50
+
+[node name="TabContainer" type="TabContainer" parent="MarginContainer"]
+margin_left = 50.0
+margin_top = 50.0
+margin_right = 974.0
+margin_bottom = 550.0
+custom_constants/hseparation = 100
+tab_align = 0
+
+[node name="Options" type="Tabs" parent="MarginContainer/TabContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_top = 37.0
+margin_right = -2.0
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/TabContainer/Options"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/margin_right = 30
+custom_constants/margin_top = 10
+custom_constants/margin_left = 30
+custom_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TabContainer/Options/MarginContainer"]
+margin_left = 30.0
+margin_top = 10.0
+margin_right = 890.0
+margin_bottom = 464.0
+
+[node name="OptionsDetails" parent="MarginContainer/TabContainer/Options/MarginContainer/VBoxContainer" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 0.0
+margin_top = 0.0
+margin_right = 860.0
+margin_bottom = 381.0
+
+[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/TabContainer/Options/MarginContainer/VBoxContainer"]
+margin_top = 385.0
+margin_right = 860.0
+margin_bottom = 454.0
+dragger_visibility = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/TabContainer/Options/MarginContainer/VBoxContainer/HSplitContainer"]
+margin_right = 424.0
+margin_bottom = 69.0
+size_flags_horizontal = 3
+custom_constants/margin_right = 20
+custom_constants/margin_top = 20
+custom_constants/margin_left = 20
+custom_constants/margin_bottom = 20
+
+[node name="LeftSide" type="VBoxContainer" parent="MarginContainer/TabContainer/Options/MarginContainer/VBoxContainer/HSplitContainer/MarginContainer"]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 404.0
+margin_bottom = 49.0
+size_flags_horizontal = 3
+
+[node name="RestartButton" type="Button" parent="MarginContainer/TabContainer/Options/MarginContainer/VBoxContainer/HSplitContainer/MarginContainer/LeftSide"]
+margin_right = 384.0
+margin_bottom = 29.0
+text = "New Game"
+
+[node name="MarginContainer2" type="MarginContainer" parent="MarginContainer/TabContainer/Options/MarginContainer/VBoxContainer/HSplitContainer"]
+margin_left = 436.0
+margin_right = 860.0
+margin_bottom = 69.0
+size_flags_horizontal = 3
+custom_constants/margin_right = 20
+custom_constants/margin_top = 20
+custom_constants/margin_left = 20
+custom_constants/margin_bottom = 20
+
+[node name="RightSide" type="VBoxContainer" parent="MarginContainer/TabContainer/Options/MarginContainer/VBoxContainer/HSplitContainer/MarginContainer2"]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 404.0
+margin_bottom = 49.0
+size_flags_horizontal = 3
+
+[node name="QuitButton" type="Button" parent="MarginContainer/TabContainer/Options/MarginContainer/VBoxContainer/HSplitContainer/MarginContainer2"]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 404.0
+margin_bottom = 49.0
+text = "Quit"
+
+[node name="Instructions" type="Tabs" parent="MarginContainer/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_top = 37.0
+margin_right = -2.0
+
+[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/TabContainer/Instructions"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -458.0
+margin_top = -225.5
+margin_right = 458.0
+margin_bottom = 225.5
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/TabContainer/Instructions"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/margin_right = 30
+custom_constants/margin_top = 30
+custom_constants/margin_left = 30
+custom_constants/margin_bottom = 30
+
+[node name="InstructionText" type="RichTextLabel" parent="MarginContainer/TabContainer/Instructions/MarginContainer"]
+margin_left = 30.0
+margin_top = 30.0
+margin_right = 890.0
+margin_bottom = 433.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+bbcode_text = "Click and drag on planets to send a fleet of ships along a path.
+
+Each fleet will consume half the population of the planet.
+
+Ships will automatically attack other ships and planets in their path.
+
+Ships only shoot forward, so flanking tactics can be highly effective.
+
+At the end of their path, ships will return to the nearest allied planet.
+
+Try \"flyby\" attacks, where you direct ships toward and away from a planet.
+
+You may want to keep a reserve of ships to intercept attackers.
+"
+text = "Click and drag on planets to send a fleet of ships along a path.
+
+Each fleet will consume half the population of the planet.
+
+Ships will automatically attack other ships and planets in their path.
+
+Ships only shoot forward, so flanking tactics can be highly effective.
+
+At the end of their path, ships will return to the nearest allied planet.
+
+Try \"flyby\" attacks, where you direct ships toward and away from a planet.
+
+You may want to keep a reserve of ships to intercept attackers.
+"
+
+[node name="Licenses" type="Tabs" parent="MarginContainer/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_top = 37.0
+margin_right = -2.0
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/TabContainer/Licenses"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/margin_right = 30
+custom_constants/margin_top = 15
+custom_constants/margin_left = 30
+custom_constants/margin_bottom = 15
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TabContainer/Licenses/MarginContainer"]
+margin_left = 30.0
+margin_top = 15.0
+margin_right = 890.0
+margin_bottom = 448.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 1
+
+[node name="Authoring" type="RichTextLabel" parent="MarginContainer/TabContainer/Licenses/MarginContainer/VBoxContainer"]
+margin_right = 860.0
+margin_bottom = 365.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+bbcode_text = "Planetary Rush was created by plexsoup. [url]https://plexsoup.itch.io[/url]
+Source code available at [url]https://github.com/plexsoup[/url]
+
+[center]Created for [url=https://itch.io/jam/mini-jam-24-space]Mini-Jam 24[/url][/center]
+
+Thanks to Mr. Joshua McLean: Composer, Streamer, Active Member of the Game Jam Community. The music you're listening to is his piece, \"Hearts Unraveled\".
+[indent]Contains music ©2019 Joshua McLean ([url]http://mrjoshuamclean.com[/url])
+Licensed under Creative Commons Attribution-ShareAlike 4.0 International[/indent]
+
+Software Used: 
+[center][url=https://www.godotengine.org]Godot[/url], [url=https://www.gimp.org]Gimp[/url], [url=http://www.audacityteam.org]Audacity[/url], [url=https://www.inkscape.org]Inkscape[/url], [url=https://www.blender.org]Blender[/url][/center]
+
+"
+text = "Planetary Rush was created by plexsoup. https://plexsoup.itch.io
+Source code available at https://github.com/plexsoup
+
+Created for Mini-Jam 24
+
+Thanks to Mr. Joshua McLean: Composer, Streamer, Active Member of the Game Jam Community. The music you're listening to is his piece, \"Hearts Unraveled\".
+	Contains music ©2019 Joshua McLean (http://mrjoshuamclean.com)
+Licensed under Creative Commons Attribution-ShareAlike 4.0 International
+
+Software Used: 
+Godot, Gimp, Audacity, Inkscape, Blender
+
+"
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/TabContainer/Licenses/MarginContainer/VBoxContainer"]
+margin_left = 262.0
+margin_top = 369.0
+margin_right = 598.0
+margin_bottom = 433.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+columns = 5
+
+[node name="GodotLogo" type="TextureButton" parent="MarginContainer/TabContainer/Licenses/MarginContainer/VBoxContainer/GridContainer"]
+margin_right = 64.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 64, 64 )
+texture_normal = ExtResource( 4 )
+expand = true
+
+[node name="GimpLogo" type="TextureButton" parent="MarginContainer/TabContainer/Licenses/MarginContainer/VBoxContainer/GridContainer"]
+margin_left = 68.0
+margin_right = 132.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 64, 64 )
+texture_normal = ExtResource( 5 )
+expand = true
+
+[node name="AudacityLogo" type="TextureButton" parent="MarginContainer/TabContainer/Licenses/MarginContainer/VBoxContainer/GridContainer"]
+margin_left = 136.0
+margin_right = 200.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 64, 64 )
+texture_normal = ExtResource( 6 )
+expand = true
+
+[node name="InkscapeLogo" type="TextureButton" parent="MarginContainer/TabContainer/Licenses/MarginContainer/VBoxContainer/GridContainer"]
+margin_left = 204.0
+margin_right = 268.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 64, 64 )
+texture_normal = ExtResource( 7 )
+expand = true
+
+[node name="BlenderLogo" type="TextureButton" parent="MarginContainer/TabContainer/Licenses/MarginContainer/VBoxContainer/GridContainer"]
+margin_left = 272.0
+margin_right = 336.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 64, 64 )
+texture_normal = ExtResource( 8 )
+expand = true
+
+[connection signal="pressed" from="MarginContainer/TabContainer/Options/MarginContainer/VBoxContainer/HSplitContainer/MarginContainer/LeftSide/RestartButton" to="." method="_on_RestartButton_pressed"]
+[connection signal="pressed" from="MarginContainer/TabContainer/Options/MarginContainer/VBoxContainer/HSplitContainer/MarginContainer2/QuitButton" to="." method="_on_QuitButton_pressed"]
+[connection signal="meta_clicked" from="MarginContainer/TabContainer/Licenses/MarginContainer/VBoxContainer/Authoring" to="." method="_on_RichText_meta_clicked"]

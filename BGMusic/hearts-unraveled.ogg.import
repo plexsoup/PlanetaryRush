@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/hearts-unraveled.ogg-868c13035c578ee20152a725bab462ad.oggstr"
+
+[deps]
+
+source_file="res://BGMusic/hearts-unraveled.ogg"
+dest_files=[ "res://.import/hearts-unraveled.ogg-868c13035c578ee20152a725bab462ad.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

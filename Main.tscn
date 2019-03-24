@@ -1,0 +1,101 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://Main.gd" type="Script" id=1]
+[ext_resource path="res://DesignNotes.gd" type="Script" id=2]
+[ext_resource path="res://GUI/PauseMenu.tscn" type="PackedScene" id=3]
+[ext_resource path="res://GUI/CyberTheme.tres" type="Theme" id=4]
+[ext_resource path="res://GUI/fonts/GoogleFonts/Gugi/Gugi-Regular.ttf" type="DynamicFontData" id=5]
+[ext_resource path="res://BGMusic/hearts-unraveled.ogg" type="AudioStream" id=6]
+
+[sub_resource type="DynamicFont" id=1]
+size = 96
+font_data = ExtResource( 5 )
+
+[node name="Main" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="DesignNotes" type="Node" parent="."]
+script = ExtResource( 2 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="PauseMenu" parent="CanvasLayer" instance=ExtResource( 3 )]
+visible = false
+
+[node name="WinScreen" type="Control" parent="CanvasLayer"]
+pause_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 4 )
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/WinScreen"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/margin_right = 30
+custom_constants/margin_top = 30
+custom_constants/margin_left = 30
+custom_constants/margin_bottom = 30
+
+[node name="Panel" type="Panel" parent="CanvasLayer/WinScreen/MarginContainer"]
+margin_left = 30.0
+margin_top = 30.0
+margin_right = 994.0
+margin_bottom = 570.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/WinScreen/MarginContainer/Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer/WinScreen/MarginContainer/Panel/VBoxContainer"]
+margin_right = 964.0
+margin_bottom = 486.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Lose" type="Label" parent="CanvasLayer/WinScreen/MarginContainer/Panel/VBoxContainer/CenterContainer"]
+visible = false
+margin_left = 264.0
+margin_top = 194.0
+margin_right = 700.0
+margin_bottom = 291.0
+custom_fonts/font = SubResource( 1 )
+text = "You Lose"
+
+[node name="Win" type="Label" parent="CanvasLayer/WinScreen/MarginContainer/Panel/VBoxContainer/CenterContainer"]
+margin_left = 294.0
+margin_top = 194.0
+margin_right = 670.0
+margin_bottom = 291.0
+custom_fonts/font = SubResource( 1 )
+text = "You Win"
+
+[node name="HSplitContainer" type="HSplitContainer" parent="CanvasLayer/WinScreen/MarginContainer/Panel/VBoxContainer"]
+margin_top = 490.0
+margin_right = 964.0
+margin_bottom = 540.0
+
+[node name="Restart" type="Button" parent="CanvasLayer/WinScreen/MarginContainer/Panel/VBoxContainer/HSplitContainer"]
+margin_right = 476.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 0, 50 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Restart"
+
+[node name="Quit" type="Button" parent="CanvasLayer/WinScreen/MarginContainer/Panel/VBoxContainer/HSplitContainer"]
+margin_left = 488.0
+margin_right = 964.0
+margin_bottom = 50.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Quit"
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+pause_mode = 2
+stream = ExtResource( 6 )
+volume_db = -35.0
+autoplay = true
+bus = "Music"
+
+[connection signal="pressed" from="CanvasLayer/WinScreen/MarginContainer/Panel/VBoxContainer/HSplitContainer/Restart" to="." method="_on_Restart_pressed"]
+[connection signal="pressed" from="CanvasLayer/WinScreen/MarginContainer/Panel/VBoxContainer/HSplitContainer/Quit" to="." method="_on_Quit_pressed"]
