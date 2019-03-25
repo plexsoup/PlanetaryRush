@@ -15,7 +15,7 @@ func _ready():
 	global.cursor = self
 	if global.PlayerFaction:
 		Faction = global.PlayerFaction
-	
+	global.camera = $Camera2D
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -25,15 +25,15 @@ func _process(delta):
 func _input(event):
 	if Input.is_action_just_pressed("left_click"):
 		current_planet = get_closest_planet()
-		print(self.name, " my Faction == ", Faction)
-		print(self.name, " planet Faction == ", current_planet.Faction)
+		#print(self.name, " my Faction == ", Faction)
+		#print(self.name, " planet Faction == ", current_planet.Faction)
 		if Faction == current_planet.Faction:
 			lock_cursor_on(current_planet)
 			spawnPath(current_planet)
 
 func set_faction(factionNum):
 	Faction = factionNum
-	print("setting faction to ", Faction)
+	#print("setting faction to ", Faction)
 
 func lock_cursor_on(planet):
 	set_global_position(planet.get_global_position())

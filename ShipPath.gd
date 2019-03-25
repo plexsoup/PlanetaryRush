@@ -23,7 +23,6 @@ func start(planet):
 	Faction = planet.Faction
 
 func end():
-	print("starting ShipPath destruction timer")
 	$DestructionTimer.start()
 
 func _on_DestructionTimer_timeout():
@@ -75,7 +74,8 @@ func _on_MousePolling_timeout():
 		
 func _draw():
 	for point in self.get_curve().get_baked_points():
-		draw_circle(point, 3, Color.red)
+		var factionColors = [ Color.gray, Color(0.6, 0.6, 1.0, 0.25), Color(1.0, 0.6, 0.6, 0.25)]
+		draw_circle(point, 3, factionColors[Faction])
 
 
 

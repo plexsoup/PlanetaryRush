@@ -3,7 +3,7 @@ extends Node
 var options : Dictionary = {
 	"debug" : false,
 	"num_planets" : 10,
-	"difficulty" : 1 # 0, 1, 2
+	"difficulty" : 0 # 0, 1, 2
 }
 
 enum Difficulties { EASY, NORMAL, HARD }
@@ -22,6 +22,7 @@ var FactionColors : Array = [
 		Color.red, 
 	]
 var PlayerFaction : int = 1
+var camera : Camera2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

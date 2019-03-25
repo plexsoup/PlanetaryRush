@@ -1,8 +1,8 @@
 [gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://GUI/CyberTheme.tres" type="Theme" id=1]
-[ext_resource path="res://IconFactionBlue.png" type="Texture" id=2]
-[ext_resource path="res://IconFactionRed.png" type="Texture" id=3]
+[ext_resource path="res://IconFactionBlue2.png" type="Texture" id=2]
+[ext_resource path="res://IconFactionRed2.png" type="Texture" id=3]
 [ext_resource path="res://GUI/FactionSelect.gd" type="Script" id=4]
 [ext_resource path="res://GUI/VolSlider.gd" type="Script" id=5]
 [ext_resource path="res://GUI/FullscreenCheckbox.gd" type="Script" id=6]
@@ -43,7 +43,7 @@ text = "Planetary Rush"
 [node name="Instructions" type="RichTextLabel" parent="HSplitContainer/LeftSide/VBoxContainer"]
 margin_top = 37.0
 margin_right = 496.0
-margin_bottom = 436.0
+margin_bottom = 438.0
 size_flags_vertical = 3
 bbcode_enabled = true
 bbcode_text = "Click and drag from your planet to send ships. If they arrive at other planets, they'll try and take them over. 
@@ -52,14 +52,14 @@ text = "Click and drag from your planet to send ships. If they arrive at other p
 "
 
 [node name="ChooseFactionLabel" type="Label" parent="HSplitContainer/LeftSide/VBoxContainer"]
-margin_top = 440.0
+margin_top = 442.0
 margin_right = 496.0
-margin_bottom = 473.0
+margin_bottom = 475.0
 text = "Choose Your Faction"
 
 [node name="FactionSelect" type="ItemList" parent="HSplitContainer/LeftSide/VBoxContainer"]
 margin_left = 98.0
-margin_top = 477.0
+margin_top = 479.0
 margin_right = 398.0
 margin_bottom = 580.0
 grow_horizontal = 2
@@ -183,28 +183,27 @@ size_flags_horizontal = 3
 size_flags_vertical = 11
 
 [node name="MarginContainer" type="MarginContainer" parent="HSplitContainer/RightSide/DisplayOptions"]
-editor/display_folded = true
 margin_right = 496.0
-margin_bottom = 33.0
 
 [node name="Label" type="Label" parent="HSplitContainer/RightSide/DisplayOptions/MarginContainer"]
+visible = false
+margin_top = -17.0
 margin_right = 496.0
-margin_bottom = 33.0
-text = "Display"
+margin_bottom = 16.0
+text = "Display Settings"
 align = 1
 
 [node name="Fullscreen" type="HSplitContainer" parent="HSplitContainer/RightSide/DisplayOptions"]
-editor/display_folded = true
-margin_top = 37.0
+margin_top = 4.0
 margin_right = 496.0
-margin_bottom = 70.0
+margin_bottom = 37.0
 dragger_visibility = 1
 
 [node name="Label" type="Label" parent="HSplitContainer/RightSide/DisplayOptions/Fullscreen"]
 margin_right = 242.0
 margin_bottom = 33.0
 size_flags_horizontal = 3
-text = "Fullscreen"
+text = "Display"
 align = 2
 
 [node name="FullscreenCheckbox" type="CheckBox" parent="HSplitContainer/RightSide/DisplayOptions/Fullscreen"]
@@ -212,10 +211,35 @@ margin_left = 254.0
 margin_right = 496.0
 margin_bottom = 33.0
 size_flags_horizontal = 3
+text = "Fullscreen"
+align = 1
+script = ExtResource( 6 )
+
+[node name="CaptureMouse" type="HSplitContainer" parent="HSplitContainer/RightSide/DisplayOptions"]
+margin_top = 41.0
+margin_right = 496.0
+margin_bottom = 74.0
+dragger_visibility = 1
+
+[node name="Label" type="Label" parent="HSplitContainer/RightSide/DisplayOptions/CaptureMouse"]
+margin_right = 242.0
+margin_bottom = 33.0
+size_flags_horizontal = 3
+text = "Mouse"
+align = 2
+
+[node name="MouseConfineCheckbox" type="CheckBox" parent="HSplitContainer/RightSide/DisplayOptions/CaptureMouse"]
+margin_left = 254.0
+margin_right = 496.0
+margin_bottom = 33.0
+size_flags_horizontal = 3
+text = "Confined"
+align = 1
 script = ExtResource( 6 )
 
 [node name="Resolution" type="HSplitContainer" parent="HSplitContainer/RightSide/DisplayOptions"]
 editor/display_folded = true
+visible = false
 margin_top = 74.0
 margin_right = 496.0
 margin_bottom = 107.0
@@ -243,6 +267,7 @@ margin_bottom = 580.0
 size_flags_vertical = 3
 
 [node name="title2" type="MarginContainer" parent="HSplitContainer/RightSide/GameOptions"]
+visible = false
 margin_right = 496.0
 margin_bottom = 33.0
 
@@ -253,10 +278,8 @@ text = "Game"
 align = 1
 
 [node name="Difficulty" type="HSplitContainer" parent="HSplitContainer/RightSide/GameOptions"]
-editor/display_folded = true
-margin_top = 37.0
 margin_right = 496.0
-margin_bottom = 70.0
+margin_bottom = 33.0
 dragger_visibility = 1
 
 [node name="Label" type="Label" parent="HSplitContainer/RightSide/GameOptions/Difficulty"]
@@ -271,9 +294,11 @@ margin_left = 254.0
 margin_right = 496.0
 margin_bottom = 33.0
 size_flags_horizontal = 3
+text = "Difficulty"
 script = ExtResource( 8 )
 
 [connection signal="item_selected" from="HSplitContainer/LeftSide/VBoxContainer/FactionSelect" to="HSplitContainer/LeftSide/VBoxContainer/FactionSelect" method="_on_FactionSelect_item_selected"]
 [connection signal="toggled" from="HSplitContainer/RightSide/DisplayOptions/Fullscreen/FullscreenCheckbox" to="HSplitContainer/RightSide/DisplayOptions/Fullscreen/FullscreenCheckbox" method="_on_FullscreenCheckbox_toggled"]
+[connection signal="toggled" from="HSplitContainer/RightSide/DisplayOptions/CaptureMouse/MouseConfineCheckbox" to="HSplitContainer/RightSide/DisplayOptions/CaptureMouse/MouseConfineCheckbox" method="_on_MouseConfineCheckbox_toggled"]
 [connection signal="item_selected" from="HSplitContainer/RightSide/DisplayOptions/Resolution/ResolutionList" to="HSplitContainer/RightSide/DisplayOptions/Resolution/ResolutionList" method="_on_ResolutionList_item_selected"]
 [connection signal="item_selected" from="HSplitContainer/RightSide/GameOptions/Difficulty/DifficultyButton" to="HSplitContainer/RightSide/GameOptions/Difficulty/DifficultyButton" method="_on_DifficultyButton_item_selected"]

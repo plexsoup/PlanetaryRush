@@ -2,7 +2,7 @@ extends Control
 
 signal opened()
 signal closed()
-
+signal quit_pressed()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -43,7 +43,10 @@ func _input(event):
 
 
 func _on_QuitButton_pressed():
-	get_tree().quit()
+	connect("quit_pressed", global.Main, "_on_Quit_pressed")
+	emit_signal("quit_pressed")
+	disconnect("quit_pressed", global.Main, "_on_Quit_pressed")
+	
 
 
 func _on_RestartButton_pressed():

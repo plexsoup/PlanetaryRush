@@ -20,6 +20,9 @@ var TimeElapsed : float = 0
 
 var VectorToGoal # for debug drawing
 
+enum States { ADVANCING, RETURNING }
+var State = States.ADVANCING
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	add_to_group("ships")
@@ -27,10 +30,14 @@ func _ready():
 # Called by fleet
 func start(faction, navTarget, originPlanet):
 	Faction = faction
+	set_color(Faction)
 	OriginPlanet = originPlanet
-	
+	$Sprite.set_frame(faction)
 	NavTarget = navTarget
-	
+
+func set_color(faction):
+	var factionColors = [ Color.gray, Color.steelblue, Color.firebrick ]
+	set_modulate(factionColors[faction])
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -41,6 +48,21 @@ func _process(delta):
 	collectVelocityVectors()
 	move(delta)
 	update()
+	
+	if State == States.RETURNING:
+		# hack to prevent hovering around planets you never left
+		land_on_nearby_planet()
+	
+func land_on_nearby_planet():
+	var myPos = get_global_position()
+	var targetPos = NavTarget.get_global_position()
+	var landingDistance = 70.0
+	if myPos.distance_squared_to(targetPos) < landingDistance * landingDistance:
+		if NavTarget.has_method("add_units"):
+			NavTarget.add_units(1)
+		die()
+	if NavTarget == null:
+		die()
 
 	
 func move(delta):

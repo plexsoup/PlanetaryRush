@@ -12,6 +12,7 @@ onready var Cursor = get_node("..")
 
 func _ready():
 	DesiredZoom = zoom
+	#Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

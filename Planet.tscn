@@ -2,13 +2,12 @@
 
 [ext_resource path="res://Planet.gd" type="Script" id=1]
 [ext_resource path="res://planets.png" type="Texture" id=2]
-[ext_resource path="res://GUI/fonts/neuropol/neuropol.ttf" type="DynamicFontData" id=3]
-[ext_resource path="res://effects/voot.wav" type="AudioStream" id=4]
+[ext_resource path="res://effects/voot.wav" type="AudioStream" id=3]
+[ext_resource path="res://GUI/fonts/neuropol/neuropol.ttf" type="DynamicFontData" id=4]
 
 [sub_resource type="DynamicFont" id=1]
-size = 32
-outline_size = 2
-font_data = ExtResource( 3 )
+size = 128
+font_data = ExtResource( 4 )
 
 [node name="Planet" type="StaticBody2D"]
 script = ExtResource( 1 )
@@ -22,24 +21,30 @@ hframes = 3
 wait_time = 0.5
 autostart = true
 
-[node name="ProductionLabel" type="Label" parent="."]
+[node name="Tween" type="Tween" parent="."]
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource( 3 )
+
+[node name="Production" type="Node2D" parent="."]
+position = Vector2( -9.75349, -10.7289 )
+scale = Vector2( 0.5, 0.5 )
+
+[node name="ProductionLabel" type="Label" parent="Production"]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -20.0
-margin_top = -19.0
-margin_right = 20.0
-margin_bottom = 19.0
+margin_left = -78.5263
+margin_top = -74.1126
+margin_right = 80.4737
+margin_bottom = 79.8874
 custom_fonts/font = SubResource( 1 )
-custom_colors/font_color = Color( 0, 0, 0, 1 )
-custom_colors/font_outline_modulate = Color( 1, 1, 1, 1 )
+custom_colors/font_color = Color( 0.890196, 0.890196, 0.890196, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_offset_x = 2
+custom_constants/shadow_offset_y = 2
 text = "12"
 align = 1
-
-[node name="Tween" type="Tween" parent="."]
-
-[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource( 4 )
 
 [connection signal="timeout" from="ProductionTimer" to="." method="_on_ProductionTimer_timeout"]

@@ -9,3 +9,13 @@ func _ready():
 
 func _on_FullscreenCheckbox_toggled(button_pressed):
 	OS.set_window_fullscreen(button_pressed)
+
+
+
+
+
+func _on_MouseConfineCheckbox_toggled(button_pressed):
+	if button_pressed:
+		Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
+	else:
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)

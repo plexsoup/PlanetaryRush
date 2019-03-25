@@ -42,7 +42,7 @@ script = ExtResource( 4 )
 BulletScene = ExtResource( 2 )
 
 [node name="ReloadTimer" type="Timer" parent="Weapons"]
-wait_time = 0.25
+wait_time = 0.33
 one_shot = true
 
 [node name="Muzzles" type="Node2D" parent="Weapons"]

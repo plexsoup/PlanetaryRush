@@ -10,5 +10,5 @@ func _ready():
 #	pass
 
 func _on_DifficultyButton_item_selected(ID):
-	global.difficulty = ID
-	pass # Replace with function body.
+	global.options["difficulty"] = ID
+	

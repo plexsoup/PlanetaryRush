@@ -1,12 +1,15 @@
 """
 
 Bugs
-- shouldn't be able to switch factions mid-game
 
+
+- AI is paralyzed when there's no gray planets left
 
 
 Features to add
-- AI: at intervals, pick a random planet and create a ShipPath toward some other planet
+
+- change ship lasers.. they're too costly
+	- if something enteres your forward firing arc, draw a line to it and inflict damage.
 
 
 

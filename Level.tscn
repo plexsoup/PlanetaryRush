@@ -35,3 +35,7 @@ script = ExtResource( 3 )
 
 [node name="AI" parent="." instance=ExtResource( 5 )]
 
+[node name="LoseCheckTimer" type="Timer" parent="."]
+autostart = true
+
+[connection signal="timeout" from="LoseCheckTimer" to="." method="_on_LoseCheckTimer_timeout"]

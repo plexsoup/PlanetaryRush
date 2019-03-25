@@ -3,11 +3,11 @@ extends Node2D
 # Declare member variables here. Examples:
 var FleetPath : PathFollow2D
 var NavTarget
-var Speed : float = 150.0 # try to keep the navTarget just a bit faster than the ships
+var Speed : float = 160.0 # try to keep the navTarget just a bit faster than the ships
 var Faction : int
 var OriginPlanet
 
-enum States { DEPLOYING, MOVING, FINISHED }
+enum States { DEPLOYING, MOVING, WAITING, FINISHED }
 var State = States.DEPLOYING
 
 # Called when the node enters the scene tree for the first time.
@@ -42,6 +42,8 @@ func move_fleet_NavTarget(delta):
 		if FleetPath.get_unit_offset() > 0.99:
 			# move the fleet somewhere else so I can queue_free
 			# send the ships home
+			State == States.WAITING
+			yield(get_tree().create_timer(1.0), "timeout")
 			release_fleet()
 	
 
@@ -52,6 +54,7 @@ func release_fleet():
 	#FleetPath.set_offset(0)
 	for ship in get_children():
 		ship.NavTarget = get_closest_friendly_planet(ship.get_global_position())
+		ship.State = ship.States.RETURNING
 	remove_path()
 	State = States.FINISHED
 		
@@ -67,7 +70,7 @@ func get_closest_friendly_planet(pos):
 
 
 func addShips(faction, numShips, shipScene):
-	print(self.name, " addShips(", faction, ", ", numShips, " , ", shipScene, ")")
+	#print(self.name, " addShips(", faction, ", ", numShips, " , ", shipScene, ")")
 	for i in range(numShips):
 		var shipNode = shipScene.instance()
 		add_child(shipNode)
@@ -76,4 +79,4 @@ func addShips(faction, numShips, shipScene):
 		shipNode.set_position(Vector2(rand_range(-50, 50), rand_range(-50, 50)))
 		
 	
-	
+

@@ -11,11 +11,17 @@ func _ready():
 
 func start(pos, rot, vel, faction):
 	Faction = faction
+	set_color(faction)
 	set_global_rotation(rot)
 	set_global_position(pos)
 	Velocity = vel
 	$pewpew.set_pitch_scale(rand_range(0.9, 1.1))
 	$pewpew.play()
+
+func set_color(faction):
+	var factionColors = [ Color.gray, Color.lightblue, Color.pink ]
+	set_modulate(factionColors[Faction])
+
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

@@ -7,6 +7,7 @@ var scale_factor: float = 70.0
 var base_production: float = 1.0
 var production_factor: float = 1.02
 var max_population : int = 40
+var difficulty_factor : float # 1, 2, 3.5
 
 # Game-Feel, Juice, Bounce and Pop
 var juicy_bounce_factor: float = 1.25
@@ -27,8 +28,14 @@ func _ready():
 func start(faction, size):
 	set_faction(faction)
 	set_planet_size(size)
-	
+	set_difficulty(faction)
 
+func set_difficulty(faction):
+	if faction != global.PlayerFaction:
+		difficulty_factor = 1.0+(float(global.options["difficulty"])/2.0)
+		#print("difficulty_factor = " , difficulty_factor)
+	else:
+		difficulty_factor = 1.0
 	
 func initialize_collision_shape():
 	var shape = CollisionShape2D.new()
@@ -60,8 +67,10 @@ func set_planet_size(size):
 	units_present = int(size * 10)
 	base_production = size / 5.0
 	
-func update_unit_label():	
-	$ProductionLabel.set_text(str(floor(units_present)))
+func update_unit_label():
+	$Production/ProductionLabel.set_text(str(floor(units_present)))
+	if global.camera != null:
+		$Production.set_scale(lerp($Production.get_scale(), global.camera.get_zoom() / 5.0, 0.8))
 	
 func set_random_texture():
 	$Sprite.set_frame(randi()%9)
@@ -72,7 +81,8 @@ func set_faction(faction):
 	$Sprite.set_self_modulate(colors[Faction])
 
 func increase_units():
-	units_present = clamp(base_production + units_present * production_factor, 1, max_population)
+	units_present = clamp( (base_production * difficulty_factor) + (units_present * production_factor), 1, max_population)
+		
 
 func _on_ProductionTimer_timeout():
 	if Faction != 0: # grey planets don't produce

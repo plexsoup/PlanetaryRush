@@ -73,6 +73,7 @@ func get_nearest_faction_planet(faction, pos):
 	return closest
 	
 func get_random_planet(faction):
+	var returnPlanet : StaticBody2D
 	var planets = get_children()
 	
 	if faction != null:
@@ -81,10 +82,19 @@ func get_random_planet(faction):
 			if planet.Faction == faction:
 				factionPlanets.push_back(planet)
 		if factionPlanets.size() > 0:
-			return factionPlanets[randi()%factionPlanets.size()]
+			returnPlanet = factionPlanets[randi()%factionPlanets.size()]
 		else: # someone lost the game
-			connect("faction_lost", global.Main, "_on_faction_lost")
-			emit_signal("faction_lost", faction)
-			disconnect("faction_lost", global.Main, "_on_faction_lost")
+			pass
+#			connect("faction_lost", global.Main, "_on_faction_lost")
+#			emit_signal("faction_lost", faction)
+#			disconnect("faction_lost", global.Main, "_on_faction_lost")
 	else:
-		return planets[randi()%planets.size()]
+		returnPlanet = planets[randi()%planets.size()]
+	
+	if returnPlanet == null: # hack in case they asked for a faction which doesn't exist
+		returnPlanet = planets[randi()%planets.size()]
+	
+	return returnPlanet
+
+
+
