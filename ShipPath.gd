@@ -21,6 +21,10 @@ func _ready():
 func start(planet):
 	MyPlanet = planet
 	Faction = planet.Faction
+	warp_to_planet(planet)
+
+func warp_to_planet(planet):
+	Input.warp_mouse_position(planet.get_global_transform_with_canvas().get_origin())
 
 func end():
 	$DestructionTimer.start()
@@ -73,9 +77,16 @@ func _on_MousePolling_timeout():
 		
 		
 func _draw():
-	for point in self.get_curve().get_baked_points():
-		var factionColors = [ Color.gray, Color(0.6, 0.6, 1.0, 0.25), Color(1.0, 0.6, 0.6, 0.25)]
-		draw_circle(point, 3, factionColors[Faction])
+	var myCurve = self.get_curve()
+	var lineLength = myCurve.get_baked_length()
+	var points = myCurve.get_baked_points()
+	var numPoints = points.size()
+	var i : int = 0
+	for point in points:
+		var pointSize = float(numPoints - i + 1) / float(numPoints) * 15.0
+		var factionColors = [ Color.gray, Color(0.6, 0.6, 1.0, 0.5), Color(1.0, 0.6, 0.6, 0.25)]
+		draw_circle(point, pointSize, factionColors[Faction])
+		i += 1
 
 
 

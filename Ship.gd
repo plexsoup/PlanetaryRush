@@ -20,7 +20,7 @@ var TimeElapsed : float = 0
 
 var VectorToGoal # for debug drawing
 
-enum States { ADVANCING, RETURNING }
+enum States { ADVANCING, RETURNING, DEAD }
 var State = States.ADVANCING
 
 # Called when the node enters the scene tree for the first time.
@@ -37,10 +37,13 @@ func start(faction, navTarget, originPlanet):
 
 func set_color(faction):
 	var factionColors = [ Color.gray, Color.steelblue, Color.firebrick ]
-	set_modulate(factionColors[faction])
-	
+	$Sprite.set_self_modulate(factionColors[faction])
+	$Weapons.set_modulate(factionColors[faction])
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	if State == States.DEAD:
+		return
+		
 	TimeElapsed += delta
 	#set_position($"..".position)
 #	if not Input.is_action_pressed("left_click"):
@@ -126,15 +129,23 @@ func get_peer_avoidance_vector():
 
 func die():
 	call_deferred("disable_collision_shapes")
+	State = States.DEAD
+	
+	var animPlayer = $death/AnimationPlayer
+	animPlayer.play("explode")
+	
+	yield(animPlayer, "animation_finished")
+	#yield(get_tree().create_timer(0.95), "timeout")
 	call_deferred("queue_free")
 
 func disable_collision_shapes():
 	$CollisionShape2D.set_disabled(true)
-	$"Front/CollisionShape2D".set_disabled(true)
+	#$"Front/CollisionShape2D".set_disabled(true)
 	$"FiringArc/CollisionPolygon2D".set_disabled(true)
 
 func _on_FiringArc_area_entered(area):
 	if area.is_in_group("ships") and area.Faction != Faction:
+		
 		$Weapons.CommenceFiring()
 		
 
@@ -152,14 +163,21 @@ func _draw():
 		var myPos = get_global_position()
 		draw_line(to_local(myPos), to_local(VectorToGoal*20 + myPos), Color.azure, 3, true)
 	
+func land(planet):
+	State = States.DEAD
+	planet.add_units(1)
+	call_deferred("disable_collision_shapes")
+	call_deferred("queue_free")
+
 
 func _on_Ship_body_entered(body):
 	if body.is_in_group("planets"):
 		if TimeElapsed > 1.0: # otherwise fires too quickly. need to check if it's our planet of origin
 			if body.Faction == Faction:
-				body.add_units(1)
-				die()
+				land(body)
 			else:
 				body._on_hit(1, Faction)
 				die()
+				# it won't be clear why we're exploding if there's no laser from the planet... maybe we should draw in a laser
+				
 				

@@ -4,7 +4,7 @@ enum States { PAUSED, ACTIVE, LOCKED }
 var State = States.ACTIVE
 
 var cursor_range : float = 3000
-var lerp_toward_mouse_speed : float = 0.15
+var lerp_toward_mouse_speed : float = 0.8
 
 var current_planet : StaticBody2D
 var Faction : int

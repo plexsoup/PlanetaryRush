@@ -135,6 +135,23 @@ func spawn_ai_fleet(numShips, destinationPlanet):
 	fleet.set_global_position(get_global_position())
 	fleet.start_AI_fleet(Faction, numShips, shipScene, originPlanet, destinationPlanet)
 	
+func celebrate():
+	for i in range(randi()%15+5):
+		spawn_firework()
+		yield(get_tree().create_timer(rand_range(0.01, 0.1)), "timeout")
+		
+func spawn_firework():
+	var rot = randf()*2.0*PI
+	var fireworkScene = load("res://effects/Firework.tscn")
+	var newFirework = fireworkScene.instance()
+	$Fireworks.add_child(newFirework)
+	var speed = 200.0
+	var deviation = 50.0
+	var vel = Vector2.RIGHT.rotated(rot) * rand_range(speed-deviation, speed+deviation)
+	var pos = get_global_position()
+	newFirework.start(pos, rot, vel, Faction)
+	
+
 
 func add_units(number):
 	units_present += number

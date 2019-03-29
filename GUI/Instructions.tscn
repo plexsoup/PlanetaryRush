@@ -1,0 +1,245 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://GUI/CyberTheme.tres" type="Theme" id=1]
+[ext_resource path="res://GUI/Instructions.gd" type="Script" id=2]
+[ext_resource path="res://GUI/InstructionsTheme.tres" type="Theme" id=3]
+[ext_resource path="res://Instructions/Galaxy.png" type="Texture" id=4]
+[ext_resource path="res://Instructions/drawLines.png" type="Texture" id=5]
+
+[node name="Instructions" type="Tabs"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_top = 37.0
+margin_right = -2.0
+theme = ExtResource( 1 )
+script = ExtResource( 2 )
+
+[node name="Panel" type="Panel" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Margin" type="MarginContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/margin_right = 30
+custom_constants/margin_top = 30
+custom_constants/margin_left = 30
+custom_constants/margin_bottom = 30
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Margin"]
+margin_left = 30.0
+margin_top = 30.0
+margin_right = 990.0
+margin_bottom = 533.0
+
+[node name="TabContainer" type="TabContainer" parent="Margin/VBoxContainer"]
+margin_right = 960.0
+margin_bottom = 470.0
+size_flags_vertical = 3
+theme = ExtResource( 3 )
+tabs_visible = false
+
+[node name="Goals" type="Tabs" parent="Margin/VBoxContainer/TabContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Margin/VBoxContainer/TabContainer/Goals"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Margin/VBoxContainer/TabContainer/Goals/HBoxContainer"]
+margin_right = 591.0
+margin_bottom = 470.0
+size_flags_horizontal = 3
+custom_constants/separation = 25
+
+[node name="Page1Title" type="Label" parent="Margin/VBoxContainer/TabContainer/Goals/HBoxContainer/VBoxContainer"]
+margin_right = 591.0
+margin_bottom = 25.0
+text = "Goals"
+align = 1
+
+[node name="Page1Text" type="RichTextLabel" parent="Margin/VBoxContainer/TabContainer/Goals/HBoxContainer/VBoxContainer"]
+margin_top = 50.0
+margin_right = 591.0
+margin_bottom = 470.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+bbcode_text = "The enemy is attempting to take over the sector.
+
+Make sure we beat them to it.
+"
+text = "The enemy is attempting to take over the sector.
+
+Make sure we beat them to it.
+"
+
+[node name="TextureRect" type="TextureRect" parent="Margin/VBoxContainer/TabContainer/Goals/HBoxContainer"]
+margin_left = 595.0
+margin_right = 960.0
+margin_bottom = 470.0
+texture = ExtResource( 4 )
+
+[node name="Planets" type="Tabs" parent="Margin/VBoxContainer/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Margin/VBoxContainer/TabContainer/Planets"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Margin/VBoxContainer/TabContainer/Planets/HBoxContainer"]
+margin_right = 591.0
+margin_bottom = 470.0
+size_flags_horizontal = 3
+custom_constants/separation = 25
+
+[node name="Page2Title" type="Label" parent="Margin/VBoxContainer/TabContainer/Planets/HBoxContainer/VBoxContainer"]
+margin_right = 591.0
+margin_bottom = 25.0
+text = "Planets"
+align = 1
+
+[node name="Page2Text" type="RichTextLabel" parent="Margin/VBoxContainer/TabContainer/Planets/HBoxContainer/VBoxContainer"]
+margin_top = 50.0
+margin_right = 591.0
+margin_bottom = 470.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+bbcode_text = "Each planet displays a population number.
+
+Populations will grow over time.
+
+Large Planets produce faster.
+
+Populations max at 40 Billion People"
+text = "Each planet displays a population number.
+
+Populations will grow over time.
+
+Large Planets produce faster.
+
+Populations max at 40 Billion People"
+
+[node name="TextureRect" type="TextureRect" parent="Margin/VBoxContainer/TabContainer/Planets/HBoxContainer"]
+margin_left = 595.0
+margin_right = 960.0
+margin_bottom = 470.0
+texture = ExtResource( 4 )
+
+[node name="Fleets" type="Tabs" parent="Margin/VBoxContainer/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Margin/VBoxContainer/TabContainer/Fleets"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Margin/VBoxContainer/TabContainer/Fleets/HBoxContainer"]
+margin_right = 478.0
+margin_bottom = 470.0
+size_flags_horizontal = 3
+custom_constants/separation = 25
+
+[node name="Page3Label" type="Label" parent="Margin/VBoxContainer/TabContainer/Fleets/HBoxContainer/VBoxContainer"]
+margin_right = 478.0
+margin_bottom = 25.0
+text = "Fleets"
+align = 1
+
+[node name="Page3Text" type="RichTextLabel" parent="Margin/VBoxContainer/TabContainer/Fleets/HBoxContainer/VBoxContainer"]
+margin_top = 50.0
+margin_right = 478.0
+margin_bottom = 470.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+bbcode_text = "Use the mouse to draw attack lines, starting from planets you occupy.
+
+Those planets will produce a fleet of ships, which will follow the path you've laid out.
+
+Fleets will always consume half the population of the planet.
+"
+text = "Use the mouse to draw attack lines, starting from planets you occupy.
+
+Those planets will produce a fleet of ships, which will follow the path you've laid out.
+
+Fleets will always consume half the population of the planet.
+"
+
+[node name="TextureRect" type="TextureRect" parent="Margin/VBoxContainer/TabContainer/Fleets/HBoxContainer"]
+margin_left = 482.0
+margin_right = 960.0
+margin_bottom = 470.0
+rect_min_size = Vector2( 0, 200 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = ExtResource( 5 )
+expand = true
+
+[node name="Tactics" type="Tabs" parent="Margin/VBoxContainer/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Margin/VBoxContainer/TabContainer/Tactics"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/separation = 25
+
+[node name="Page4Label" type="Label" parent="Margin/VBoxContainer/TabContainer/Tactics/VBoxContainer"]
+margin_right = 960.0
+margin_bottom = 25.0
+text = "Advanced Tactics"
+align = 1
+
+[node name="Page4Text" type="RichTextLabel" parent="Margin/VBoxContainer/TabContainer/Tactics/VBoxContainer"]
+margin_top = 50.0
+margin_right = 960.0
+margin_bottom = 470.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+bbcode_text = "Use the mouse to draw a line between your planets and other planets.
+The planet will produce a fleet of ships, consisting of half their population.
+The fleet will do their best to follow the path you've laid out.
+"
+text = "Use the mouse to draw a line between your planets and other planets.
+The planet will produce a fleet of ships, consisting of half their population.
+The fleet will do their best to follow the path you've laid out.
+"
+
+[node name="Navigation" type="GridContainer" parent="Margin/VBoxContainer"]
+margin_left = 383.0
+margin_top = 474.0
+margin_right = 576.0
+margin_bottom = 503.0
+size_flags_horizontal = 4
+custom_constants/hseparation = 20
+columns = 3
+
+[node name="BackButton" type="Button" parent="Margin/VBoxContainer/Navigation"]
+margin_right = 44.0
+margin_bottom = 29.0
+text = "<<"
+
+[node name="PageCount" type="Label" parent="Margin/VBoxContainer/Navigation"]
+margin_left = 64.0
+margin_top = 2.0
+margin_right = 129.0
+margin_bottom = 27.0
+text = "1 of 4"
+
+[node name="ForwardButton" type="Button" parent="Margin/VBoxContainer/Navigation"]
+margin_left = 149.0
+margin_right = 193.0
+margin_bottom = 29.0
+text = ">>"
+
+[connection signal="pressed" from="Margin/VBoxContainer/Navigation/BackButton" to="." method="_on_BackButton_pressed"]
+[connection signal="pressed" from="Margin/VBoxContainer/Navigation/ForwardButton" to="." method="_on_ForwardButton_pressed"]

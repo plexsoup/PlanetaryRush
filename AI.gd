@@ -12,6 +12,7 @@ extends Node
 
 var Faction : int
 var Difficulty : float
+var win : bool = false
 
 signal ships_requested(destinationPlanet)
 signal faction_lost(faction)
@@ -79,13 +80,16 @@ func planets_remaining():
 	
 	
 func _on_DecisionTimer_timeout():
-	if planets_remaining() > 0:
+	if planets_remaining() > 0 and win == false:
 		spawn_fleet(plot_new_course())
 		$DecisionTimer.set_wait_time(rand_range(0.8, 5.0/(Difficulty)))
 		$DecisionTimer.start()
 	else:
 		#print(self.name, " triggered _on_DecideionTimer_timeout" )
-		connect("faction_lost", global.Main, "_on_faction_lost")
+		connect("faction_lost", global.level, "_on_faction_lost")
 		emit_signal("faction_lost", Faction)
-		disconnect("faction_lost", global.Main, "_on_faction_lost")
+		disconnect("faction_lost", global.level, "_on_faction_lost")
 		
+func _on_player_lost():
+	win = true
+	

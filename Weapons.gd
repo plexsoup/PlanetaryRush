@@ -37,7 +37,7 @@ func CommenceFiring():
 	
 
 func _on_ReloadTimer_timeout():
-	if TimesFired < NumShotsInBurst:
+	if TimesFired < NumShotsInBurst and MyShip.State != MyShip.States.DEAD:
 		fire()
 		$ReloadTimer.start()
 
