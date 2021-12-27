@@ -94,21 +94,25 @@ func _draw():
 		var pointRatio: float = float(i)/float(numPoints)
 		var remainingRatio: float = 1.0 - pointRatio
 		var targetRatio = pathFollowNode.get_unit_offset()
-		
+		var aheadOfFleet: bool = pointRatio > targetRatio
 		
 		var pointSizeScaleFactor = 30.0
 		var pointSize = remainingRatio * pointSizeScaleFactor
 		#var pointSize = float(numPoints - i + 1) / float(numPoints) * pointSizeScaleFactor
-		var factionColors = [ Color.gray, Color(0.6, 0.6, 1.0, 0.5), Color(1.0, 0.6, 0.6, 0.25)]
 		
-		if pointRatio > targetRatio:
-			draw_circle(point, pointSize, factionColors[Faction])
+		var alpha : float = 0.0
+		if aheadOfFleet:
+			alpha = 0.25
+		else:
+			alpha = 0.025
+		
+		var factionColors = [ Color.gray, Color(0.6, 0.6, 1.0, alpha), Color(1.0, 0.6, 0.6, alpha)]
+		
+		#if pointRatio > targetRatio:
+		draw_circle(point, pointSize, factionColors[Faction])
 
 		
 		i+= 1
 		
-#		if FrameTicks % 25 == 0:
-#			print(self.name + ": pointRatio == " + str(pointRatio))
-#			print(self.name + ": targetRatio == " + str(targetRatio))
 
 

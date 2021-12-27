@@ -22,6 +22,14 @@ func shoot():
 	State = States.MOVING
 
 func explode():
+	var explosionSprite = get_node("Explosion")
+	var randScale = rand_range(1.0, 10.0)
+	explosionSprite.scale.x = randScale
+	explosionSprite.scale.y = randScale
+	var randColors = PoolColorArray([Color.coral, Color.darkorange, Color.gold, Color.red, Color.azure, Color.deeppink])
+	var randColor = randColors[randi()%randColors.size()]
+	explosionSprite.set_self_modulate(randColor)
+	
 	State = States.EXPLODING
 	$AnimationPlayer.play("explode")
 	yield($AnimationPlayer, "animation_finished")
