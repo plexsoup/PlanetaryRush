@@ -6,6 +6,7 @@ var NavTarget
 var Speed : float = 160.0 # try to keep the navTarget just a bit faster than the ships
 var Faction : int
 var OriginPlanet
+var Name : String
 
 enum States { DEPLOYING, MOVING, WAITING, FINISHED }
 var State = States.DEPLOYING
@@ -13,6 +14,7 @@ var State = States.DEPLOYING
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	State = States.DEPLOYING
+	Name = self.name
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -51,11 +53,12 @@ func move_fleet_NavTarget(delta):
 	
 
 func release_fleet():
+	#let the ships return to the nearest planet, at their own discretion
 	
 	# spawn a position2D node at the planet
 	# tell each ship (child) to follow that
 	#FleetPath.set_offset(0)
-	for ship in get_children():
+	for ship in $ShipsContainer.get_children():
 		ship.NavTarget = get_closest_friendly_planet(ship.get_global_position())
 		ship.State = ship.States.RETURNING
 	remove_path()
@@ -76,7 +79,7 @@ func addShips(faction, numShips, shipScene):
 	#print(self.name, " addShips(", faction, ", ", numShips, " , ", shipScene, ")")
 	for i in range(numShips):
 		var shipNode = shipScene.instance()
-		add_child(shipNode)
+		$ShipsContainer.add_child(shipNode)
 		shipNode.start(faction, NavTarget, OriginPlanet)
 		# stick to local coords for this
 		shipNode.set_position(Vector2(rand_range(-50, 50), rand_range(-50, 50)))

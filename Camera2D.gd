@@ -33,6 +33,22 @@ func _process(delta):
 	
 	zoom = lerp(zoom, DesiredZoom, 0.2 * delta * 60)
 	#print("zoom: ", str(zoom))
+	
+	check_for_keyboard_movement(delta)
+	
+func check_for_keyboard_movement(delta):
+	var scrollSpeed = 500.0 * delta
+	if Input.is_action_pressed("ui_up"):
+		offset.y -= scrollSpeed
+	if Input.is_action_pressed("ui_left"):
+		offset.x -= scrollSpeed
+	if Input.is_action_pressed("ui_right"):
+		offset.x += scrollSpeed
+	if Input.is_action_pressed("ui_down"):
+		offset.y += scrollSpeed
+	
+	
+	
 
 func _draw():
 	#draw_string(global.BaseFont, Vector2(0, 20), "zoom: " + str(zoom), Color.antiquewhite )
@@ -43,13 +59,18 @@ func _input(event):
 		DesiredZoom = zoom * 0.8
 		var direction = -1
 		#move_toward_mouse(direction)
-		set_camera_drag_margins()
+		
+		#set_camera_drag_margins()
 		
 	if event is InputEventMouseButton and event.is_action("zoom_out"):
 		DesiredZoom = zoom * 1.25
 		var direction = 1
 		#move_toward_mouse(direction)
-		set_camera_drag_margins()
+		
+		#set_camera_drag_margins()
+		
+	if event is InputEventKey and event.is_action("ui_up"):
+		pass # we'll do this in _process instead. if is_action_pressed
 
 	DesiredZoom.x = clamp(DesiredZoom.x, MinZoom, MaxZoom)
 	DesiredZoom.y = clamp(DesiredZoom.y, MinZoom, MaxZoom)

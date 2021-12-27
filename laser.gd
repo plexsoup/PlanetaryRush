@@ -46,9 +46,10 @@ func _on_laser_area_entered(area):
 func _on_laser_body_entered(body):
 	# hit a planet. kill some population
 	if body.is_in_group("planets") and body.Faction != Faction:
-		if body.has_method("_on_hit"):
-			if not is_connected("hit", body, "_on_hit"):
-				connect("hit", body, "_on_hit")
+		var enemyPlanet = body
+		if enemyPlanet.has_method("_on_hit"):
+			if not is_connected("hit", enemyPlanet, "_on_hit"):
+				connect("hit", enemyPlanet, "_on_hit")
 			emit_signal("hit", Damage, Faction)
 			die()
 

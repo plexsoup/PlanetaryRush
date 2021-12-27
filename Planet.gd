@@ -29,6 +29,7 @@ func start(faction, size):
 	set_faction(faction)
 	set_planet_size(size)
 	set_difficulty(faction)
+	$PlanetNameLabel.text = self.name
 
 func set_difficulty(faction):
 	if faction != global.PlayerFaction:
@@ -158,7 +159,9 @@ func spawn_firework():
 	var pos = get_global_position()
 	newFirework.start(pos, rot, vel, Faction)
 	
-
+func spawn_explosion():
+	pass
+	
 
 func add_units(number):
 	units_present += number
@@ -171,7 +174,7 @@ func _on_ShipPath_finished_drawing(path):
 func _on_AI_requested_ships(destinationPlanet):
 	send_ai_ships(units_present/2, destinationPlanet)
 	
-func _on_hit(damage, faction):
+func _on_hit(damage, faction, location = get_global_position()):
 	units_present -= damage
 	if units_present <= 0:
 		# switch sides

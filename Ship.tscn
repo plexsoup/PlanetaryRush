@@ -103,6 +103,9 @@ BulletScene = ExtResource( 2 )
 wait_time = 0.33
 one_shot = true
 
+[node name="SwapMagazineTimer" type="Timer" parent="Weapons"]
+one_shot = true
+
 [node name="Muzzles" type="Node2D" parent="Weapons"]
 
 [node name="Muzzle1" type="Position2D" parent="Weapons/Muzzles"]
@@ -126,7 +129,20 @@ volume_db = -22.0
 [node name="AnimationPlayer" type="AnimationPlayer" parent="death"]
 anims/explode = SubResource( 2 )
 
+[node name="StatusLabel" type="Label" parent="."]
+margin_left = -96.9697
+margin_top = -127.273
+margin_right = -17.9697
+margin_bottom = -112.273
+rect_scale = Vector2( 2.51108, 3.57773 )
+text = "Status Label"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [connection signal="body_entered" from="." to="." method="_on_Ship_body_entered"]
 [connection signal="area_entered" from="FiringArc" to="." method="_on_FiringArc_area_entered"]
 [connection signal="body_entered" from="FiringArc" to="." method="_on_FiringArc_body_entered"]
 [connection signal="timeout" from="Weapons/ReloadTimer" to="Weapons" method="_on_ReloadTimer_timeout"]
+[connection signal="timeout" from="Weapons/SwapMagazineTimer" to="." method="_on_SwapMagazineTimer_timeout"]
+[connection signal="timeout" from="Weapons/SwapMagazineTimer" to="Weapons" method="_on_SwapMagazineTimer_timeout"]

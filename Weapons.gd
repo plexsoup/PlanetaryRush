@@ -6,11 +6,16 @@ export var BulletSpeed : float = 500
 
 var TimesFired : int = 0
 var MyShip : Area2D
-var NumShotsInBurst : int = 6
+var NumShotsInBurst : int = 3
+var MagazineSize = NumShotsInBurst
+
+enum Status {READY, FIRING, RELOADING}
+var WeaponStatus = Status.READY
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	MyShip = get_parent()
+	
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -34,11 +39,24 @@ func fire():
 func CommenceFiring():
 	TimesFired = 0
 	$ReloadTimer.start()
+	WeaponStatus = Status.FIRING
 	
 
 func _on_ReloadTimer_timeout():
-	if TimesFired < NumShotsInBurst and MyShip.State != MyShip.States.DEAD:
-		fire()
-		$ReloadTimer.start()
+	if MyShip.State != MyShip.States.DEAD:
+		if TimesFired <= MagazineSize:
+			fire()
+			get_node("ReloadTimer").start()
+		elif TimesFired > MagazineSize:
+			WeaponStatus = Status.RELOADING
+			
+			get_node("SwapMagazineTimer").start()
+			
 
+	
+
+# the SwapMagazineTimer sends a signal to the Weapons and to the Ship itself.
+func _on_SwapMagazineTimer_timeout():
+	WeaponStatus = Status.READY
+	
 	

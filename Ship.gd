@@ -10,17 +10,21 @@ extends Area2D
 
 var VelocityVectors:Array = []
 var Speed : float = 150.0
-var TurnSpeed : float = 5.0
+var TurnSpeed : float = 2.5
 var Faction : int
+var IsHumanPlayer: bool = false
+var MyFleet: Node2D
 export var BulletScene : PackedScene
 var Health = 1
 var NavTarget # could be Position2D (FleetTarget) or StaticBody2D (planet)
 var OriginPlanet : StaticBody2D
 var TimeElapsed : float = 0
+var Ticks: int = 0
+onready var FiringArcCollisionShape = $FiringArc/CollisionPolygon2D
 
 var VectorToGoal # for debug drawing
 
-enum States { ADVANCING, RETURNING, DEAD }
+enum States { ADVANCING, RETURNING, BOMBARDING, DEAD }
 var State = States.ADVANCING
 
 # Called when the node enters the scene tree for the first time.
@@ -30,9 +34,12 @@ func _ready():
 # Called by fleet
 func start(faction, navTarget, originPlanet):
 	Faction = faction
+	if Faction == global.PlayerFaction:
+		IsHumanPlayer = true
 	set_color(Faction)
 	OriginPlanet = originPlanet
 	$Sprite.set_frame(faction)
+	MyFleet = get_parent().get_parent() # each fleet has a ShipsContainer node
 	NavTarget = navTarget
 
 func set_color(faction):
@@ -46,12 +53,16 @@ func _process(delta):
 		return
 		
 	TimeElapsed += delta
+	Ticks += 1
+	
 	#set_position($"..".position)
 #	if not Input.is_action_pressed("left_click"):
 #		set_global_position($"../PathFollow2D".get_global_position())
 	collectVelocityVectors()
 	move(delta)
-	update()
+	$StatusLabel.text = NavTarget.name
+
+	update() # refreshes _draw()
 	
 	if State == States.RETURNING:
 		# hack to prevent hovering around planets you never left
@@ -74,22 +85,29 @@ func move(delta):
 	VectorToGoal = vectorToGoal
 	
 	var myPos = get_global_position()
-	#set_global_position(myPos + Vector2.RIGHT.rotated(rotation) * delta * Speed)
-	set_global_position(myPos + vectorToGoal * delta * Speed * global.game_speed)
+
 	turnTowardsTarget(vectorToGoal, delta)
+
+	var fwd = Vector2.RIGHT.rotated(rotation)
+	set_global_position(myPos + fwd * delta * Speed * global.game_speed)
+	
+	#set_global_position(myPos + vectorToGoal * delta * Speed * global.game_speed)
 	
 	
 	
 func turnTowardsTarget(vectorToGoal, delta):
 	var myRot = get_global_rotation()
-	var rotToGoal = Vector2.RIGHT.angle_to(vectorToGoal)
-	set_global_rotation(lerp(myRot, rotToGoal, TurnSpeed * delta * global.game_speed))
+	var myFwdVector = Vector2.RIGHT.rotated(myRot)
+	var angleToGoal = myFwdVector.angle_to(vectorToGoal)
 	
-
+	self.rotate(angleToGoal * TurnSpeed * delta * global.game_speed)
+	# note, this will rotate more and more slowly as it gets closer to the target rotation.
+	
+			  
 func collectVelocityVectors():
 	VelocityVectors = []
 	VelocityVectors.push_back(get_peer_avoidance_vector())
-	VelocityVectors.push_back(get_fleet_path_vector())
+	VelocityVectors.push_back(get_fleet_path_vector()*2.0)
 	# later, add:
 		# threat_pursuit_vector
 		# planet_attack_vector
@@ -139,20 +157,35 @@ func die():
 	#yield(get_tree().create_timer(0.95), "timeout")
 	call_deferred("queue_free")
 
-func disable_collision_shapes():
-	$CollisionShape2D.set_disabled(true)
-	#$"Front/CollisionShape2D".set_disabled(true)
-	$"FiringArc/CollisionPolygon2D".set_disabled(true)
+func disable_collision_shapes(): # for death
+	$CollisionShape2D.call_deferred("set_disabled", true)
+	FiringArcCollisionShape.call_deferred("set_disabled", true)
+
+func disable_firingArc():
+	FiringArcCollisionShape.call_deferred("set_disabled", true)
+	
+func enable_firingArc():
+	FiringArcCollisionShape.call_deferred("set_disabled", false)
 
 func _on_FiringArc_area_entered(area):
 	if area.is_in_group("ships") and area.Faction != Faction:
 		
-		$Weapons.CommenceFiring()
+		if $Weapons.WeaponStatus == $Weapons.Status.READY:
+			$Weapons.CommenceFiring()
+			disable_firingArc()
+		# TODO: what happens if the weapons aren't ready? should it circle for another pass?
 		
 
 func _on_FiringArc_body_entered(body):
 	if body.is_in_group("planets") and body.Faction != Faction:
-		$Weapons.CommenceFiring()
+		# the ship reached it's target planet. Break off from the path and start bombardment
+		
+		if $Weapons.WeaponStatus == $Weapons.Status.READY:
+			$Weapons.CommenceFiring()
+			
+			disable_collision_shapes()
+		# TODO: what happens if the weapons aren't ready? should it circle for another pass?
+		
 		
 func _on_hit(damage, faction):
 	Health -= damage
@@ -162,23 +195,39 @@ func _on_hit(damage, faction):
 func _draw():
 	if global.Debug:
 		var myPos = get_global_position()
+		# azure = direction to target
 		draw_line(to_local(myPos), to_local(VectorToGoal*20 + myPos), Color.azure, 3, true)
+		# green = direction of Vector2.RIGHT
+		draw_line(to_local(myPos), to_local(Vector2.RIGHT * 20 + myPos), Color.green, 3, true)
+		# red = direction of self.rotation
+		draw_line(to_local(myPos), to_local(Vector2.RIGHT.rotated(self.rotation) * 20 + myPos), Color.red, 3, true)
 	
 func land(planet):
-	State = States.DEAD
-	planet.add_units(1)
-	call_deferred("disable_collision_shapes")
-	call_deferred("queue_free")
+	if planet.Faction == Faction:
+		State = States.DEAD
+		planet.add_units(1)
+		call_deferred("disable_collision_shapes")
+		call_deferred("queue_free")
+	else:
+		print("Something's wrong, ship is trying to land on an enemy planet")
 
 
 func _on_Ship_body_entered(body):
 	if body.is_in_group("planets"):
+		var planet = body
 		if TimeElapsed > 1.0: # otherwise fires too quickly. need to check if it's our planet of origin
-			if body.Faction == Faction:
-				land(body)
+			if planet.Faction == Faction:
+				land(planet)
 			else:
-				body._on_hit(1, Faction)
+				# you landed on the enemy planet. remove 1 from their population tit for tat
+				planet._on_hit(1, Faction, self.get_global_position())
 				die()
-				# it won't be clear why we're exploding if there's no laser from the planet... maybe we should draw in a laser
+				# might want to add a small animation? maybe too small to notice though
 				
 				
+
+
+func _on_SwapMagazineTimer_timeout(): #Weapons say they're ready again
+	enable_firingArc()
+	
+	

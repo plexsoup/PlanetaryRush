@@ -57,4 +57,16 @@ anims/victory = SubResource( 2 )
 
 [node name="Sprite" type="Sprite" parent="Fireworks"]
 
+[node name="PlanetNameLabel" type="Label" parent="."]
+margin_left = -64.0
+margin_top = -115.0
+margin_right = -24.0
+margin_bottom = -101.0
+rect_scale = Vector2( 3.19936, 2.49317 )
+text = "Planet"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [connection signal="timeout" from="ProductionTimer" to="." method="_on_ProductionTimer_timeout"]
