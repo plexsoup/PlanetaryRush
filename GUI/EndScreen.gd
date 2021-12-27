@@ -66,9 +66,11 @@ func show_lose_info():
 
 func _on_Restart_pressed():
 	emit_signal("Restart_pressed")
-
+	$ClickNoise.play()
 
 func _on_Quit_pressed():
+	$ClickNoise.play()
+	yield(get_tree().create_timer(0.2), "timeout")
 	emit_signal("Quit_pressed")
 
 

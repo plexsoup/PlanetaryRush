@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://GUI/CyberTheme.tres" type="Theme" id=1]
 [ext_resource path="res://PauseMenu.gd" type="Script" id=2]
@@ -9,6 +9,8 @@
 [ext_resource path="res://audacityIcon.png" type="Texture" id=7]
 [ext_resource path="res://inkscapeIcon.png" type="Texture" id=8]
 [ext_resource path="res://BlenderIcon.png" type="Texture" id=9]
+[ext_resource path="res://effects/UISlide.wav" type="AudioStream" id=10]
+[ext_resource path="res://effects/clickNoise.wav" type="AudioStream" id=11]
 
 [node name="PauseMenu" type="Control"]
 pause_mode = 2
@@ -360,6 +362,15 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color( 0.501961, 0.501961, 0.501961, 0.501961 )
 
+[node name="SlideNoise" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 10 )
+volume_db = -29.823
+
+[node name="ClickNoise" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 11 )
+volume_db = -29.823
+
+[connection signal="tab_changed" from="MarginContainer/TabContainer" to="." method="_on_TabContainer_tab_changed"]
 [connection signal="pressed" from="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/HSplitContainer/MarginContainer/LeftSide/RestartButton" to="." method="_on_RestartButton_pressed"]
 [connection signal="pressed" from="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/HSplitContainer/MarginContainer2/QuitButton" to="." method="_on_QuitButton_pressed"]
 [connection signal="meta_clicked" from="MarginContainer/TabContainer/Licenses/MarginContainer/VBoxContainer/Authoring" to="." method="_on_RichText_meta_clicked"]

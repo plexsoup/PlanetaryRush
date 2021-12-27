@@ -39,6 +39,9 @@ func start_AI_fleet(faction, numShips, shipScene, originPlanet, destinationPlane
 func move_fleet_NavTarget(delta):
 	if FleetPath != null and is_instance_valid(FleetPath):
 		FleetPath.set_offset(FleetPath.get_offset() + delta * Speed * global.game_speed)
+		# tell the path how far we've gotten, so the path can remove the line behind us
+		
+		
 		if FleetPath.get_unit_offset() > 0.99:
 			# move the fleet somewhere else so I can queue_free
 			# send the ships home

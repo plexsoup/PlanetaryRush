@@ -17,8 +17,8 @@ script = ExtResource( 1 )
 
 [node name="Sprite" type="Sprite" parent="."]
 texture = ExtResource( 2 )
-vframes = 3
 hframes = 3
+vframes = 3
 
 [node name="ProductionTimer" type="Timer" parent="."]
 wait_time = 0.5
@@ -42,11 +42,11 @@ margin_left = -78.5263
 margin_top = -74.1126
 margin_right = 80.4737
 margin_bottom = 79.8874
-custom_fonts/font = SubResource( 1 )
 custom_colors/font_color = Color( 0.890196, 0.890196, 0.890196, 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_offset_x = 2
 custom_constants/shadow_offset_y = 2
+custom_fonts/font = SubResource( 1 )
 text = "12"
 align = 1
 

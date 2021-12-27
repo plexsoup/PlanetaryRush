@@ -9,7 +9,7 @@ var options : Dictionary = {
 enum Difficulties { EASY, NORMAL, HARD }
 
 var Debug : bool = false
-var game_speed: float = 0.5
+var game_speed: float = 1.0
 var screen_size : Vector2
 var cursor : Area2D
 var Main : Node2D

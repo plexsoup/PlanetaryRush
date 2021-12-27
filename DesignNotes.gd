@@ -3,6 +3,8 @@
 Bugs
 
 
+
+
 - AI is paralyzed when there's no gray planets left
 
 
@@ -13,7 +15,10 @@ Features to add
 
 
 
-Game Feel Enhancements
+Game Feel Enhancements to change
+- remove drawn line behind ships travelling toward objectives
+
+
 
 
 

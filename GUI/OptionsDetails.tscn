@@ -1,15 +1,21 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://GUI/CyberTheme.tres" type="Theme" id=1]
-[ext_resource path="res://GUI/BluePanel.tres" type="StyleBox" id=2]
-[ext_resource path="res://GUI/FullscreenCheckbox.gd" type="Script" id=3]
-[ext_resource path="res://GUI/ResolutionList.gd" type="Script" id=4]
-[ext_resource path="res://GUI/DifficultyButton.gd" type="Script" id=5]
-[ext_resource path="res://GUI/SpeedSlider.gd" type="Script" id=6]
-[ext_resource path="res://GUI/VolSlider.gd" type="Script" id=7]
-[ext_resource path="res://IconFactionBlue2.png" type="Texture" id=8]
-[ext_resource path="res://IconFactionRed2.png" type="Texture" id=9]
-[ext_resource path="res://GUI/FactionSelect.gd" type="Script" id=10]
+[ext_resource path="res://GUI/OptionsDetails.gd" type="Script" id=2]
+[ext_resource path="res://GUI/BluePanel.tres" type="StyleBox" id=3]
+[ext_resource path="res://GUI/FullscreenCheckbox.gd" type="Script" id=4]
+[ext_resource path="res://GUI/ResolutionList.gd" type="Script" id=5]
+[ext_resource path="res://GUI/DifficultyButton.gd" type="Script" id=6]
+[ext_resource path="res://GUI/GameSpeedLabel.gd" type="Script" id=7]
+[ext_resource path="res://GUI/SpeedSlider.gd" type="Script" id=8]
+[ext_resource path="res://effects/tone.ogg" type="AudioStream" id=9]
+[ext_resource path="res://GUI/VolSlider.gd" type="Script" id=10]
+[ext_resource path="res://effects/pew.wav" type="AudioStream" id=11]
+[ext_resource path="res://IconFactionBlue2.png" type="Texture" id=12]
+[ext_resource path="res://IconFactionRed2.png" type="Texture" id=13]
+[ext_resource path="res://GUI/FactionSelect.gd" type="Script" id=14]
+[ext_resource path="res://effects/clickNoise.wav" type="AudioStream" id=15]
+[ext_resource path="res://effects/UISlide.wav" type="AudioStream" id=16]
 
 [node name="OptionsDetails" type="MarginContainer"]
 pause_mode = 2
@@ -20,6 +26,7 @@ margin_top = 10.0
 margin_right = -10.0
 margin_bottom = -10.0
 theme = ExtResource( 1 )
+script = ExtResource( 2 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 margin_right = 1004.0
@@ -45,12 +52,11 @@ size_flags_vertical = 11
 [node name="DisplayLabel" type="Label" parent="VBoxContainer/HSplitContainer/LSide/Options"]
 margin_right = 496.0
 margin_bottom = 25.0
-custom_styles/normal = ExtResource( 2 )
+custom_styles/normal = ExtResource( 3 )
 text = "Game"
 align = 1
 
 [node name="Fullscreen" type="HSplitContainer" parent="VBoxContainer/HSplitContainer/LSide/Options"]
-editor/display_folded = true
 margin_top = 29.0
 margin_right = 496.0
 margin_bottom = 58.0
@@ -71,10 +77,9 @@ margin_bottom = 29.0
 size_flags_horizontal = 3
 text = "Fullscreen"
 align = 1
-script = ExtResource( 3 )
+script = ExtResource( 4 )
 
 [node name="CaptureMouse" type="HSplitContainer" parent="VBoxContainer/HSplitContainer/LSide/Options"]
-editor/display_folded = true
 margin_top = 62.0
 margin_right = 496.0
 margin_bottom = 91.0
@@ -95,7 +100,7 @@ margin_bottom = 29.0
 size_flags_horizontal = 3
 text = "Confined"
 align = 1
-script = ExtResource( 3 )
+script = ExtResource( 4 )
 
 [node name="Resolution" type="HSplitContainer" parent="VBoxContainer/HSplitContainer/LSide/Options"]
 editor/display_folded = true
@@ -118,10 +123,9 @@ margin_right = 496.0
 margin_bottom = 33.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-script = ExtResource( 4 )
+script = ExtResource( 5 )
 
 [node name="Difficulty" type="HSplitContainer" parent="VBoxContainer/HSplitContainer/LSide/Options"]
-editor/display_folded = true
 margin_top = 95.0
 margin_right = 496.0
 margin_bottom = 124.0
@@ -141,32 +145,38 @@ margin_right = 496.0
 margin_bottom = 29.0
 size_flags_horizontal = 3
 text = "Difficulty"
-script = ExtResource( 5 )
+script = ExtResource( 6 )
 
 [node name="GameSpeed" type="HSplitContainer" parent="VBoxContainer/HSplitContainer/LSide/Options"]
-editor/display_folded = true
 margin_top = 128.0
 margin_right = 496.0
 margin_bottom = 153.0
 dragger_visibility = 1
 
-[node name="Label" type="Label" parent="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed"]
+[node name="GameSpeedLabel" type="Label" parent="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed"]
 margin_right = 242.0
 margin_bottom = 25.0
 size_flags_horizontal = 3
 text = "Game Speed"
 align = 2
+script = ExtResource( 7 )
 
 [node name="SpeedSlider" type="HSlider" parent="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed"]
 margin_left = 254.0
 margin_right = 496.0
 margin_bottom = 16.0
 size_flags_horizontal = 3
+min_value = 0.5
 max_value = 2.0
 step = 0.1
 value = 1.0
 ticks_on_borders = true
-script = ExtResource( 6 )
+script = ExtResource( 8 )
+
+[node name="ToneNoise" type="AudioStreamPlayer" parent="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider"]
+stream = ExtResource( 9 )
+volume_db = -10.0
+bus = "SFX"
 
 [node name="RSide" type="VBoxContainer" parent="VBoxContainer/HSplitContainer"]
 margin_left = 508.0
@@ -183,7 +193,7 @@ size_flags_vertical = 3
 [node name="AudioLabel" type="Label" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer"]
 margin_right = 496.0
 margin_bottom = 25.0
-custom_styles/normal = ExtResource( 2 )
+custom_styles/normal = ExtResource( 3 )
 text = "Audio"
 align = 1
 
@@ -209,7 +219,7 @@ size_flags_horizontal = 3
 min_value = -24.0
 max_value = 24.0
 ticks_on_borders = true
-script = ExtResource( 7 )
+script = ExtResource( 10 )
 
 [node name="Music" type="HSplitContainer" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer"]
 editor/display_folded = true
@@ -233,11 +243,10 @@ size_flags_horizontal = 3
 min_value = -24.0
 max_value = 24.0
 ticks_on_borders = true
-script = ExtResource( 7 )
+script = ExtResource( 10 )
 bus = 1
 
 [node name="FX" type="HSplitContainer" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer"]
-editor/display_folded = true
 margin_top = 87.0
 margin_right = 496.0
 margin_bottom = 112.0
@@ -258,8 +267,16 @@ size_flags_horizontal = 3
 min_value = -24.0
 max_value = 24.0
 ticks_on_borders = true
-script = ExtResource( 7 )
+script = ExtResource( 10 )
 bus = 2
+
+[node name="pewpewNoise" type="AudioStreamPlayer" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider"]
+stream = ExtResource( 11 )
+volume_db = -10.68
+bus = "SFX"
+
+[node name="Timer" type="Timer" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider"]
+wait_time = 0.15
 
 [node name="CenterContainer" type="CenterContainer" parent="VBoxContainer"]
 margin_top = 157.0
@@ -291,18 +308,49 @@ grow_vertical = 2
 rect_min_size = Vector2( 200, 0 )
 size_flags_horizontal = 3
 size_flags_vertical = 0
-items = [ "", ExtResource( 8 ), false, "", ExtResource( 9 ), false ]
+items = [ "", ExtResource( 12 ), false, "", ExtResource( 13 ), false ]
 allow_reselect = true
 auto_height = true
 max_columns = 2
 same_column_width = true
 fixed_column_width = 72
 icon_mode = 0
-script = ExtResource( 10 )
+script = ExtResource( 14 )
 
+[node name="ClickNoise" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 15 )
+volume_db = -31.515
+bus = "SFX"
+
+[node name="SlideNoise" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 16 )
+volume_db = -24.582
+bus = "SFX"
+
+[node name="ToneNoise" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 9 )
+bus = "SFX"
+
+[connection signal="toggled" from="VBoxContainer/HSplitContainer/LSide/Options/Fullscreen/FullscreenCheckbox" to="." method="_on_UI_element_clicked"]
 [connection signal="toggled" from="VBoxContainer/HSplitContainer/LSide/Options/Fullscreen/FullscreenCheckbox" to="VBoxContainer/HSplitContainer/LSide/Options/Fullscreen/FullscreenCheckbox" method="_on_FullscreenCheckbox_toggled"]
+[connection signal="visibility_changed" from="VBoxContainer/HSplitContainer/LSide/Options/Fullscreen/FullscreenCheckbox" to="VBoxContainer/HSplitContainer/LSide/Options/Fullscreen/FullscreenCheckbox" method="_on_FullscreenCheckbox_visibility_changed"]
+[connection signal="toggled" from="VBoxContainer/HSplitContainer/LSide/Options/CaptureMouse/MouseConfineCheckbox" to="." method="_on_UI_element_clicked"]
 [connection signal="toggled" from="VBoxContainer/HSplitContainer/LSide/Options/CaptureMouse/MouseConfineCheckbox" to="VBoxContainer/HSplitContainer/LSide/Options/CaptureMouse/MouseConfineCheckbox" method="_on_MouseConfineCheckbox_toggled"]
+[connection signal="visibility_changed" from="VBoxContainer/HSplitContainer/LSide/Options/CaptureMouse/MouseConfineCheckbox" to="VBoxContainer/HSplitContainer/LSide/Options/CaptureMouse/MouseConfineCheckbox" method="_on_MouseConfineCheckbox_visibility_changed"]
 [connection signal="item_selected" from="VBoxContainer/HSplitContainer/LSide/Options/Resolution/ResolutionList" to="VBoxContainer/HSplitContainer/LSide/Options/Resolution/ResolutionList" method="_on_ResolutionList_item_selected"]
+[connection signal="item_selected" from="VBoxContainer/HSplitContainer/LSide/Options/Difficulty/DifficultyButton" to="." method="_on_UI_element_clicked"]
 [connection signal="item_selected" from="VBoxContainer/HSplitContainer/LSide/Options/Difficulty/DifficultyButton" to="VBoxContainer/HSplitContainer/LSide/Options/Difficulty/DifficultyButton" method="_on_DifficultyButton_item_selected"]
+[connection signal="pressed" from="VBoxContainer/HSplitContainer/LSide/Options/Difficulty/DifficultyButton" to="." method="_on_UI_slide_element_selected"]
+[connection signal="visibility_changed" from="VBoxContainer/HSplitContainer/LSide/Options/Difficulty/DifficultyButton" to="VBoxContainer/HSplitContainer/LSide/Options/Difficulty/DifficultyButton" method="_on_DifficultyButton_visibility_changed"]
+[connection signal="mouse_entered" from="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" to="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" method="_on_SpeedSlider_mouse_entered"]
+[connection signal="mouse_exited" from="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" to="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" method="_on_SpeedSlider_mouse_exited"]
 [connection signal="value_changed" from="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" to="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" method="_on_SpeedSlider_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" to="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/GameSpeedLabel" method="_on_SpeedSlider_value_changed"]
+[connection signal="visibility_changed" from="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" to="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" method="_on_SpeedSlider_visibility_changed"]
+[connection signal="mouse_entered" from="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" to="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" method="_on_SoundFxVolSlider_mouse_entered"]
+[connection signal="mouse_exited" from="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" to="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" method="_on_SoundFxVolSlider_mouse_exited"]
+[connection signal="value_changed" from="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" to="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" method="_on_SoundFxVolSlider_value_changed"]
+[connection signal="visibility_changed" from="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" to="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" method="_on_SoundFxVolSlider_visibility_changed"]
+[connection signal="timeout" from="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider/Timer" to="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" method="_on_Timer_timeout"]
+[connection signal="item_selected" from="VBoxContainer/CenterContainer/Faction/FactionSelect" to="." method="_on_UI_element_clicked"]
 [connection signal="item_selected" from="VBoxContainer/CenterContainer/Faction/FactionSelect" to="VBoxContainer/CenterContainer/Faction/FactionSelect" method="_on_FactionSelect_item_selected"]

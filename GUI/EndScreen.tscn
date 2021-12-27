@@ -1,9 +1,11 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://GUI/CyberTheme.tres" type="Theme" id=1]
 [ext_resource path="res://GUI/EndScreen.gd" type="Script" id=2]
 [ext_resource path="res://GUI/fonts/GoogleFonts/Gugi/Gugi-Regular.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://GUI/OptionsDetails.tscn" type="PackedScene" id=4]
+[ext_resource path="res://effects/UISlide.wav" type="AudioStream" id=5]
+[ext_resource path="res://effects/clickNoise.wav" type="AudioStream" id=6]
 
 [sub_resource type="DynamicFont" id=1]
 size = 96
@@ -120,6 +122,13 @@ margin_bottom = 50.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "Quit"
+
+[node name="SlideNoise" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 5 )
+volume_db = -10.0
+
+[node name="ClickNoise" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 6 )
 
 [connection signal="pressed" from="MarginContainer/MarginContainer/VBoxContainer/HSplitContainer/Restart" to="." method="_on_Restart_pressed"]
 [connection signal="pressed" from="MarginContainer/MarginContainer/VBoxContainer/HSplitContainer/Quit" to="." method="_on_Quit_pressed"]

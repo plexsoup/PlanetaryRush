@@ -205,13 +205,23 @@ margin_bottom = 470.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 bbcode_enabled = true
-bbcode_text = "Use the mouse to draw a line between your planets and other planets.
-The planet will produce a fleet of ships, consisting of half their population.
-The fleet will do their best to follow the path you've laid out.
+bbcode_text = "Ships only fire forwards. Try to flank enemy fleets.
+
+Try to arrive at planets immediately after your opponent does.
+
+Find a balance between quick, direct paths and circuitous paths which give your ships more \"airtime\".
+
+Approach planets from multiple angles to avoid their fleets.
+
 "
-text = "Use the mouse to draw a line between your planets and other planets.
-The planet will produce a fleet of ships, consisting of half their population.
-The fleet will do their best to follow the path you've laid out.
+text = "Ships only fire forwards. Try to flank enemy fleets.
+
+Try to arrive at planets immediately after your opponent does.
+
+Find a balance between quick, direct paths and circuitous paths which give your ships more \"airtime\".
+
+Approach planets from multiple angles to avoid their fleets.
+
 "
 
 [node name="Navigation" type="GridContainer" parent="Margin/VBoxContainer"]

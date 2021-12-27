@@ -177,4 +177,3 @@ Tabs/styles/panel = SubResource( 4 )
 Tabs/styles/tab_bg = SubResource( 5 )
 Tabs/styles/tab_disabled = null
 Tabs/styles/tab_fg = ExtResource( 2 )
-

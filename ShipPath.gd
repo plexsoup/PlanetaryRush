@@ -8,6 +8,8 @@ enum States { DRAWING, FINISHED }
 var State = States.DRAWING
 var Faction : int
 
+var FrameTicks = 0
+
 signal finished_drawing(path)
 
 
@@ -35,7 +37,12 @@ func _on_DestructionTimer_timeout():
 	call_deferred("queue_free")
 
 func _process(delta):
-	update()
+	update() # triggers _draw function
+	#if FrameTicks % 250 == 0:
+		#print("hi: " + str(FrameTicks) + " /t FrameTicks in " + self.name) 
+		
+	FrameTicks += 1
+	
 
 
 func initialize_path():
@@ -77,17 +84,31 @@ func _on_MousePolling_timeout():
 		
 		
 func _draw():
+	var pathFollowNode = get_node("PathFollow2D")
 	var myCurve = self.get_curve()
 	var lineLength = myCurve.get_baked_length()
 	var points = myCurve.get_baked_points()
 	var numPoints = points.size()
 	var i : int = 0
 	for point in points:
-		var pointSize = float(numPoints - i + 1) / float(numPoints) * 15.0
+		var pointRatio: float = float(i)/float(numPoints)
+		var remainingRatio: float = 1.0 - pointRatio
+		var targetRatio = pathFollowNode.get_unit_offset()
+		
+		
+		var pointSizeScaleFactor = 30.0
+		var pointSize = remainingRatio * pointSizeScaleFactor
+		#var pointSize = float(numPoints - i + 1) / float(numPoints) * pointSizeScaleFactor
 		var factionColors = [ Color.gray, Color(0.6, 0.6, 1.0, 0.5), Color(1.0, 0.6, 0.6, 0.25)]
-		draw_circle(point, pointSize, factionColors[Faction])
-		i += 1
+		
+		if pointRatio > targetRatio:
+			draw_circle(point, pointSize, factionColors[Faction])
 
-
+		
+		i+= 1
+		
+#		if FrameTicks % 25 == 0:
+#			print(self.name + ": pointRatio == " + str(pointRatio))
+#			print(self.name + ": targetRatio == " + str(targetRatio))
 
 

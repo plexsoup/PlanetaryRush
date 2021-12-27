@@ -4,7 +4,7 @@ extends StaticBody2D
 var units_present : float = -1.0
 var original_scale: Vector2
 var scale_factor: float = 70.0
-var base_production: float = 1.0
+var base_production: float = 1.0 # based on planet size
 var production_factor: float = 1.02
 var max_population : int = 40
 var difficulty_factor : float # 1, 2, 3.5
@@ -32,7 +32,7 @@ func start(faction, size):
 
 func set_difficulty(faction):
 	if faction != global.PlayerFaction:
-		difficulty_factor = 1.0+(float(global.options["difficulty"])/2.0)
+		difficulty_factor = 1.0+(float(global.options["difficulty"] ) * 0.75)
 		#print("difficulty_factor = " , difficulty_factor)
 	else:
 		difficulty_factor = 1.0
@@ -56,7 +56,7 @@ func set_random_properties():
 #	pass
 
 func set_random_size():
-	set_planet_size(rand_range(0.3, 1.5))
+	set_planet_size(rand_range(0.5, 2.5))
 
 func set_planet_size(size):
 	var newScale = Vector2(1,1) * size
@@ -81,7 +81,10 @@ func set_faction(faction):
 	$Sprite.set_self_modulate(colors[Faction])
 
 func increase_units():
-	units_present = clamp( (base_production * difficulty_factor) + (units_present * production_factor), 1, max_population)
+	
+	var baseProd = base_production * difficulty_factor * global.game_speed
+	var popGrowth = ((units_present * production_factor) - units_present) * global.game_speed
+	units_present = clamp( units_present + baseProd + popGrowth, 1, max_population)
 		
 
 func _on_ProductionTimer_timeout():
@@ -92,14 +95,18 @@ func _on_ProductionTimer_timeout():
 
 
 func take_focus(): # called by Cursor
-	popUp(original_scale, original_scale * juicy_bounce_factor)
-	focused = true
+	if self.Faction == global.PlayerFaction:
+		popUp(original_scale, original_scale * juicy_bounce_factor)
+		focused = true
 
 func lose_focus(): # called by Cursor
-	popUp(original_scale * juicy_bounce_factor, original_scale)
-	focused = false
+	if self.Faction == global.PlayerFaction:
+		popUp(original_scale * juicy_bounce_factor, original_scale)
+		focused = false
 
 func popUp(initial_scale, final_scale):
+	# hmmm, this is throwing errors sometimes. $Tween doesn't get added to the scene fast enough?
+	
 	var tween = $Tween
 	var sprite = $Sprite
 	tween.interpolate_property(sprite, "scale", initial_scale, final_scale , 0.3, Tween.TRANS_ELASTIC, Tween.EASE_IN_OUT, 0)
@@ -156,6 +163,7 @@ func spawn_firework():
 func add_units(number):
 	units_present += number
 
+# signal coming from cursor via global.level
 func _on_ShipPath_finished_drawing(path):
 	# send half your ships along the path
 	send_ships(units_present/2, path)

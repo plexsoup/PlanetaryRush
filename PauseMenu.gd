@@ -12,6 +12,7 @@ func _ready():
 func start():
 	yield(get_tree().create_timer(0.2), "timeout")
 	show_pause_menu()
+	
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -53,7 +54,13 @@ func _on_RestartButton_pressed():
 	if global.Main.has_method("restart"):
 		global.Main.restart()
 		hide_pause_menu()
+		$ClickNoise.play()
 
 
 func _on_RichText_meta_clicked(meta):
 	OS.shell_open(meta)
+
+
+func _on_TabContainer_tab_changed(tab):
+	$SlideNoise.play()
+	
