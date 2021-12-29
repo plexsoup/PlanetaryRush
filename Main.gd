@@ -8,7 +8,7 @@ Show an option screen
 extends Node2D
 
 var CurrentLevel : Node2D
-var levels: Array = ["res://Level.tscn"]
+var levels: Array = ["res://Levels/Level.tscn"]
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -36,11 +36,12 @@ func remove_level():
 func restart():
 	remove_level()
 	load_level(levels[0])
+	#global.State = global.States.FIGHTING
 
 func _on_faction_lost(faction):
 	var endScreen = get_node("CanvasLayer/EndScreen")
 	endScreen.show()
-	global.pause()
+	#global.toggle_hard_pause() # the pause menu does this
 	
 	if faction == global.PlayerFaction:
 		endScreen.lose()
@@ -60,5 +61,5 @@ func _on_Restart_pressed():
 	if global.Main.has_method("restart"):
 		global.Main.restart()
 		$CanvasLayer/EndScreen.hide()
-		global.unpause()
+		#global.toggle_hard_pause() # the pause menu does this currently
 		

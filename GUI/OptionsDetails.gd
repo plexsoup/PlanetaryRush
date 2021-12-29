@@ -32,3 +32,11 @@ func _on_SpeedSlider_mouse_entered():
 
 func _on_SpeedSlider_mouse_exited():
 	pass # Replace with function body.
+
+
+func _on_NumFactionsButton_item_selected(index):
+	$ClickNoise.play()
+	global.NumFactions = index + 2
+	print("NumFactionsButton says " + str(index))
+
+

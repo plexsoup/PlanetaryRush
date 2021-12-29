@@ -1,0 +1,130 @@
+extends Area2D
+
+enum States { PAUSED, ACTIVE, LOCKED, DRAWING, SEEKING }
+var State = States.ACTIVE
+
+var cursor_range : float = 3000
+
+
+var current_planet : StaticBody2D
+var Faction : int
+
+export (PackedScene) var PlayerControllerScene = null
+export (PackedScene) var AIControllerScene = null
+var ControllerObj : Node2D # could be local_human or AI or (future) network player
+
+signal new_path_requested(planet)
+
+func _ready():
+	pass
+
+func start(faction, isLocalHumanPlayer):
+	check_requirements()
+	
+	set_faction(faction)
+	setupCamera(faction)
+	if isLocalHumanPlayer:
+		global.cursor = self # who uses this? Camera?
+	spawn_player_controller(faction, isLocalHumanPlayer)
+
+
+func check_requirements():
+	if PlayerControllerScene == null:
+		printerr("Error in " + self.name + ": PlayerController needs a scene in the inspector")
+		
+	if AIControllerScene == null:
+		printerr("Error in " + self.name + ": AIController needs a scene in the inspector")
+
+func setupCamera(faction):
+	if faction == global.PlayerFaction:
+		global.camera = $Camera2D
+		$Camera2D.current = true
+
+	else: # AI don't really need a camera
+		$Camera2D.call_deferred("queue_free")
+	# Someday we may have to tweak the camera settings if we add multiplayer / network
+
+func spawn_player_controller(faction, isLocalHumanPlayer):
+	#Set up an event listener for the player, or a bot for AI
+	if isLocalHumanPlayer:
+		var newPlayerController = PlayerControllerScene.instance()
+		self.add_child(newPlayerController)
+		ControllerObj = newPlayerController
+	else:
+		var newAIController = AIControllerScene.instance()
+		self.add_child(newAIController)
+		newAIController.start(faction)
+		ControllerObj = newAIController
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	if global.Debug:
+		$DebugInfoLabel.text = str(get_global_position())
+#		if global.Ticks % 200 == 0:
+#			print("Cursor, current state is : " + States.keys()[State])
+
+func set_faction(factionNum):
+	Faction = factionNum
+	$Sprite.set_self_modulate(global.FactionColors[factionNum])
+
+
+func lock_cursor_on(planet):
+	set_global_position(planet.get_global_position())
+	State = States.LOCKED
+		
+func spawnPath(planet):
+	connect("new_path_requested", global.level, "_on_new_path_requested")
+	emit_signal("new_path_requested", planet, Faction, self)
+	disconnect("new_path_requested", global.level, "_on_new_path_requested")
+	
+
+func get_closest_friendly_planet():
+	return global.planet_container.get_nearest_faction_planet(get_global_position(), Faction)
+
+func get_closest_planet():
+	return global.planet_container.get_nearest_planet(get_global_position())
+
+func is_inside_margins():
+	if get_global_mouse_position().length_squared() >= cursor_range * cursor_range:
+		return false
+	else:
+		return true
+
+func isStillDrawing():
+	# expose this to ShipPaths so they know when to terminate drawing and spawn ships
+	# ask the current player controller for a response, then furnish the respons to the shipPath
+	return ControllerObj.isStillDrawing()
+
+func _on_Cursor_body_entered(body):
+	if body.is_in_group("planets"):
+		if body.has_method("take_focus"):
+			body.take_focus()
+
+func _on_Cursor_body_exited(body):
+	if body.is_in_group("planets"):
+		if body.has_method("lose_focus"):
+			body.lose_focus()
+
+func _on_pause_menu_opened():
+	State = States.PAUSED
+	
+func _on_pause_menu_closed():
+	State = States.ACTIVE
+	
+func _on_ShipPath_finished_drawing(path):
+	State = States.ACTIVE
+
+func _on_PlayerController_Clicked(): # signal emulates a mouse click, but it could come from AI
+	if global.State == global.States.FIGHTING:
+		current_planet = get_closest_planet()
+		if current_planet:
+			if Faction == current_planet.Faction:
+				#lock_cursor_on(current_planet)
+				spawnPath(current_planet)
+
+func _on_PlayerController_Released(): # signal a mouse left-button release.
+	State = States.ACTIVE #**** Is this even close to correct?
+	
+	
+	
+

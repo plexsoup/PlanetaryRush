@@ -77,10 +77,9 @@ func _input(event):
 
 func move_toward_mouse(direction):
 	# not the greatest feel, but it works ok for now
-	pass
-#	var myPos = get_global_position()
-#	var cursorPos = Cursor.get_global_position()
-#	#set_global_position(lerp(myPos, cursorPos, 0.8))
+	var myPos = get_global_position()
+	var cursorPos = Cursor.get_global_position()
+	set_global_position(lerp(myPos, cursorPos, 0.8))
 
 func set_camera_drag_margins():
 	var drag = lerp(0, 1.0, (zoom.x - MinZoom) / (MaxZoom - MinZoom) )

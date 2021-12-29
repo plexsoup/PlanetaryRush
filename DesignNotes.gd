@@ -1,11 +1,16 @@
 """
+Current Work Effort:
+- figure out how to pause the game on startup.. need to pause the AI in particular
+- set the starting planets further apart, if possible
+
+
 
 Bugs
 
-- I've seen ships fly off in random directions now and then.
-- Camera offset (keyboard) isn't working well with camera mouse drag.
-- Ships wiggle a lot
+- AI planets sometimes go below 1. (I've seen 0 or -1)
 
+- Camera offset (keyboard) isn't working well with camera mouse drag.
+- AI ships don't get released or land. They just fly around the destination planet.
 
 - AI is paralyzed when there's no gray planets left
 
@@ -14,6 +19,11 @@ Features to add
 
 - change ship lasers.. they're too costly
 	- if something enteres your forward firing arc, draw a line to it and inflict damage.
+
+- change the AI fleet spawning to create a path first, then send that instead of a destination planet.AABB
+	- make the AI play by the same rules as the player.
+	
+- add a bombardment phase, when a ship is near the planet.
 
 
 

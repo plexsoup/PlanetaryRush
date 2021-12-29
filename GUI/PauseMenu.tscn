@@ -4,11 +4,11 @@
 [ext_resource path="res://PauseMenu.gd" type="Script" id=2]
 [ext_resource path="res://GUI/OptionsDetails.tscn" type="PackedScene" id=3]
 [ext_resource path="res://GUI/Instructions.tscn" type="PackedScene" id=4]
-[ext_resource path="res://godotIcon.png" type="Texture" id=5]
-[ext_resource path="res://GimpLogowilber-big.png" type="Texture" id=6]
-[ext_resource path="res://audacityIcon.png" type="Texture" id=7]
-[ext_resource path="res://inkscapeIcon.png" type="Texture" id=8]
-[ext_resource path="res://BlenderIcon.png" type="Texture" id=9]
+[ext_resource path="res://GUI/godotIcon.png" type="Texture" id=5]
+[ext_resource path="res://GUI/GimpLogowilber-big.png" type="Texture" id=6]
+[ext_resource path="res://GUI/audacityIcon.png" type="Texture" id=7]
+[ext_resource path="res://GUI/inkscapeIcon.png" type="Texture" id=8]
+[ext_resource path="res://GUI/BlenderIcon.png" type="Texture" id=9]
 [ext_resource path="res://effects/UISlide.wav" type="AudioStream" id=10]
 [ext_resource path="res://effects/clickNoise.wav" type="AudioStream" id=11]
 
@@ -18,6 +18,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 theme = ExtResource( 1 )
 script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 anchor_left = 0.5
@@ -73,12 +76,12 @@ anchor_bottom = 0.0
 margin_left = 0.0
 margin_top = 0.0
 margin_right = 844.0
-margin_bottom = 265.0
+margin_bottom = 294.0
 
 [node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer"]
-margin_top = 269.0
+margin_top = 298.0
 margin_right = 844.0
-margin_bottom = 338.0
+margin_bottom = 367.0
 dragger_visibility = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/HSplitContainer"]
@@ -277,21 +280,21 @@ margin_bottom = 420.0
 dragger_visibility = 1
 
 [node name="Disclaimer" type="Label" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer"]
-margin_right = 896.0
-margin_bottom = 105.0
+margin_right = 844.0
+margin_bottom = 81.0
 text = "In Development: 
    These options aren't implemented yet.
 Stay Tuned to future updates!"
 
 [node name="Body" type="HSplitContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer"]
-margin_top = 117.0
-margin_right = 896.0
-margin_bottom = 433.0
+margin_top = 93.0
+margin_right = 844.0
+margin_bottom = 405.0
 dragger_visibility = 1
 
 [node name="LeftSide" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body"]
-margin_right = 442.0
-margin_bottom = 316.0
+margin_right = 416.0
+margin_bottom = 312.0
 size_flags_horizontal = 3
 
 [node name="Threats" type="HSplitContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide"]
@@ -301,13 +304,13 @@ size_flags_vertical = 3
 dragger_visibility = 1
 
 [node name="Label" type="Label" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/Threats"]
-margin_right = 121.0
+margin_right = 91.0
 margin_bottom = 279.0
 size_flags_vertical = 1
 text = "Threats"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/Threats"]
-margin_left = 133.0
+margin_left = 103.0
 margin_right = 442.0
 margin_bottom = 279.0
 
@@ -335,12 +338,13 @@ margin_bottom = 316.0
 dragger_visibility = 1
 
 [node name="Label" type="Label" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/ShipCombat"]
-margin_right = 197.0
-margin_bottom = 33.0
+margin_top = 4.0
+margin_right = 150.0
+margin_bottom = 29.0
 text = "Ship Combat"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/ShipCombat"]
-margin_left = 209.0
+margin_left = 162.0
 margin_right = 442.0
 margin_bottom = 33.0
 
@@ -348,13 +352,13 @@ margin_bottom = 33.0
 margin_right = 233.0
 margin_bottom = 29.0
 text = "Bullets"
-items = [ "Bullets", null, false, -1, null, "Rays", null, false, -1, null ]
+items = [ "Bullets", null, false, 0, null, "Rays", null, false, 1, null ]
 selected = 0
 
 [node name="RightSide" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body"]
-margin_left = 454.0
-margin_right = 896.0
-margin_bottom = 316.0
+margin_left = 428.0
+margin_right = 844.0
+margin_bottom = 312.0
 size_flags_horizontal = 3
 
 [node name="ColorRect" type="ColorRect" parent="MarginContainer/TabContainer/More Options"]

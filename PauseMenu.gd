@@ -24,23 +24,26 @@ func hide_pause_menu():
 	if not is_connected("closed", global.cursor, "_on_pause_menu_closed"):
 		connect("closed", global.cursor, "_on_pause_menu_closed")
 	emit_signal("closed")
-	global.unpause()
+	global.toggle_hard_pause()
 	
 func show_pause_menu():
 	show()
 	if not is_connected("opened", global.cursor, "_on_pause_menu_opened"):
 		connect("opened", global.cursor, "_on_pause_menu_opened")		
 	emit_signal("opened")
-	global.pause()
+	global.toggle_hard_pause()
 
 
 
 func _input(event):
-	if is_visible() == false and Input.is_action_just_pressed("ui_cancel"):
+	if is_visible() == false and Input.is_action_just_pressed("ui_show_options_menu"):
 		show_pause_menu()
-	elif is_visible() == true and Input.is_action_just_pressed("ui_cancel"):
+	elif is_visible() == true and Input.is_action_just_pressed("ui_show_options_menu"):
 		hide_pause_menu()
-		
+	elif Input.is_action_just_pressed("ui_pause_action"):
+		print("user requested a soft pause")
+		global.toggle_soft_pause()
+	
 
 
 func _on_QuitButton_pressed():
@@ -52,8 +55,10 @@ func _on_QuitButton_pressed():
 
 func _on_RestartButton_pressed():
 	if global.Main.has_method("restart"):
+		
 		global.Main.restart()
 		hide_pause_menu()
+		global.toggle_hard_pause()
 		$ClickNoise.play()
 
 
