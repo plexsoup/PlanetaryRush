@@ -11,7 +11,7 @@ extends Area2D
 var VelocityVectors:Array = []
 var Speed : float = 150.0
 var TurnSpeed : float = 10.0
-var Faction : int
+var FactionObj : Node2D
 var IsHumanPlayer: bool = false
 var MyFleet: Node2D
 export var BulletScene : PackedScene
@@ -32,20 +32,19 @@ func _ready():
 	add_to_group("ships")
 
 # Called by fleet
-func start(faction, navTarget, originPlanet):
-	Faction = faction
-	if Faction == global.PlayerFaction:
+func start(factionObj, navTarget, originPlanet):
+	FactionObj = factionObj
+	if FactionObj.IsLocalHumanPlayer:
 		IsHumanPlayer = true
-	set_color(Faction)
+	set_color(factionObj)
 	OriginPlanet = originPlanet
-	$Sprite.set_frame(faction)
+	$Sprite.set_frame(factionObj.Number)
 	MyFleet = get_parent().get_parent() # each fleet has a ShipsContainer node
-	NavTarget = navTarget
+	NavTarget = navTarget # FleetTarget
 
-func set_color(faction):
-	var factionColors = global.FactionColors
-	$Sprite.set_self_modulate(factionColors[faction])
-	$Weapons.set_modulate(factionColors[faction])
+func set_color(factionObj):
+	$Sprite.set_self_modulate(factionObj.fColor)
+	$Weapons.set_modulate(factionObj.fColor)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -170,7 +169,7 @@ func enable_firingArc():
 	FiringArcCollisionShape.call_deferred("set_disabled", false)
 
 func _on_FiringArc_area_entered(area):
-	if area.is_in_group("ships") and area.Faction != Faction:
+	if area.is_in_group("ships") and area.FactionObj != FactionObj:
 		
 		if $Weapons.WeaponStatus == $Weapons.Status.READY:
 			$Weapons.CommenceFiring()
@@ -179,7 +178,7 @@ func _on_FiringArc_area_entered(area):
 		
 
 func _on_FiringArc_body_entered(body):
-	if body.is_in_group("planets") and body.Faction != Faction:
+	if body.is_in_group("planets") and body.FactionObj != FactionObj:
 		# the ship reached it's target planet. Break off from the path and start bombardment
 		
 		if $Weapons.WeaponStatus == $Weapons.Status.READY:
@@ -189,7 +188,7 @@ func _on_FiringArc_body_entered(body):
 		# TODO: what happens if the weapons aren't ready? should it circle for another pass?
 		
 		
-func _on_hit(damage, faction):
+func _on_hit(damage, factionObj): # is factionObj the attacker or defender?
 	Health -= damage
 	if Health < 0:
 		die()
@@ -205,24 +204,26 @@ func _draw():
 		draw_line(to_local(myPos), to_local(Vector2.RIGHT.rotated(self.rotation) * 20 + myPos), Color.red, 3, true)
 	
 func land(planet):
-	if planet.Faction == Faction:
+	if planet.FactionObj == FactionObj:
 		State = States.DEAD
 		planet.add_units(1)
 		call_deferred("disable_collision_shapes")
 		call_deferred("queue_free")
 	else:
-		print("Something's wrong, ship is trying to land on an enemy planet")
-
+		#print("Something's wrong, ship is trying to land on an enemy planet, redirecting")
+		# get a new planet to land on.
+		NavTarget = MyFleet.get_closest_friendly_planet(get_global_position())
+		land_on_nearby_planet()
 
 func _on_Ship_body_entered(body):
 	if body.is_in_group("planets"):
 		var planet = body
 		if TimeElapsed > 1.0: # otherwise fires too quickly. need to check if it's our planet of origin
-			if planet.Faction == Faction:
+			if planet.FactionObj == FactionObj:
 				land(planet)
 			else:
 				# you landed on the enemy planet. remove 1 from their population tit for tat
-				planet._on_hit(1, Faction, self.get_global_position())
+				planet._on_hit(1, FactionObj, self.get_global_position())
 				die()
 				# might want to add a small animation? maybe too small to notice though
 				

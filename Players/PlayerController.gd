@@ -2,14 +2,14 @@ extends Node2D
 
 
 # Declare member variables here. Examples:
-var Faction
+var FactionObj
 signal click_mouse(position)
 var lerp_toward_mouse_speed : float = 0.8 # Not higher than 1!
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	check_requirements()
-	Faction = get_parent().Faction
+	FactionObj = get_parent().FactionObj
 	
 
 func start(): # typically called by the parent once the node is in the scene.
@@ -30,7 +30,7 @@ func _process(delta):
 	
 
 func _input(event):
-	if Input.is_action_just_pressed("left_click") and Faction == global.PlayerFaction:
+	if Input.is_action_just_pressed("left_click") and FactionObj.IsLocalHumanPlayer:
 		#signal the parent that we clicked.
 		connect("click_mouse", get_parent(), "_on_PlayerController_Clicked")
 		emit_signal("click_mouse")

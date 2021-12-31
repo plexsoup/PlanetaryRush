@@ -9,11 +9,11 @@ var Velocity
 func _ready():
 	pass
 
-func start(pos, rot, vel, faction):
+func start(pos, rot, vel, factionObj):
 	set_global_position(pos)
 	set_global_rotation(rot)
 	Velocity = vel
-	$projectile.set_self_modulate(global.FactionColors[faction])
+	$projectile.set_self_modulate(factionObj.fColor)
 	shoot()
 	
 func shoot():

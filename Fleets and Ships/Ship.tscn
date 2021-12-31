@@ -81,9 +81,10 @@ script = ExtResource( 1 )
 BulletScene = ExtResource( 2 )
 
 [node name="Sprite" type="Sprite" parent="."]
+position = Vector2( -4.54546, -4.76837e-07 )
+scale = Vector2( 0.683304, 0.713012 )
 texture = ExtResource( 3 )
-hframes = 3
-frame = 1
+hframes = 5
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( -3.69334, -0.615562 )
@@ -99,11 +100,12 @@ polygon = PoolVector2Array( -14.6054, -16.5883, 437.565, -274.673, 437.331, 270.
 script = ExtResource( 4 )
 BulletScene = ExtResource( 2 )
 
-[node name="ReloadTimer" type="Timer" parent="Weapons"]
+[node name="ReloadTimer" type="Timer" parent="Weapons" groups=["InGameTimers"]]
 wait_time = 0.33
 one_shot = true
 
-[node name="SwapMagazineTimer" type="Timer" parent="Weapons"]
+[node name="SwapMagazineTimer" type="Timer" parent="Weapons" groups=["InGameTimers"]]
+wait_time = 2.0
 one_shot = true
 
 [node name="Muzzles" type="Node2D" parent="Weapons"]

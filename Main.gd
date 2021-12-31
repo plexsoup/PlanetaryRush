@@ -12,7 +12,7 @@ var levels: Array = ["res://Levels/Level.tscn"]
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	load_level(levels[0])
+	# load_level(levels[0]) # this happens when start button is pushed
 	randomize()
 	global.Main = self
 	hide_end_screen()
@@ -28,22 +28,37 @@ func load_level(level_path):
 	CurrentLevel = newLevel
 	
 func remove_level():
-	if CurrentLevel.has_method("end"):
-		CurrentLevel.end()
-	else:
-		CurrentLevel.queue_free()
+	if CurrentLevel and CurrentLevel != null:
+		if CurrentLevel.has_method("end"):
+			CurrentLevel.end()
+		else:
+			CurrentLevel.queue_free()
+
+func print_debug_info():
+	if global.Debug:
+		# print_tree_pretty()
+		print("We could put more debug info in Main.gd print_debug_info.")
+		print("But right now it's empty.")
+		print("If you need it, you could add a print_tree_pretty() call.")
+		
+func updateInGameTimers(speed):
+	printerr("Main.gd updateInGameTimers needs development")
+	var timerNodes = get_tree().get_nodes_in_group("InGameTimers")
+	for timerNode in timerNodes:
+		pass
+
 	
 func restart():
 	remove_level()
 	load_level(levels[0])
 	#global.State = global.States.FIGHTING
 
-func _on_faction_lost(faction):
+func _on_faction_lost(factionObj):
 	var endScreen = get_node("CanvasLayer/EndScreen")
 	endScreen.show()
 	#global.toggle_hard_pause() # the pause menu does this
 	
-	if faction == global.PlayerFaction:
+	if factionObj.IsLocalHumanPlayer:
 		endScreen.lose()
 	else:
 		endScreen.win()
@@ -63,3 +78,7 @@ func _on_Restart_pressed():
 		$CanvasLayer/EndScreen.hide()
 		#global.toggle_hard_pause() # the pause menu does this currently
 		
+
+
+func _on_DebugTimer_timeout():
+	print_debug_info()

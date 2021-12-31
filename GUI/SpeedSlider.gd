@@ -28,6 +28,10 @@ func stop_tone():
 func _on_SpeedSlider_value_changed(value):
 	global.game_speed = value
 	$ToneNoise.set_pitch_scale(value+0.1)
+	#update all the timers in the game
+	global.Main.updateInGameTimers(value)
+		
+		
 
 
 func _on_SpeedSlider_mouse_entered():
@@ -43,3 +47,4 @@ func _on_SpeedSlider_mouse_exited():
 
 func _on_SpeedSlider_visibility_changed():
 	set_value(global.game_speed)
+	

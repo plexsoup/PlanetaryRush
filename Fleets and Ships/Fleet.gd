@@ -4,7 +4,7 @@ extends Node2D
 var FleetPath : PathFollow2D
 var NavTarget
 var Speed : float = 160.0 # try to keep the navTarget just a bit faster than the ships
-var Faction : int
+var FactionObj : Node2D
 var OriginPlanet
 var Name : String
 
@@ -22,22 +22,14 @@ func _process(delta):
 		move_fleet_NavTarget(delta)
 
 # called from Planet
-func start(fleetPath, faction, numShips, shipScene, originPlanet):
-	Faction = faction
+func start(fleetPath, factionObj, numShips, shipScene, originPlanet):
+	FactionObj = factionObj
 	FleetPath = fleetPath
 	NavTarget = FleetPath.get_node("FleetTarget")
 	OriginPlanet = originPlanet
 	State = States.MOVING
-	addShips(faction, numShips, shipScene)
-	
-#AI will use regular start, just like the player
-#func start_AI_fleet(faction, numShips, shipScene, originPlanet, destinationPlanet):
-#	Faction = faction
-#	FleetPath = null
-#	NavTarget = destinationPlanet
-#	OriginPlanet = originPlanet
-#	State = States.MOVING
-#	addShips(faction, numShips, shipScene)
+	addShips(factionObj, numShips, shipScene)
+
 
 func move_fleet_NavTarget(delta):
 	if FleetPath != null and is_instance_valid(FleetPath):
@@ -70,20 +62,21 @@ func remove_path():
 		FleetPath.get_parent().end()
 
 func get_closest_friendly_planet(pos):
-	return global.planet_container.get_nearest_faction_planet(Faction, pos)
+	return global.planet_container.get_nearest_faction_planet(FactionObj, pos)
 
 	
 	
 
 
-func addShips(faction, numShips, shipScene):
-	#print(self.name, " addShips(", faction, ", ", numShips, " , ", shipScene, ")")
+func addShips(factionObj, numShips, shipScene):
 	for i in range(numShips):
 		var shipNode = shipScene.instance()
 		$ShipsContainer.add_child(shipNode)
-		shipNode.start(faction, NavTarget, OriginPlanet)
+		shipNode.start(factionObj, NavTarget, OriginPlanet)
 		# stick to local coords for this
 		shipNode.set_position(Vector2(rand_range(-50, 50), rand_range(-50, 50)))
-		
+
+		# added the next line so ships orient themselves toward the cursor.
+		shipNode.set_rotation(shipNode.get_angle_to(factionObj.CursorObj.get_global_position()))
 	
 

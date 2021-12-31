@@ -10,7 +10,7 @@
 
 extends Node2D
 
-var Faction : int
+var FactionObj : Node2D
 var Difficulty : float
 var win : bool = false
 
@@ -27,7 +27,7 @@ var PseudoMouseSpeed : float = 8.0 # just a guess
 
 #signal ships_requested(destinationPlanet) # removed.. all the AI can do is click
 
-signal faction_lost(faction)
+signal faction_lost(factionObj)
 signal click_mouse()
 signal release_mouse()
 
@@ -37,10 +37,10 @@ func _ready():
 	Difficulty = float(1.0 + global.options["difficulty"]) # 1, 2, 3
 
 	
-func start(faction):
+func start(factionObj):
 	# set up a delay interval so the AI can't make too many Actions per minute.
 	restart_timer()
-	Faction = faction
+	FactionObj = factionObj
 	
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -58,7 +58,7 @@ func _process(delta):
 
 func move_cursor_toward_objective(objective):
 	var currentPos = get_parent().get_global_position()
-	var newPos = currentPos + currentPos.direction_to(objective) * PseudoMouseSpeed
+	var newPos = currentPos + currentPos.direction_to(objective) * PseudoMouseSpeed * global.game_speed
 	get_parent().set_global_position( newPos )
 	
 	
@@ -72,34 +72,29 @@ func execute_click_events(objective):
 			# change the state and execute a click
 			start_path()
 		elif State == States.DRAWING_PATH:
+			print("AIController is trying to end_path() now")
 			end_path()
 			
 	
 	
-
-func get_random_planet(faction):
-	var rndPlanet = global.planet_container.get_random_planet(faction)
+# refactor: could move this function into the factionObj
+func get_random_planet(factionObj):
+	var rndPlanet = global.planet_container.get_random_planet(factionObj)
 	#print("found random planet: " + str(rndPlanet) + " from " + global.planet_container.name)
 	return rndPlanet
 	
 
 func plot_new_course():
-	var factionToAttack : int
-	#print("My Faction is " + str(Faction))
+	var factionToAttack : Node2D
 	
 	var diceroll = randf()
-	#print("diceroll = " + str(diceroll))
-
+	
 	if randf() < 0.6:
-		var neutralFaction = global.NumFactions
-		factionToAttack = neutralFaction
-		#print("I think neutral faction is " + str(neutralFaction))
+		factionToAttack = global.NeutralFactionObj
 	else:
-		factionToAttack = global.PlayerFaction
-		#print("I think player faction is " + str(global.PlayerFaction))
-
-	#print("I'm planning to attack Faction " + str(factionToAttack))
-	var originPlanet = get_random_planet(Faction)
+		factionToAttack = global.PlayerFactionObj
+	
+	var originPlanet = get_random_planet(FactionObj)
 	var destinationPlanet = get_random_planet(factionToAttack)
 	# note: this will send ships to your own planets sometimes
 	if originPlanet != destinationPlanet:
@@ -145,7 +140,7 @@ func planets_remaining():
 	var planets = global.planet_container.get_children()
 	var friendlyPlanets = []
 	for planet in planets:
-		if planet.Faction == Faction:
+		if planet.FactionObj == FactionObj:
 			friendlyPlanets.push_back(planet)
 	#print("planets_remaining == ", friendlyPlanets.size())
 	return friendlyPlanets.size()
@@ -161,14 +156,14 @@ func _on_DecisionTimer_timeout():
 		#print("global State == " + global.States.keys()[global.State])
 		pass
 	
-	if planets_remaining() > 0 and win == false:
+	if FactionObj.getRemainingPlanetCount() > 0 and win == false:
 		#print("Plotting New Course")
 		plot_new_course()
 
 	else:
 		#print(self.name, " triggered _on_DecideionTimer_timeout" )
 		connect("faction_lost", global.level, "_on_faction_lost")
-		emit_signal("faction_lost", Faction)
+		emit_signal("faction_lost", FactionObj)
 		disconnect("faction_lost", global.level, "_on_faction_lost")
 		
 func _on_player_lost():

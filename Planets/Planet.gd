@@ -17,7 +17,7 @@ var trans_mode = Tween.TRANS_ELASTIC
 var ease_mode = Tween.EASE_IN_OUT
 
 var focused : bool = false
-var Faction : int
+var FactionObj : Node2D
 
 
 # Called when the node enters the scene tree for the first time.
@@ -28,18 +28,18 @@ func _ready():
 	add_to_group("planets")
 	State = States.READY
 	
-func start(faction, size):
-	set_faction(faction)
+func start(factionObj, size):
+	set_faction(factionObj)
 	set_planet_size(size)
-	set_difficulty(faction)
+	set_difficulty(factionObj)
 	$PlanetNameLabel.text = self.name
+	
 
-func set_difficulty(faction):
-	if faction != global.PlayerFaction:
-		difficulty_factor = 1.0+(float(global.options["difficulty"] ) * 0.75)
-		#print("difficulty_factor = " , difficulty_factor)
-	else:
+func set_difficulty(factionObj):
+	if factionObj.IsLocalHumanPlayer:
 		difficulty_factor = 1.0
+	else:
+		difficulty_factor = 1.0+(float(global.options["difficulty"] ) * 0.75)
 	
 func initialize_collision_shape():
 	var shape = CollisionShape2D.new()
@@ -48,12 +48,15 @@ func initialize_collision_shape():
 	shape.set_name("CollisionShape2D")
 	add_child(shape)
 	
+	
+# **** Not sure what to do here.
 func set_random_properties():
 	set_random_texture()
-	var colors = global.FactionColors
-	set_faction(0) # most will start grey
+	#var colors = global.FactionColors
+	#set_faction(global.NeutralFactionObj) # most will start grey
+	#printerr("Planet.set_random_properties requires refactor")
 
-	#set_random_size() # moved logic to Planets.gd
+
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -79,10 +82,9 @@ func update_unit_label():
 func set_random_texture():
 	$Sprite.set_frame(randi()%9)
 
-func set_faction(faction):
-	var colors = global.FactionColors
-	Faction = faction
-	$Sprite.set_self_modulate(colors[Faction])
+func set_faction(factionObj):
+	FactionObj = factionObj
+	$Sprite.set_self_modulate(factionObj.fColor)
 
 func increase_units():
 	
@@ -92,19 +94,19 @@ func increase_units():
 		
 
 func _on_ProductionTimer_timeout():
-	if Faction != 0: # grey planets don't produce
+	if not FactionObj.IsNeutralFaction: # grey planets don't produce
 		increase_units()
 	update_unit_label()
 
 
 
 func take_focus(): # called by Cursor
-	if self.Faction == global.PlayerFaction:
+	if self.FactionObj.IsLocalHumanPlayer:
 		popUp(original_scale, original_scale * juicy_bounce_factor)
 		focused = true
 
 func lose_focus(): # called by Cursor
-	if self.Faction == global.PlayerFaction:
+	if self.FactionObj.IsLocalHumanPlayer:
 		popUp(original_scale * juicy_bounce_factor, original_scale)
 		focused = false
 
@@ -125,10 +127,6 @@ func send_ships(number, path):
 	spawn_fleet(number, path)
 	units_present -= number
 
-func send_ai_ships(number, destinationPlanet):
-	spawn_ai_fleet(number, destinationPlanet)
-	units_present -= number
-
 func spawn_fleet(numShips, path): # coming from Planet
 	var originPlanet = self
 	var shipScene = load("res://Fleets and Ships/Ship.tscn")
@@ -137,18 +135,9 @@ func spawn_fleet(numShips, path): # coming from Planet
 	var fleet = fleetScene.instance()
 	global.level.FleetContainer.add_child(fleet)
 	fleet.set_global_position(get_global_position())
-	fleet.start(path.get_node("PathFollow2D"), Faction, numShips, shipScene, originPlanet)
+	fleet.start(path.get_node("PathFollow2D"), FactionObj, numShips, shipScene, originPlanet)
 
-func spawn_ai_fleet(numShips, destinationPlanet):
-	var originPlanet = self
-	var shipScene = load("res://Fleets and Ships/Ship.tscn")
-	var fleetScene = load("res://Fleets and Ships/Fleet.tscn")
 
-	var fleet = fleetScene.instance()
-	global.level.FleetContainer.add_child(fleet)
-	fleet.set_global_position(get_global_position())
-	fleet.start_AI_fleet(Faction, numShips, shipScene, originPlanet, destinationPlanet)
-	
 func celebrate():
 	for i in range(randi()%15+5):
 		spawn_firework()
@@ -163,7 +152,7 @@ func spawn_firework():
 	var deviation = 50.0
 	var vel = Vector2.RIGHT.rotated(rot) * rand_range(speed-deviation, speed+deviation)
 	var pos = get_global_position()
-	newFirework.start(pos, rot, vel, Faction)
+	newFirework.start(pos, rot, vel, FactionObj)
 	
 func spawn_explosion():
 	pass
@@ -176,13 +165,10 @@ func add_units(number):
 func _on_ShipPath_finished_drawing(path):
 	# send half your ships along the path
 	send_ships(units_present/2, path)
-
-func _on_AI_requested_ships(destinationPlanet):
-	send_ai_ships(units_present/2, destinationPlanet)
 	
-func _on_hit(damage, faction, location = get_global_position()):
+func _on_hit(damage, factionObj, location = get_global_position()):
 	units_present -= damage
 	if units_present <= 0:
 		# switch sides
-		set_faction(faction)
+		set_faction(factionObj)
 	update_unit_label()

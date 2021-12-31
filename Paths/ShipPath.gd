@@ -1,12 +1,12 @@
 extends Path2D
 
 var last_point : Vector2
-var min_point_separation : float = 50.0
+var min_point_separation : float = 15.0
 var MyPlanet : StaticBody2D
 
 enum States { DRAWING, FINISHED }
 var State = States.DRAWING
-var Faction : int # I wonder why are factions are integers instead of objects?
+var FactionObj : Node2D # I wonder why are factions are integers instead of objects?
 var CursorObj : Node2D
 	
 var FrameTicks = 0
@@ -21,19 +21,16 @@ func _ready():
 	initialize_path()
 
 
-func start(planet, faction, cursorObj):
+func start(planet, factionObj, cursorObj):
 	MyPlanet = planet
 	CursorObj = cursorObj
-	if faction == planet.Faction:
-		Faction = faction
-	else:
-		print("Err: ShipPath -> planet faction does not match player faction")
+	FactionObj = factionObj
 	warp_to_planet(planet) # why?
 
 func warp_to_planet(planet): 
 	# relocate the cursor to the nearest planet, 
 	# so the player can be sloppy with their inputs.
-	if Faction == global.PlayerFaction:
+	if FactionObj.IsLocalHumanPlayer:
 		Input.warp_mouse_position(planet.get_global_transform_with_canvas().get_origin())
 
 func end():
@@ -80,7 +77,7 @@ func find_faction_cursor():
 
 
 func finish_path():
-	#if Faction == global.PlayerFaction:
+	
 	$MousePolling.stop()
 	State = States.FINISHED
 	connect("finished_drawing", MyPlanet, "_on_ShipPath_finished_drawing")
@@ -93,17 +90,10 @@ func finish_path():
 
 	
 func _on_MousePolling_timeout():
-	if Faction == global.PlayerFaction:
-		# add a point to the path
-		if Input.is_action_pressed("left_click") and State == States.DRAWING:
-			add_point()
-		else:
-			finish_path()
+	if CursorObj.isStillDrawing():
+		add_point()
 	else:
-		if CursorObj.isStillDrawing():
-			add_point()
-		else:
-			finish_path()
+		finish_path()
 		
 		
 func _draw():
@@ -113,30 +103,22 @@ func _draw():
 	var points = myCurve.get_baked_points()
 	var numPoints = points.size()
 	var i : int = 0
+	var factionColor = FactionObj.fColor
+
 	for point in points:
+		var pointColor = factionColor
 		#Note: points have already been converted to_local for the draw function to work.
 		var pointRatio: float = float(i)/float(numPoints)
 		var remainingRatio: float = 1.0 - pointRatio
 		var targetRatio = pathFollowNode.get_unit_offset()
 		var behindFleet: bool = pointRatio < targetRatio
-		
 		var pointSizeScaleFactor = 30.0
 		var pointSize = remainingRatio * pointSizeScaleFactor
-		#var pointSize = float(numPoints - i + 1) / float(numPoints) * pointSizeScaleFactor
-		
-		var alpha : float = 0.0
-		
-		var factionColor = global.FactionColors[Faction]
-		if Faction == global.PlayerFaction:
-			factionColor.a = 0.5
-		else:
-			factionColor.a = 0.15
 		if behindFleet:
-			factionColor.a = factionColor.a / 2.0
-		#draw_circle(to_local(point), pointSize, factionColor)
-		draw_circle(point, pointSize, factionColor)
-		
+			pointColor.a = 0.05
+		# seems like the baked curve has more points than we originally added into it.
+		if i % 5 == 0:
+			draw_circle(point, pointSize, pointColor)
 		i+= 1
-		
 
 

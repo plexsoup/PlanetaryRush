@@ -11,8 +11,8 @@ enum States { STARTSCREEN, OPTIONS_MENU, FIGHTING, SHOPPING, PAUSED, ENDSCREEN }
 var State = States.STARTSCREEN
 var Ticks : int = 0
 
-var Debug : bool = true
-var game_speed: float = 0.2
+var Debug : bool = false
+var game_speed: float = 0.2 # normal game is 1.0, fast game is 2.0, paused is 0.0. lower is slower (easier)
 var previous_game_speed: float
 var screen_size : Vector2
 var cursor : Area2D
@@ -25,17 +25,25 @@ var planet_container : Node2D
 var NumFactions : int = 2
 
 var FactionColors : PoolColorArray = [
-		Color(0.0,0.0,0.8,0.5), 
-		Color(0.8,0.0,0.0,0.5), 
-		Color(0.0,0.8,0.0,0.5), 
-		Color(0.8,0.8,0.0,0.5), 
-		Color(0.8,0.0,0.8,0.5), 
-		Color(0.0,0.8,0.8,0.5), 
-		Color(0.8,0.0,0.8,0.5),
-		Color(0.8,0.8,0.8,0.5),
+		Color.blue, 
+		Color.orangered, 
+		Color.greenyellow, 
+		Color.orange, 
+		Color.lightseagreen, 
+		Color.chocolate,
+		Color.purple,
+		Color.red, 
 	]
-var PlayerFaction : int = 1
+
+
+
+var PlayerFactionNum : int = 1
+var PlayerFactionObj : Node2D
+
 var camera : Camera2D
+
+var NeutralFactionNum : int = 0
+var NeutralFactionObj : Node2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

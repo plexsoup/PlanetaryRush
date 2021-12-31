@@ -21,6 +21,7 @@ config/icon="res://GUI/icon.png"
 [autoload]
 
 global="*res://global.gd"
+SignalsBus="*res://Utilities/SignalsBus.gd"
 
 [debug]
 

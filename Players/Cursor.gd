@@ -7,7 +7,7 @@ var cursor_range : float = 3000
 
 
 var current_planet : StaticBody2D
-var Faction : int
+var FactionObj : Node2D
 
 export (PackedScene) var PlayerControllerScene = null
 export (PackedScene) var AIControllerScene = null
@@ -18,14 +18,14 @@ signal new_path_requested(planet)
 func _ready():
 	pass
 
-func start(faction, isLocalHumanPlayer):
+func start(factionObj, isLocalHumanPlayer):
 	check_requirements()
 	
-	set_faction(faction)
-	setupCamera(faction)
+	set_faction(factionObj)
+	setupCamera(factionObj)
 	if isLocalHumanPlayer:
 		global.cursor = self # who uses this? Camera?
-	spawn_player_controller(faction, isLocalHumanPlayer)
+	spawn_player_controller(factionObj, isLocalHumanPlayer)
 
 
 func check_requirements():
@@ -35,8 +35,8 @@ func check_requirements():
 	if AIControllerScene == null:
 		printerr("Error in " + self.name + ": AIController needs a scene in the inspector")
 
-func setupCamera(faction):
-	if faction == global.PlayerFaction:
+func setupCamera(factionObj):
+	if factionObj.IsLocalHumanPlayer:
 		global.camera = $Camera2D
 		$Camera2D.current = true
 
@@ -44,7 +44,7 @@ func setupCamera(faction):
 		$Camera2D.call_deferred("queue_free")
 	# Someday we may have to tweak the camera settings if we add multiplayer / network
 
-func spawn_player_controller(faction, isLocalHumanPlayer):
+func spawn_player_controller(factionObj, isLocalHumanPlayer):
 	#Set up an event listener for the player, or a bot for AI
 	if isLocalHumanPlayer:
 		var newPlayerController = PlayerControllerScene.instance()
@@ -53,7 +53,7 @@ func spawn_player_controller(faction, isLocalHumanPlayer):
 	else:
 		var newAIController = AIControllerScene.instance()
 		self.add_child(newAIController)
-		newAIController.start(faction)
+		newAIController.start(factionObj)
 		ControllerObj = newAIController
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -63,9 +63,9 @@ func _process(delta):
 #		if global.Ticks % 200 == 0:
 #			print("Cursor, current state is : " + States.keys()[State])
 
-func set_faction(factionNum):
-	Faction = factionNum
-	$Sprite.set_self_modulate(global.FactionColors[factionNum])
+func set_faction(factionObj):
+	FactionObj = factionObj
+	$Sprite.set_self_modulate(factionObj.fColor)
 
 
 func lock_cursor_on(planet):
@@ -73,13 +73,15 @@ func lock_cursor_on(planet):
 	State = States.LOCKED
 		
 func spawnPath(planet):
-	connect("new_path_requested", global.level, "_on_new_path_requested")
-	emit_signal("new_path_requested", planet, Faction, self)
-	disconnect("new_path_requested", global.level, "_on_new_path_requested")
-	
+	if planet.FactionObj == self.FactionObj:
+		connect("new_path_requested", global.level, "_on_new_path_requested")
+		emit_signal("new_path_requested", planet, FactionObj, self)
+		disconnect("new_path_requested", global.level, "_on_new_path_requested")
+	else:
+		printerr("Cursor.gd: someone's trying to draw paths from unowned planets")
 
 func get_closest_friendly_planet():
-	return global.planet_container.get_nearest_faction_planet(get_global_position(), Faction)
+	return global.planet_container.get_nearest_faction_planet(get_global_position(), FactionObj)
 
 func get_closest_planet():
 	return global.planet_container.get_nearest_planet(get_global_position())
@@ -118,9 +120,8 @@ func _on_PlayerController_Clicked(): # signal emulates a mouse click, but it cou
 	if global.State == global.States.FIGHTING:
 		current_planet = get_closest_planet()
 		if current_planet:
-			if Faction == current_planet.Faction:
-				#lock_cursor_on(current_planet)
-				spawnPath(current_planet)
+			#lock_cursor_on(current_planet)
+			spawnPath(current_planet)
 
 func _on_PlayerController_Released(): # signal a mouse left-button release.
 	State = States.ACTIVE #**** Is this even close to correct?
