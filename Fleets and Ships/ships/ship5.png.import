@@ -1,0 +1,18 @@
+[remap]
+
+importer="texture_atlas"
+type="Texture"
+path="res://.import/ship5.png-58211b76d6fad17d0ad0415c65737eb5.res"
+group_file="res://Fleets and Ships/ships/ShipAtlas.png"
+valid=true
+[deps]
+
+
+source_file="res://Fleets and Ships/ships/ship5.png"
+dest_files=[ "res://.import/ship5.png-58211b76d6fad17d0ad0415c65737eb5.res" ]
+
+[params]
+
+atlas_file="res://Fleets and Ships/ships/ShipAtlas.png"
+import_mode=0
+crop_to_region=true

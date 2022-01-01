@@ -1,7 +1,12 @@
 """
 Current Work Effort:
+- figure out who's the authoritative source of truth for winning and losing.
+	- who declares, who announces?
+	- there's no effective win condition
+
 - sometimes the AI draws from unowned planets
-- there's no effective win condition
+	- Maybe the Cursor should be a child of the Faction
+
 - finish the SignalsBus.gd and sdEvent.gd effort to generalize signaling
 
 - set the starting planets further apart, if possible
@@ -9,6 +14,7 @@ Current Work Effort:
 - find all the timers and make sure they respect game speed.
 	- add to group InGameTimers
 	- walk through the group and adjust as required
+	- consider a custom timer object (if required)
 
 
 Bugs

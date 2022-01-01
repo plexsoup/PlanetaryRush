@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Levels/Level.gd" type="Script" id=1]
 [ext_resource path="res://Scenery/stars.jpg" type="Texture" id=2]
+[ext_resource path="res://GUI/InLevelGUI.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Planets/Planets.gd" type="Script" id=4]
 
 [node name="Level" type="Node2D"]
@@ -21,6 +22,8 @@ self_modulate = Color( 0.25098, 0.25098, 0.25098, 1 )
 texture = ExtResource( 2 )
 region_enabled = true
 region_rect = Rect2( 0, 0, 8912, 6420 )
+
+[node name="InLevelGUI" parent="CanvasLayer" instance=ExtResource( 3 )]
 
 [node name="Cursors" type="Node2D" parent="."]
 

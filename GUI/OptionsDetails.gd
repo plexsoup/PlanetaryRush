@@ -42,6 +42,12 @@ func _on_NumFactionsButton_item_selected(index):
 	global.NeutralFactionNum = global.NumFactions
 	global.FactionColors[global.NeutralFactionNum] = Color.gray # this could be a signal instead of changing values directly?
 
-	
+	var factionSelector : ItemList = get_node("VBoxContainer/HSplitContainer2/Faction/FactionSelect")
+	for i in range(5):
+		if i >= global.NumFactions:
+			factionSelector.set_item_disabled(i, true)
+		else:
+			factionSelector.set_item_disabled(i, false)
+
 
 

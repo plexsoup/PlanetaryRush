@@ -99,9 +99,11 @@ func turnTowardsTarget(vectorToGoal, delta):
 	var myRot = get_global_rotation()
 	var myFwdVector = Vector2.RIGHT.rotated(myRot)
 	var angleToGoal = myFwdVector.angle_to(vectorToGoal)
+	var lerpedRot = lerp_angle(myRot, angleToGoal, 0.8)
 	
 	self.rotate(angleToGoal * TurnSpeed * delta * global.game_speed)
-	# note, this will rotate more and more slowly as it gets closer to the target rotation.
+	#self.rotate( lerpedRot * TurnSpeed * delta * global.game_speed )
+	# why does lerpedRot send some of them off to the left?
 
 
 func collectVelocityVectors():
@@ -212,13 +214,14 @@ func land(planet):
 func _on_Ship_body_entered(body):
 	#Hmm. this only seems to happen for the initial origin planet.
 	# land_on_nearby_planet doesn't even use collision shapes
-	print("ship.gd Does this event (_on_Ship_body_entered ) ever happen?")
-	if body.is_in_group("planets"):
-		print("body is in 'planets' group")
-		var planet = body
-		if TimeElapsed > 1.0 / max(global.game_speed,0.1): # otherwise fires too quickly. need to check if it's our planet of origin
-			land(planet)
-			print("Ship.gd - landing now")
+
+#	if body.is_in_group("planets"):
+#		var planet = body
+#		if TimeElapsed > 2.0 / max(global.game_speed,0.1): # otherwise fires too quickly. need to check if it's our planet of origin
+#			print("ship.gd Does this event (_on_Ship_body_entered ) ever happen?")
+#			land(planet)
+#			print("Ship.gd - landing now")
+	pass
 
 
 func _on_SwapMagazineTimer_timeout(): #Weapons say they're ready again

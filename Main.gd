@@ -61,7 +61,8 @@ func _on_faction_lost(factionObj):
 	if factionObj.IsLocalHumanPlayer:
 		endScreen.lose()
 	else:
-		endScreen.win()
+		if CurrentLevel.FactionContainer.get_child_count() <= 1:
+			endScreen.win()
 
 
 func _on_Quit_pressed():

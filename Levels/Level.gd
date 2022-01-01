@@ -106,21 +106,39 @@ func _on_new_path_requested(planet, factionObj, cursorObj):
 		$Paths.add_child(pathFollowNode)
 		pathFollowNode.start(planet, factionObj, cursorObj)
 
+# Why are the LoseCheckTimer and the signal from AI both starting the celebration?
 func _on_LoseCheckTimer_timeout():
-	if State != States.CELEBRATING:
-		var playerHeldPlanets = count_player_planets()
-		if playerHeldPlanets == 0:
-			losing_faction = global.PlayerFactionObj
-			start_celebration()
-		$LoseCheckTimer.start()
+#	if State != States.CELEBRATING:
+#		var playerHeldPlanets = count_player_planets()
+#		if playerHeldPlanets == 0:
+#			losing_faction = global.PlayerFactionObj
+#			start_celebration()
+#		$LoseCheckTimer.start()
+		printerr("not sure we need two places to check for loss")
 		
 func _on_faction_lost(factionObj): # coming from AI
+	# This just starts the fireworks
 	if State != States.CELEBRATING:
 		losing_faction = factionObj
-		start_celebration()
+		if FactionContainer.get_child_count() <= 1:
+			start_celebration()
+		else:
+			pass
+			printerr("Level _on_faction_lost() thinks a faction lost the game, but why does it even care if there's more than one remaining?")
+
+func _on_faction_won(factionObj): # coming from faction.gd
+	# verify first
+	print("Level.gd got a request for celebration. ")
+	print("There are " + str(FactionContainer.get_child_count()) + " factions left")
+	
+	if State != States.CELEBRATING:
+		losing_faction = factionObj
+		if FactionContainer.get_child_count() <= 1:
+			start_celebration()
+	
 
 func _on_CelebrationDuration_timeout():
-	# Note: This will break when you implement AI vs AI
+	# Let main know that the celebration is over. it's ok to show the endscreen
 	connect("faction_lost", global.Main, "_on_faction_lost")
 	emit_signal("faction_lost", losing_faction)
 	disconnect("faction_lost", global.Main, "_on_faction_lost")

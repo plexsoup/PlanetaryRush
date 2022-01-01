@@ -29,7 +29,13 @@ func start(number, myColor, isLocalHuman, isNeutralFaction):
 
 # factions could probably keep better track of their own planets?
 func getRemainingPlanetCount():
-	return global.level.PlanetContainer.getRemainingPlanetsCount(self)
+	#var remainingPlanetCount = global.level.PlanetContainer.getRemainingPlanetsCount(self)
+	var remainingPlanetCount = CurrentPlanetList.size()
+#	if remainingPlanetCount == 0:
+#		resign()
+	return remainingPlanetCount
+
+
 
 func get_nearest_planet(pos):
 	var closestPlanet = null
@@ -44,6 +50,7 @@ func get_nearest_planet(pos):
 
 
 func _on_planet_switched_faction(planetObj, newFaction):
+	#print("Faction.gd: _on_planet_switched_faction: " + planetObj.name + ": " + str(newFaction.Number))
 	if CurrentPlanetList.has(planetObj) and newFaction == self:
 		printerr("Faction trying to add a pre-owned planet to its planet list") #nothing to be done?
 	elif CurrentPlanetList.has(planetObj) and newFaction != self:
@@ -52,5 +59,11 @@ func _on_planet_switched_faction(planetObj, newFaction):
 	elif CurrentPlanetList.has(planetObj) == false:
 		# gained a planet
 		CurrentPlanetList.push_back(planetObj)
+	
+	if CurrentPlanetList.size() == global.planet_container.get_child_count():
+		print("faction " + self.name + " thinks it won the game")
+	elif CurrentPlanetList.size() == 0:
+		print("faction " + self.name + " thinks it lost the game")
+		
 		
 

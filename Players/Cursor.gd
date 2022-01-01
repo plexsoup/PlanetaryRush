@@ -95,7 +95,11 @@ func is_inside_margins():
 func isStillDrawing():
 	# expose this to ShipPaths so they know when to terminate drawing and spawn ships
 	# ask the current player controller for a response, then furnish the respons to the shipPath
-	return ControllerObj.isStillDrawing()
+	if is_instance_valid(ControllerObj):
+		return ControllerObj.isStillDrawing()
+	else:
+		printerr("Cursor.gd is looking for a nonexistent Player Controller. Maybe the faction was queue_free'd")
+		return false
 
 func _on_Cursor_body_entered(body):
 	if body.is_in_group("planets"):

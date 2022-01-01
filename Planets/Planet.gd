@@ -30,7 +30,7 @@ func _ready():
 	State = States.READY
 	
 func start(factionObj, size):
-	set_faction(factionObj)
+	switch_faction(factionObj)
 	set_planet_size(size)
 	set_difficulty(factionObj)
 	$PlanetNameLabel.text = self.name
@@ -90,11 +90,23 @@ func set_faction(factionObj):
 		myColor.a = 0.5
 	$Sprite.set_self_modulate(myColor)
 	
-
-	connect("switched_faction", factionObj, "_on_planet_switched_faction")
-	emit_signal("switched_faction", self, factionObj)
-	disconnect("switched_faction", factionObj, "_on_planet_switched_faction")
-
+func switch_faction(newFaction):
+	var oldFaction = FactionObj
+	if oldFaction == newFaction:
+		printerr("Planet is trying to switch factions from itself to itself.")
+		return
+	else:
+		set_faction(newFaction)
+		# notify factions about the change in planets
+		for faction in [newFaction, oldFaction]:
+			if is_instance_valid(faction):
+				connect("switched_faction", faction, "_on_planet_switched_faction")
+				emit_signal("switched_faction", self, newFaction)
+				disconnect("switched_faction", faction, "_on_planet_switched_faction")
+			else:
+				# Probably setting up a new planet.
+				# Or possibly trying to notify a faction that was queued_free already.
+				print("Planet is trying to notify a nonexistent faction about allegiance change. Maybe just initializing the planet?")
 
 
 func increase_units():
@@ -193,13 +205,18 @@ func _on_ship_landed(damage, factionObj):
 	# switch to the new faction if you're neutral
 	
 	if FactionObj == global.NeutralFactionObj:
-		set_faction(factionObj)
+		if units_present <= 0: # empty neutral, claim it
+			switch_faction(factionObj)
+			units_present += damage
+		else: # populated neutral, reduce population
+			units_present -= damage
+			if units_present <= 0:
+				switch_faction(factionObj)
+	elif FactionObj == factionObj: # friendly planet, add population
 		units_present += damage
-	elif FactionObj == factionObj:
-		units_present += damage
-	else:
+	else: # enemy planet, reduce population
 		units_present -= damage
 		if units_present <= 0:
-			set_faction(global.NeutralFactionObj)
+			switch_faction(global.NeutralFactionObj)
 			units_present = 1
 

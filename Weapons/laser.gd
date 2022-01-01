@@ -3,7 +3,7 @@ extends Area2D
 var Velocity : Vector2
 var FactionObj : Node2D
 var Damage : float = 0.5
-var DefaultLifespan : float = 0.5
+var DefaultLifespan : float = 0.25
 signal hit(damage)
 
 # Called when the node enters the scene tree for the first time.

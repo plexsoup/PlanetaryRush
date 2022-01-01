@@ -62,17 +62,24 @@ func remove_path():
 		FleetPath.get_parent().end()
 
 func get_closest_friendly_planet(pos):
+	# This logic assumes a neutral faction exists, which may not be the case.
 	var nearestFriendly = FactionObj.get_nearest_planet(pos)
 	var nearestNeutral = global.NeutralFactionObj.get_nearest_planet(pos)
 
 	# might want to change this to search for the nearest dead neutral (1 or 0 units present)
-	var friendlyPos = nearestFriendly.get_global_position()
-	var neutralPos = nearestNeutral.get_global_position()
-	if pos.distance_squared_to(friendlyPos) < pos.distance_squared_to(neutralPos):
-		print("fleet.gd found closest friendly planet")
-		return nearestFriendly
+	if nearestFriendly == null and nearestNeutral == null:
+		printerr("Fleet can't find a nearby friendly planet")
+		return
 	else:
-		return nearestNeutral
+		var friendlyPos = nearestFriendly.get_global_position()
+		if is_instance_valid(nearestNeutral):
+			var neutralPos = nearestNeutral.get_global_position()
+			if pos.distance_squared_to(friendlyPos) < pos.distance_squared_to(neutralPos):
+				return nearestFriendly
+			else:
+				return nearestNeutral
+		else:
+			return nearestFriendly
 	
 
 

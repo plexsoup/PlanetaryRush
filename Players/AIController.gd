@@ -45,18 +45,29 @@ func start(factionObj):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if not CurrentSourcePlanet or CurrentSourcePlanet == null:
-		# you may have lost. there's no planets left
-		if FactionObj.getRemainingPlanetCount() == 0:
-			resign()
+	var remainingPlanets = FactionObj.getRemainingPlanetCount()
+	if remainingPlanets == 0:
+		# ignore the fact that you may have fleets in transit
+		resign()
+			
+#	if not CurrentSourcePlanet or CurrentSourcePlanet == null:
+#		# you may have lost. there's no planets left
+#		if FactionObj.getRemainingPlanetCount() == 0:
+#			resign()
 	
 	else:
 		var objective:Vector2 = get_global_position()
 		if State == States.SEEKING:
-			objective = CurrentSourcePlanet.get_global_position()
+			if CurrentSourcePlanet != null and is_instance_valid(CurrentSourcePlanet):
+				objective = CurrentSourcePlanet.get_global_position()
+			else:
+				printerr("AIController.gd has invalid source planet")
 		elif State == States.DRAWING_PATH:
-			objective = CurrentTargetPlanet.get_global_position()
-			
+			if CurrentTargetPlanet == null:
+				printerr("AI Controller in _process, has no CurrentPlanet to seek")
+			else:
+				objective = CurrentTargetPlanet.get_global_position()
+
 		move_cursor_toward_objective(objective)
 		execute_click_events(objective)
 		
@@ -158,7 +169,13 @@ func planets_remaining():
 func resign():
 	printerr("AIController.gd resign() needs work")
 	print("AI quits! No planets left.")
+
+	connect("faction_lost", global.level, "_on_faction_lost")
+	emit_signal("faction_lost", FactionObj)
+	disconnect("faction_lost", global.level, "_on_faction_lost")
+
 	call_deferred("queue_free")
+
 	
 func _on_DecisionTimer_timeout():
 	#print("AI Timer ding")
@@ -176,9 +193,10 @@ func _on_DecisionTimer_timeout():
 
 	else:
 		#print(self.name, " triggered _on_DecideionTimer_timeout" )
-		connect("faction_lost", global.level, "_on_faction_lost")
-		emit_signal("faction_lost", FactionObj)
-		disconnect("faction_lost", global.level, "_on_faction_lost")
+#		connect("faction_lost", global.level, "_on_faction_lost")
+#		emit_signal("faction_lost", FactionObj)
+#		disconnect("faction_lost", global.level, "_on_faction_lost")
+		resign()
 		
 func _on_player_lost():
 	win = true
