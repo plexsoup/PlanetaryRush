@@ -19,6 +19,7 @@ var ease_mode = Tween.EASE_IN_OUT
 var focused : bool = false
 var FactionObj : Node2D
 
+signal switched_faction(planetObj, newFactionObj)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -44,7 +45,7 @@ func set_difficulty(factionObj):
 func initialize_collision_shape():
 	var shape = CollisionShape2D.new()
 	shape.set_shape(CircleShape2D.new())
-	shape.get_shape().set_radius(70)
+	shape.get_shape().set_radius(70.0)
 	shape.set_name("CollisionShape2D")
 	add_child(shape)
 	
@@ -84,7 +85,17 @@ func set_random_texture():
 
 func set_faction(factionObj):
 	FactionObj = factionObj
-	$Sprite.set_self_modulate(factionObj.fColor)
+	var myColor = factionObj.fColor
+	if global.Debug: 
+		myColor.a = 0.5
+	$Sprite.set_self_modulate(myColor)
+	
+
+	connect("switched_faction", factionObj, "_on_planet_switched_faction")
+	emit_signal("switched_faction", self, factionObj)
+	disconnect("switched_faction", factionObj, "_on_planet_switched_faction")
+
+
 
 func increase_units():
 	
@@ -119,7 +130,7 @@ func popUp(initial_scale, final_scale):
 	var tween = $Tween
 	var sprite = $Sprite
 	tween.interpolate_property(sprite, "scale", initial_scale, final_scale , 0.3, Tween.TRANS_ELASTIC, Tween.EASE_IN_OUT, 0)
-	tween.start()
+	tween.call_deferred("start")
 	if initial_scale.x < final_scale.x:
 		$AudioStreamPlayer2D.play()
 
@@ -169,6 +180,26 @@ func _on_ShipPath_finished_drawing(path):
 func _on_hit(damage, factionObj, location = get_global_position()):
 	units_present -= damage
 	if units_present <= 0:
-		# switch sides
+		# become neutral when population is zero
+		if FactionObj != global.NeutralFactionObj:
+			set_faction(global.NeutralFactionObj)
+			
+		units_present = 0
+		
+	if global.Debug:
+		update_unit_label()
+
+func _on_ship_landed(damage, factionObj):
+	# switch to the new faction if you're neutral
+	
+	if FactionObj == global.NeutralFactionObj:
 		set_faction(factionObj)
-	update_unit_label()
+		units_present += damage
+	elif FactionObj == factionObj:
+		units_present += damage
+	else:
+		units_present -= damage
+		if units_present <= 0:
+			set_faction(global.NeutralFactionObj)
+			units_present = 1
+

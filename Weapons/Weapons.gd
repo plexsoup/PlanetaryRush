@@ -53,12 +53,18 @@ func _on_ReloadTimer_timeout():
 	if MyShip.State != MyShip.States.DEAD:
 		if TimesFired <= MagazineSize:
 			fire()
-			ReloadTimer.set_wait_time(DefaultReloadTime * global.game_speed)
-			ReloadTimer.start()
+			if global.game_speed > 0.0:
+				ReloadTimer.set_wait_time(DefaultReloadTime / global.game_speed)
+				ReloadTimer.start()
+			else:
+				printerr("Weapons.gd needs a pause function in _on_ReloadTimer_timeout")
 		elif TimesFired > MagazineSize:
 			WeaponStatus = Status.RELOADING
-			SwapMagazineTimer.set_wait_time(DefaultSwapMagazineTime * global.game_speed)
-			SwapMagazineTimer.start()
+			if global.game_speed > 0.0:
+				SwapMagazineTimer.set_wait_time(DefaultSwapMagazineTime / global.game_speed)
+				SwapMagazineTimer.start()
+			else:
+				printerr("Weapons.gd needs a pause function in _on_ReloadTimer_timeout")
 			
 
 	

@@ -23,7 +23,7 @@ var CurrentSourcePlanet = null # planet from which to grab ships
 enum RouteTypes { STRAIGHT, CURVED, SINE }
 var CurrentRouteType = RouteTypes.STRAIGHT
 
-var PseudoMouseSpeed : float = 8.0 # just a guess
+var PseudoMouseSpeed : float = 16.0 # just a guess
 
 #signal ships_requested(destinationPlanet) # removed.. all the AI can do is click
 
@@ -45,16 +45,22 @@ func start(factionObj):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	var objective:Vector2 = get_global_position()
-	if State == States.SEEKING:
-		objective = CurrentSourcePlanet.get_global_position()
-	elif State == States.DRAWING_PATH:
-		objective = CurrentTargetPlanet.get_global_position()
-		
-	move_cursor_toward_objective(objective)
-	execute_click_events(objective)
+	if not CurrentSourcePlanet or CurrentSourcePlanet == null:
+		# you may have lost. there's no planets left
+		if FactionObj.getRemainingPlanetCount() == 0:
+			resign()
 	
-	$StateLabel.text = States.keys()[State]
+	else:
+		var objective:Vector2 = get_global_position()
+		if State == States.SEEKING:
+			objective = CurrentSourcePlanet.get_global_position()
+		elif State == States.DRAWING_PATH:
+			objective = CurrentTargetPlanet.get_global_position()
+			
+		move_cursor_toward_objective(objective)
+		execute_click_events(objective)
+		
+		$StateLabel.text = States.keys()[State]
 
 func move_cursor_toward_objective(objective):
 	var currentPos = get_parent().get_global_position()
@@ -72,11 +78,9 @@ func execute_click_events(objective):
 			# change the state and execute a click
 			start_path()
 		elif State == States.DRAWING_PATH:
-			print("AIController is trying to end_path() now")
 			end_path()
-			
-	
-	
+
+
 # refactor: could move this function into the factionObj
 func get_random_planet(factionObj):
 	var rndPlanet = global.planet_container.get_random_planet(factionObj)
@@ -107,8 +111,11 @@ func plot_new_course():
 		
 
 func restart_timer():
-	$DecisionTimer.set_wait_time(rand_range(2.0/Difficulty * global.game_speed, 5.0/Difficulty * global.game_speed))
-	$DecisionTimer.start()
+	if global.game_speed > 0.0:
+		$DecisionTimer.set_wait_time(rand_range(2.0/Difficulty / global.game_speed, 5.0/Difficulty / global.game_speed))
+		$DecisionTimer.start()
+	else:
+		printerr("AIController needs a pause function in restart_timer")
 
 func start_path():
 	# call this when the cursor gets close to the origin planet..
@@ -136,15 +143,22 @@ func isStillDrawing():
 
 func planets_remaining():
 	#print("AI Faction == ", Faction)
+	var planetsRemaining = FactionObj.getRemainingPlanetCount()
+	print(FactionObj.name + " planets remaining == " + planetsRemaining)
+	return planetsRemaining
 	
-	var planets = global.planet_container.get_children()
-	var friendlyPlanets = []
-	for planet in planets:
-		if planet.FactionObj == FactionObj:
-			friendlyPlanets.push_back(planet)
-	#print("planets_remaining == ", friendlyPlanets.size())
-	return friendlyPlanets.size()
+#	var planets = global.planet_container.get_children()
+#	var friendlyPlanets = []
+#	for planet in planets:
+#		if planet.FactionObj == FactionObj:
+#			friendlyPlanets.push_back(planet)
+#	#print("planets_remaining == ", friendlyPlanets.size())
+#	return friendlyPlanets.size()
 	
+func resign():
+	printerr("AIController.gd resign() needs work")
+	print("AI quits! No planets left.")
+	call_deferred("queue_free")
 	
 func _on_DecisionTimer_timeout():
 	#print("AI Timer ding")

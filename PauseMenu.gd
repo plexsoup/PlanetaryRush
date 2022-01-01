@@ -43,7 +43,7 @@ func _input(event):
 	elif is_visible() == true and Input.is_action_just_pressed("ui_show_options_menu"):
 		hide_pause_menu()
 	elif Input.is_action_just_pressed("ui_pause_action"):
-		print("user requested a soft pause")
+		print("user requested a soft pause toggle")
 		global.toggle_soft_pause()
 	
 

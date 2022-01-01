@@ -132,6 +132,7 @@ volume_db = -22.0
 anims/explode = SubResource( 2 )
 
 [node name="StatusLabel" type="Label" parent="."]
+visible = false
 margin_left = -96.9697
 margin_top = -127.273
 margin_right = -17.9697

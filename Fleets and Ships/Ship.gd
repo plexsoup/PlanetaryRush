@@ -70,8 +70,10 @@ func _process(delta):
 		land_on_nearby_planet()
 	
 func land_on_nearby_planet():
-	if NavTarget == null:
-		die()
+		#Why aren't we using collision shapes for this?
+
+	if NavTarget == null: # ? why ?
+		die() # *** ? Huh? What's happening here?
 	else:
 		var myPos = get_global_position()
 		var targetPos = NavTarget.get_global_position()
@@ -91,11 +93,8 @@ func move(delta):
 
 	var fwd = Vector2.RIGHT.rotated(rotation)
 	set_global_position(myPos + fwd * delta * Speed * global.game_speed)
-	
-	#set_global_position(myPos + vectorToGoal * delta * Speed * global.game_speed)
-	
-	
-	
+
+
 func turnTowardsTarget(vectorToGoal, delta):
 	var myRot = get_global_rotation()
 	var myFwdVector = Vector2.RIGHT.rotated(myRot)
@@ -103,8 +102,8 @@ func turnTowardsTarget(vectorToGoal, delta):
 	
 	self.rotate(angleToGoal * TurnSpeed * delta * global.game_speed)
 	# note, this will rotate more and more slowly as it gets closer to the target rotation.
-	
-			  
+
+
 func collectVelocityVectors():
 	VelocityVectors = []
 	VelocityVectors.push_back(get_peer_avoidance_vector())
@@ -204,30 +203,22 @@ func _draw():
 		draw_line(to_local(myPos), to_local(Vector2.RIGHT.rotated(self.rotation) * 20 + myPos), Color.red, 3, true)
 	
 func land(planet):
-	if planet.FactionObj == FactionObj:
-		State = States.DEAD
-		planet.add_units(1)
-		call_deferred("disable_collision_shapes")
-		call_deferred("queue_free")
-	else:
-		#print("Something's wrong, ship is trying to land on an enemy planet, redirecting")
-		# get a new planet to land on.
-		NavTarget = MyFleet.get_closest_friendly_planet(get_global_position())
-		land_on_nearby_planet()
+	planet._on_ship_landed(1, FactionObj)
+	State = States.DEAD
+	call_deferred("disable_collision_shapes")
+	call_deferred("queue_free")
+	
 
 func _on_Ship_body_entered(body):
+	#Hmm. this only seems to happen for the initial origin planet.
+	# land_on_nearby_planet doesn't even use collision shapes
+	print("ship.gd Does this event (_on_Ship_body_entered ) ever happen?")
 	if body.is_in_group("planets"):
+		print("body is in 'planets' group")
 		var planet = body
-		if TimeElapsed > 1.0: # otherwise fires too quickly. need to check if it's our planet of origin
-			if planet.FactionObj == FactionObj:
-				land(planet)
-			else:
-				# you landed on the enemy planet. remove 1 from their population tit for tat
-				planet._on_hit(1, FactionObj, self.get_global_position())
-				die()
-				# might want to add a small animation? maybe too small to notice though
-				
-				
+		if TimeElapsed > 1.0 / max(global.game_speed,0.1): # otherwise fires too quickly. need to check if it's our planet of origin
+			land(planet)
+			print("Ship.gd - landing now")
 
 
 func _on_SwapMagazineTimer_timeout(): #Weapons say they're ready again

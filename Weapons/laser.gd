@@ -3,6 +3,7 @@ extends Area2D
 var Velocity : Vector2
 var FactionObj : Node2D
 var Damage : float = 0.5
+var DefaultLifespan : float = 0.5
 signal hit(damage)
 
 # Called when the node enters the scene tree for the first time.
@@ -17,6 +18,10 @@ func start(pos, rot, vel, factionObj):
 	Velocity = vel
 	$pewpew.set_pitch_scale(rand_range(0.9, 1.1))
 	$pewpew.play()
+
+	if global.game_speed > 0:
+		$Timer.start(DefaultLifespan / global.game_speed)
+	
 
 func set_color(factionObj):
 	set_modulate(factionObj.fColor)

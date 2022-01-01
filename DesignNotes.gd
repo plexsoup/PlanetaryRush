@@ -10,7 +10,13 @@ Current Work Effort:
 	- add to group InGameTimers
 	- walk through the group and adjust as required
 
+
 Bugs
+- shooting a planet to 0 population should make it neutral, not allied.
+	- landing ships on a planet should make it allied.
+	
+- global.toggle_soft_pause needs a way to restart timers after a pause.
+
 - AI doesn't realize they've lost a planet before they finish drawing a line
 - Game ends when 1 AI dies, not when the player is the last remaining player.
 - lines will draw even if the planet has zero or -1 ships

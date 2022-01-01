@@ -37,6 +37,8 @@ func _on_SpeedSlider_mouse_exited():
 func _on_NumFactionsButton_item_selected(index):
 	$ClickNoise.play()
 	global.NumFactions = index + 2
+	print("OptionDetails.gd: index == " + str(index) + " therefore NumFactions = " + str(global.NumFactions) )
+
 	global.NeutralFactionNum = global.NumFactions
 	global.FactionColors[global.NeutralFactionNum] = Color.gray # this could be a signal instead of changing values directly?
 

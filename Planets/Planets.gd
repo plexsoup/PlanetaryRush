@@ -73,7 +73,7 @@ func get_nearest_planet(pos):
 
 func get_nearest_faction_planet(factionObj, pos):
 
-	var closest = null
+	var closestPlanet = null
 	var closest_dist_sq = 10000000
 	for planet in global.planet_container.get_children():
 		if planet.FactionObj == factionObj:
@@ -81,8 +81,8 @@ func get_nearest_faction_planet(factionObj, pos):
 			var dist_sq_to_planet = pos.distance_squared_to(planetPos)
 			if dist_sq_to_planet < closest_dist_sq:
 				closest_dist_sq = dist_sq_to_planet
-				closest = planet
-	return closest
+				closestPlanet = planet
+	return closestPlanet
 	
 # refactor: should move this into FactionObj
 func get_faction_planets(factionObj):
@@ -101,8 +101,7 @@ func get_random_planet(factionObj):
 		if factionPlanets.size() > 0:
 			returnPlanet = factionPlanets[randi()%factionPlanets.size()]
 		else: # someone lost the game
-			printerr(self.name + ": random planet requested for faction with zero planets")
-			returnPlanet = allPlanets[randi()%allPlanets.size()]
+			return null
 	else:
 		returnPlanet = allPlanets[randi()%allPlanets.size()]
 	

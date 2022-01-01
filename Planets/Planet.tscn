@@ -58,6 +58,7 @@ anims/victory = SubResource( 2 )
 [node name="Sprite" type="Sprite" parent="Fireworks"]
 
 [node name="PlanetNameLabel" type="Label" parent="."]
+visible = false
 margin_left = -64.0
 margin_top = -115.0
 margin_right = -24.0
