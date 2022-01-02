@@ -1,5 +1,12 @@
 """
 Current Work Effort:
+- remove queue_free from faction and ai_controller
+	- change to a DEAD state
+	- allows other objects to continue to reference them.
+	- but you'll have to change:
+		 if is_instance_valid() checks to:
+		 if obj.State == obj.States.DEAD checks
+	
 - figure out who's the authoritative source of truth for winning and losing.
 	- who declares, who announces?
 	- there's no effective win condition
@@ -18,21 +25,13 @@ Current Work Effort:
 
 
 Bugs
-- shooting a planet to 0 population should make it neutral, not allied.
-	- landing ships on a planet should make it allied.
-	
+- Sometimes ships don't land. What's that about?
+	- maybe give them a timer or fuel limit
+- If player selects any other factions, game freaks out.
 - global.toggle_soft_pause needs a way to restart timers after a pause.
-
 - AI doesn't realize they've lost a planet before they finish drawing a line
-- Game ends when 1 AI dies, not when the player is the last remaining player.
 - lines will draw even if the planet has zero or -1 ships
-- pretty serious lag.
-- AI planets sometimes go below 1. (I've seen 0 or -1)
-
-- Camera offset (keyboard) isn't working well with camera mouse drag.
-- AI ships don't get released or land. They just fly around the destination planet.
-
-- AI is paralyzed when there's no gray planets left
+- AI is paralyzed when there's no gray planets left?
 - faction list on title screen is wrong / makes no sense
 
 Refactoring Required

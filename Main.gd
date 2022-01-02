@@ -37,9 +37,10 @@ func remove_level():
 func print_debug_info():
 	if global.Debug:
 		# print_tree_pretty()
-		print("We could put more debug info in Main.gd print_debug_info.")
-		print("But right now it's empty.")
-		print("If you need it, you could add a print_tree_pretty() call.")
+#		print("We could put more debug info in Main.gd print_debug_info.")
+#		print("But right now it's empty.")
+#		print("If you need it, you could add a print_tree_pretty() call.")
+		pass
 		
 func updateInGameTimers(speed):
 	printerr("Main.gd updateInGameTimers needs development")
@@ -54,16 +55,35 @@ func restart():
 	#global.State = global.States.FIGHTING
 
 func _on_faction_lost(factionObj):
-	var endScreen = get_node("CanvasLayer/EndScreen")
-	endScreen.show()
-	#global.toggle_hard_pause() # the pause menu does this
 	
+#	#global.toggle_hard_pause() # the pause menu does this
+#
 	if factionObj.IsLocalHumanPlayer:
+		var endScreen = get_node("CanvasLayer/EndScreen")
+		endScreen.show()
 		endScreen.lose()
-	else:
-		if CurrentLevel.FactionContainer.get_child_count() <= 1:
-			endScreen.win()
+#	else:
+#		if CurrentLevel.FactionContainer.get_child_count() <= 1:
+#			endScreen.win()
 
+func _on_faction_won(factionObj):
+	# This should come after the planets all celebrate.
+	# verify a faction won and the celebration is over,
+	# then show the end-screen
+	
+	if is_instance_valid(factionObj) == false:
+		printerr("A faction queued free before it won?")
+		return
+	else: # factionObj is valid
+		var endScreen = get_node("CanvasLayer/EndScreen")
+		endScreen.show()
+		#global.toggle_hard_pause() # the pause menu does this
+		
+		if factionObj.IsLocalHumanPlayer:
+			endScreen.win()
+		else:
+			if CurrentLevel.FactionContainer.get_child_count() <= 1:
+				endScreen.lose()
 
 func _on_Quit_pressed():
 	$AudioStreamPlayer.stop()

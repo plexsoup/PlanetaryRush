@@ -15,5 +15,5 @@ func _ready():
 
 func _on_FactionSelect_item_selected(index):
 	print(self.name, " chose index: ", index)
-	global.PlayerFactionNum = index+1 # 0 is reserved for Gray
+	global.PlayerFactionNum = index+1
 	

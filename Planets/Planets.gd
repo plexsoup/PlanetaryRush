@@ -107,6 +107,5 @@ func get_random_planet(factionObj):
 	
 	return returnPlanet
 
-func getRemainingPlanetsCount(factionObj):
-	return get_child_count()
+
 

@@ -24,7 +24,9 @@ func start(pos, rot, vel, factionObj):
 	
 
 func set_color(factionObj):
-	set_modulate(factionObj.fColor)
+	if is_instance_valid(factionObj):
+		set_modulate(factionObj.fColor)
+	else: die()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

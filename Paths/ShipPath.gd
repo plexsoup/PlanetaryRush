@@ -97,6 +97,9 @@ func _on_MousePolling_timeout():
 		
 		
 func _draw():
+	if not is_instance_valid(FactionObj):
+		return
+
 	var pathFollowNode = get_node("PathFollow2D")
 	var myCurve = self.get_curve()
 	var lineLength = myCurve.get_baked_length()

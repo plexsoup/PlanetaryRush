@@ -76,12 +76,12 @@ anchor_bottom = 0.0
 margin_left = 0.0
 margin_top = 0.0
 margin_right = 844.0
-margin_bottom = 294.0
+margin_bottom = 308.0
 
 [node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer"]
-margin_top = 298.0
+margin_top = 312.0
 margin_right = 844.0
-margin_bottom = 367.0
+margin_bottom = 381.0
 dragger_visibility = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/HSplitContainer"]

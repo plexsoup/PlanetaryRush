@@ -24,6 +24,7 @@ var planet_container : Node2D
 var NumFactions : int = 2
 
 var FactionColors : PoolColorArray = [
+		Color.gray,
 		Color.blue, 
 		Color.orangered, 
 		Color.greenyellow, 

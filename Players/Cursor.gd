@@ -73,12 +73,12 @@ func lock_cursor_on(planet):
 	State = States.LOCKED
 		
 func spawnPath(planet):
-	if planet.FactionObj == self.FactionObj:
+	if planet.FactionObj == self.FactionObj and FactionObj.State == FactionObj.States.ALIVE:
 		connect("new_path_requested", global.level, "_on_new_path_requested")
 		emit_signal("new_path_requested", planet, FactionObj, self)
 		disconnect("new_path_requested", global.level, "_on_new_path_requested")
-	else:
-		printerr("Cursor.gd: someone's trying to draw paths from unowned planets")
+	elif FactionObj.State == FactionObj.States.ALIVE:
+		printerr("Cursor.gd: " + FactionObj.Name + " is trying to draw paths from unowned planets")
 
 func get_closest_friendly_planet():
 	return global.planet_container.get_nearest_faction_planet(get_global_position(), FactionObj)

@@ -14,7 +14,7 @@ var FactionObj : Node2D
 var Difficulty : float
 var win : bool = false
 
-enum States { SEEKING, DRAWING_PATH, WAITING }
+enum States { SEEKING, DRAWING_PATH, WAITING, DEAD }
 var State = States.WAITING
 
 var CurrentTargetPlanet = null # planet to send ships toward
@@ -27,7 +27,7 @@ var PseudoMouseSpeed : float = 16.0 # just a guess
 
 #signal ships_requested(destinationPlanet) # removed.. all the AI can do is click
 
-signal faction_lost(factionObj)
+#signal faction_lost(factionObj)
 signal click_mouse()
 signal release_mouse()
 
@@ -45,17 +45,18 @@ func start(factionObj):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	var remainingPlanets = FactionObj.getRemainingPlanetCount()
-	if remainingPlanets == 0:
-		# ignore the fact that you may have fleets in transit
-		resign()
-			
-#	if not CurrentSourcePlanet or CurrentSourcePlanet == null:
-#		# you may have lost. there's no planets left
-#		if FactionObj.getRemainingPlanetCount() == 0:
-#			resign()
-	
+	if State == States.DEAD:
+		return
+	elif is_instance_valid(FactionObj):
+		var remainingPlanets = FactionObj.getRemainingPlanetCount()
+		if remainingPlanets == 0:
+			# ignore the fact that you may have fleets in transit
+			resign()
 	else:
+		# dude, your faction quit and queued_free.
+		resign()
+	
+	if is_instance_valid(CurrentSourcePlanet):
 		var objective:Vector2 = get_global_position()
 		if State == States.SEEKING:
 			if CurrentSourcePlanet != null and is_instance_valid(CurrentSourcePlanet):
@@ -169,12 +170,9 @@ func planets_remaining():
 func resign():
 	printerr("AIController.gd resign() needs work")
 	print("AI quits! No planets left.")
-
-	connect("faction_lost", global.level, "_on_faction_lost")
-	emit_signal("faction_lost", FactionObj)
-	disconnect("faction_lost", global.level, "_on_faction_lost")
-
-	call_deferred("queue_free")
+	
+	State = States.DEAD
+	call_deferred("queue_free") # this is probably safe. no one should expect AI Controller to be around after death.
 
 	
 func _on_DecisionTimer_timeout():
@@ -187,17 +185,12 @@ func _on_DecisionTimer_timeout():
 		#print("global State == " + global.States.keys()[global.State])
 		pass
 	
-	if FactionObj.getRemainingPlanetCount() > 0 and win == false:
-		#print("Plotting New Course")
+	if FactionObj.getRemainingPlanetCount() > 0 and State != States.DEAD:
 		plot_new_course()
 
 	else:
-		#print(self.name, " triggered _on_DecideionTimer_timeout" )
-#		connect("faction_lost", global.level, "_on_faction_lost")
-#		emit_signal("faction_lost", FactionObj)
-#		disconnect("faction_lost", global.level, "_on_faction_lost")
 		resign()
 		
-func _on_player_lost():
-	win = true
+#func _on_player_lost():
+#	win = true
 	

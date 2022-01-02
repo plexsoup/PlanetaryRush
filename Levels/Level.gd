@@ -5,14 +5,14 @@ onready var BulletContainer : Node2D = $Bullets
 onready var PlanetContainer : Node2D = $Planets
 onready var FactionContainer : Node2D = $Factions
 
-var losing_faction # should think about changing this to winning faction.
+var Winning_faction
 
 enum States { PLAYING, CELEBRATING }
 var State = States.PLAYING
 
 
-signal faction_lost(factionObj)
-signal player_lost()
+signal faction_won(factionObj)
+#signal player_lost()
 
 
 func _ready():
@@ -49,8 +49,15 @@ func spawn_factions(numFactions):
 func spawn_faction(factionNum, color, isHuman, isNeutralFaction):
 	var factionScene = load("res://Players/Faction.tscn")
 	var factionNode = factionScene.instance()
+	var factionName : String = ""
 	$Factions.add_child(factionNode)
-	factionNode.start(factionNum, color, isHuman, isNeutralFaction)
+	if isHuman:
+		factionName = "Player 1"
+	elif isNeutralFaction:
+		factionName = "Neutral"
+	else:
+		factionName = "Faction " + str(factionNum)
+	factionNode.start(factionNum, factionName, color, isHuman, isNeutralFaction)
 	if isNeutralFaction:
 		global.NeutralFactionObj = factionNode
 	
@@ -92,11 +99,13 @@ func start_celebration():
 		for planet in PlanetContainer.get_children():
 			if planet.has_method("celebrate"):
 				planet.celebrate()
-		
-		# this broke when we refactored AI
-#		connect("player_lost", $AI, "_on_player_lost")
-#		emit_signal("player_lost")
-#		disconnect("player_lost", $AI, "_on_player_lost")
+
+func countRemainingFactions():
+	var remainingAliveFactions = []
+	for faction in FactionContainer.get_children():
+		if faction.State == faction.States.ALIVE:
+			remainingAliveFactions.push_back(faction)
+	return remainingAliveFactions.size()
 
 func _on_new_path_requested(planet, factionObj, cursorObj):
 	if State == States.PLAYING:
@@ -106,41 +115,20 @@ func _on_new_path_requested(planet, factionObj, cursorObj):
 		$Paths.add_child(pathFollowNode)
 		pathFollowNode.start(planet, factionObj, cursorObj)
 
-# Why are the LoseCheckTimer and the signal from AI both starting the celebration?
-func _on_LoseCheckTimer_timeout():
-#	if State != States.CELEBRATING:
-#		var playerHeldPlanets = count_player_planets()
-#		if playerHeldPlanets == 0:
-#			losing_faction = global.PlayerFactionObj
-#			start_celebration()
-#		$LoseCheckTimer.start()
-		printerr("not sure we need two places to check for loss")
-		
-func _on_faction_lost(factionObj): # coming from AI
-	# This just starts the fireworks
-	if State != States.CELEBRATING:
-		losing_faction = factionObj
-		if FactionContainer.get_child_count() <= 1:
-			start_celebration()
-		else:
-			pass
-			printerr("Level _on_faction_lost() thinks a faction lost the game, but why does it even care if there's more than one remaining?")
-
 func _on_faction_won(factionObj): # coming from faction.gd
 	# verify first
 	print("Level.gd got a request for celebration. ")
-	print("There are " + str(FactionContainer.get_child_count()) + " factions left")
+	print("There are " + str(countRemainingFactions()) + " factions left")
 	
 	if State != States.CELEBRATING:
-		losing_faction = factionObj
-		if FactionContainer.get_child_count() <= 1:
+		if countRemainingFactions() <= 2: # this is a terrible check
 			start_celebration()
 	
 
 func _on_CelebrationDuration_timeout():
 	# Let main know that the celebration is over. it's ok to show the endscreen
-	connect("faction_lost", global.Main, "_on_faction_lost")
-	emit_signal("faction_lost", losing_faction)
-	disconnect("faction_lost", global.Main, "_on_faction_lost")
+	connect("faction_won", global.Main, "_on_faction_won")
+	emit_signal("faction_won", Winning_faction)
+	disconnect("faction_won", global.Main, "_on_faction_won")
 	
 	

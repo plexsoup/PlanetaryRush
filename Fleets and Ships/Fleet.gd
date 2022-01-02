@@ -11,6 +11,8 @@ var Name : String
 enum States { DEPLOYING, MOVING, WAITING, FINISHED }
 var State = States.DEPLOYING
 
+signal ship_released()
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	State = States.DEPLOYING
@@ -53,33 +55,55 @@ func release_fleet():
 	#FleetPath.set_offset(0)
 	for ship in $ShipsContainer.get_children():
 		ship.NavTarget = get_closest_friendly_planet(ship.get_global_position())
-		ship.State = ship.States.RETURNING
+		
+		notifyShipItsReleased(ship)
+		
+		
 	remove_path()
 	State = States.FINISHED
-		
+
+func notifyShipItsReleased(shipObj):
+	#ship.State = ship.States.RETURNING	
+	connect("ship_released", shipObj, "_on_fleet_released_ship")
+	emit_signal("ship_released")
+	disconnect("ship_released", shipObj, "_on_fleet_released_ship")
+
+
 func remove_path():
 	if FleetPath != null and is_instance_valid(FleetPath):
 		FleetPath.get_parent().end()
 
 func get_closest_friendly_planet(pos):
-	# This logic assumes a neutral faction exists, which may not be the case.
-	var nearestFriendly = FactionObj.get_nearest_planet(pos)
-	var nearestNeutral = global.NeutralFactionObj.get_nearest_planet(pos)
+	# this code is a bit of a mess as of Jan 2, 2022
+	var nearestFriendly
+	var nearestNeutral
+	if is_instance_valid(FactionObj):
+		nearestFriendly = FactionObj.get_nearest_planet(pos)
+	if is_instance_valid(global.NeutralFactionObj):
+		nearestNeutral = global.NeutralFactionObj.get_nearest_planet(pos)
 
-	# might want to change this to search for the nearest dead neutral (1 or 0 units present)
+	# might want to change this 
+	# to search for the nearest 'dead' neutral planet
+	# which has (1 or 0 units present)
 	if nearestFriendly == null and nearestNeutral == null:
 		printerr("Fleet can't find a nearby friendly planet")
 		return
-	else:
-		var friendlyPos = nearestFriendly.get_global_position()
+	else: # one of them must be valid
+		var friendlyPos : Vector2
+		var neutralPos : Vector2
+		if is_instance_valid(nearestFriendly):
+			friendlyPos = nearestFriendly.get_global_position()
 		if is_instance_valid(nearestNeutral):
-			var neutralPos = nearestNeutral.get_global_position()
+			neutralPos = nearestNeutral.get_global_position()
+		if is_instance_valid(nearestNeutral) and is_instance_valid(nearestFriendly):
 			if pos.distance_squared_to(friendlyPos) < pos.distance_squared_to(neutralPos):
 				return nearestFriendly
 			else:
 				return nearestNeutral
-		else:
+		elif is_instance_valid(nearestFriendly):
 			return nearestFriendly
+		elif is_instance_valid(nearestNeutral):
+			return nearestNeutral
 	
 
 

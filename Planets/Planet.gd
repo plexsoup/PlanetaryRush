@@ -84,6 +84,14 @@ func set_random_texture():
 	$Sprite.set_frame(randi()%9)
 
 func set_faction(factionObj):
+	if not is_instance_valid(factionObj):
+		# dude, your ships claimed a new planet, but your faction already quit!
+		# that's cold.
+		printerr("A faction managed to claim a planet AFTER it resigned. They should have been allowed to continue.")
+		return
+		
+	# note, does not notify the factions about the change!
+	# Use Switch faction instead.
 	FactionObj = factionObj
 	var myColor = factionObj.fColor
 	if global.Debug: 
@@ -91,6 +99,10 @@ func set_faction(factionObj):
 	$Sprite.set_self_modulate(myColor)
 	
 func switch_faction(newFaction):
+	if not is_instance_valid(newFaction):
+		# ships tried to claim a planet after your faction disappeared
+		return
+		
 	var oldFaction = FactionObj
 	if oldFaction == newFaction:
 		printerr("Planet is trying to switch factions from itself to itself.")
@@ -194,7 +206,11 @@ func _on_hit(damage, factionObj, location = get_global_position()):
 	if units_present <= 0:
 		# become neutral when population is zero
 		if FactionObj != global.NeutralFactionObj:
-			set_faction(global.NeutralFactionObj)
+			if is_instance_valid(global.NeutralFactionObj):
+				# sometimes the neutral faction has already quit.
+				switch_faction(global.NeutralFactionObj)
+			else:
+				switch_faction(factionObj)
 			
 		units_present = 0
 		

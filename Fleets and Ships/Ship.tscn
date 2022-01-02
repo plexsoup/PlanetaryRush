@@ -116,6 +116,14 @@ position = Vector2( 21.6198, -12.4828 )
 [node name="Muzzle2" type="Position2D" parent="Weapons/Muzzles"]
 position = Vector2( 21.6198, 11.4533 )
 
+[node name="Engines" type="Node2D" parent="."]
+scale = Vector2( 1, 1 )
+
+[node name="FuelLimitTimer" type="Timer" parent="Engines"]
+wait_time = 30.0
+one_shot = true
+autostart = true
+
 [node name="death" type="Node2D" parent="."]
 visible = false
 
@@ -149,3 +157,4 @@ __meta__ = {
 [connection signal="timeout" from="Weapons/ReloadTimer" to="Weapons" method="_on_ReloadTimer_timeout"]
 [connection signal="timeout" from="Weapons/SwapMagazineTimer" to="." method="_on_SwapMagazineTimer_timeout"]
 [connection signal="timeout" from="Weapons/SwapMagazineTimer" to="Weapons" method="_on_SwapMagazineTimer_timeout"]
+[connection signal="timeout" from="Engines/FuelLimitTimer" to="." method="_on_FuelLimitTimer_timeout"]

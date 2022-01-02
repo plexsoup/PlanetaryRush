@@ -7,32 +7,48 @@ var IsLocalHumanPlayer : bool = false
 var IsNeutralFaction : bool = false
 var fColor : Color
 var CursorObj : Node2D
+var Name : String
 
 var CurrentPlanetList = []
+var CurrentShipList = [] # keep track so we can stay alive until the last ship is dead
+
+enum States { PAUSED, ALIVE, DEAD} # not really using PAUSED yet
+var State = States.PAUSED
 
 onready var Level = get_parent()
+
+signal faction_won(factionObj)
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
 
-func start(number, myColor, isLocalHuman, isNeutralFaction):
+func start(number, myName, myColor, isLocalHuman, isNeutralFaction):
 	Number = number
+	Name = myName
 	fColor = myColor
 	IsLocalHumanPlayer = isLocalHuman
 	IsNeutralFaction = isNeutralFaction
 	set_modulate(myColor)
+	State = States.ALIVE
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
 
-# factions could probably keep better track of their own planets?
+func RegisterShip(shipObj):
+	CurrentShipList.push_back(shipObj)
+	
+func DeregisterShip(shipObj):
+	var shipIndex = CurrentShipList.find(shipObj)
+	if shipIndex != -1:
+		CurrentShipList.remove(shipIndex)
+
+
+
 func getRemainingPlanetCount():
-	#var remainingPlanetCount = global.level.PlanetContainer.getRemainingPlanetsCount(self)
 	var remainingPlanetCount = CurrentPlanetList.size()
-#	if remainingPlanetCount == 0:
-#		resign()
 	return remainingPlanetCount
 
 
@@ -48,7 +64,47 @@ func get_nearest_planet(pos):
 			closestPlanet = planet
 	return closestPlanet
 
+func resign():
+	print("Faction " + self.Name + " is quitting now.")
+	State = States.DEAD
+	#call_deferred("queue_free")
 
+func win_conditions_met():
+	# between you and the neutral faction, all planets are accounted for.
+	if IsNeutralFaction:
+		return # no point winning if you're neutral
+	var totalPlanets = global.planet_container.get_child_count()
+	var totalAlliedPlanets = 0
+	totalAlliedPlanets += CurrentPlanetList.size()
+	if is_instance_valid(global.NeutralFactionObj):
+		totalAlliedPlanets += global.NeutralFactionObj.CurrentPlanetList.size()
+	
+	if totalAlliedPlanets == totalPlanets:
+		return true
+	else:
+		return false
+
+func win():
+		print("faction " + self.name + " thinks it won the game")
+		
+		connect("faction_won", global.Main.CurrentLevel, "_on_faction_won")
+		emit_signal("faction_won", self)
+		disconnect("faction_won", global.Main.CurrentLevel, "_on_faction_won")	
+
+func lose_conditions_met():
+	# no planets and no ships left
+	var remainingPlanets = CurrentPlanetList.size()
+	var remainingShips = CurrentShipList.size()
+	if remainingPlanets == 0 and remainingShips == 0:
+		print(self.name + " says: Yep, no ships left. Quitting")
+		return true
+	else:
+		return false
+
+func lose():
+	resign()
+
+	
 func _on_planet_switched_faction(planetObj, newFaction):
 	#print("Faction.gd: _on_planet_switched_faction: " + planetObj.name + ": " + str(newFaction.Number))
 	if CurrentPlanetList.has(planetObj) and newFaction == self:
@@ -59,11 +115,16 @@ func _on_planet_switched_faction(planetObj, newFaction):
 	elif CurrentPlanetList.has(planetObj) == false:
 		# gained a planet
 		CurrentPlanetList.push_back(planetObj)
+	if win_conditions_met():
+		win()
+	elif lose_conditions_met():
+		lose()
+
+
+func _on_ship_created(shipObj):
+	RegisterShip(shipObj)
 	
-	if CurrentPlanetList.size() == global.planet_container.get_child_count():
-		print("faction " + self.name + " thinks it won the game")
-	elif CurrentPlanetList.size() == 0:
-		print("faction " + self.name + " thinks it lost the game")
-		
-		
+func _on_ship_destroyed(shipObj):
+	DeregisterShip(shipObj)
+	
 

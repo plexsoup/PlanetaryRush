@@ -15,6 +15,7 @@ var FactionObj : Node2D
 var IsHumanPlayer: bool = false
 var MyFleet: Node2D
 export var BulletScene : PackedScene
+export var DefaultFuelTimeLimit : float = 30.0 # seconds
 var Health = 1
 var NavTarget # could be Position2D (FleetTarget) or StaticBody2D (planet)
 var OriginPlanet : StaticBody2D
@@ -27,6 +28,9 @@ var VectorToGoal # for debug drawing
 enum States { ADVANCING, RETURNING, BOMBARDING, DEAD }
 var State = States.ADVANCING
 
+signal created(shipObj)
+signal destroyed(shipObj)
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	add_to_group("ships")
@@ -34,6 +38,7 @@ func _ready():
 # Called by fleet
 func start(factionObj, navTarget, originPlanet):
 	FactionObj = factionObj
+	registerShipWithFaction()
 	if FactionObj.IsLocalHumanPlayer:
 		IsHumanPlayer = true
 	set_color(factionObj)
@@ -41,6 +46,27 @@ func start(factionObj, navTarget, originPlanet):
 	$Sprite.set_frame(factionObj.Number)
 	MyFleet = get_parent().get_parent() # each fleet has a ShipsContainer node
 	NavTarget = navTarget # FleetTarget
+	startFuelTimer(DefaultFuelTimeLimit)
+
+func startFuelTimer(durationInSeconds):
+	# adjusted for game_speed
+	$Engines/FuelLimitTimer.set_wait_time(durationInSeconds / max(global.game_speed, 0.1))
+	$Engines/FuelLimitTimer.start()
+
+
+func registerShipWithFaction():
+	connect("created", FactionObj, "_on_ship_created")
+	emit_signal("created", self)
+	disconnect("created", FactionObj, "_on_ship_created")
+
+
+func deregisterShipWithFaction():
+	connect("destroyed", FactionObj, "_on_ship_destroyed")
+	emit_signal("destroyed", self)
+	disconnect("destroyed", FactionObj, "_on_ship_destroyed")
+	
+
+
 
 func set_color(factionObj):
 	$Sprite.set_self_modulate(factionObj.fColor)
@@ -54,12 +80,8 @@ func _process(delta):
 	TimeElapsed += delta
 	Ticks += 1
 	
-	#set_position($"..".position)
-#	if not Input.is_action_pressed("left_click"):
-#		set_global_position($"../PathFollow2D".get_global_position())
 	collectVelocityVectors()
 	move(delta)
-	#$StatusLabel.text = NavTarget.name
 	
 	$StatusLabel.text = States.keys()[State]
 	
@@ -73,11 +95,12 @@ func land_on_nearby_planet():
 		#Why aren't we using collision shapes for this?
 
 	if NavTarget == null: # ? why ?
+		printerr("Ship.gd NavTarget == null in land_on_nearby_planet")
 		die() # *** ? Huh? What's happening here?
 	else:
 		var myPos = get_global_position()
 		var targetPos = NavTarget.get_global_position()
-		var landingDistance = 50.0
+		var landingDistance = 80.0
 		if myPos.distance_squared_to(targetPos) < landingDistance * landingDistance:
 			land(NavTarget)
 
@@ -149,6 +172,7 @@ func get_peer_avoidance_vector():
 	return returnVec
 
 func die():
+	deregisterShipWithFaction()
 	call_deferred("disable_collision_shapes")
 	State = States.DEAD
 	
@@ -157,6 +181,8 @@ func die():
 	
 	yield(animPlayer, "animation_finished")
 	#yield(get_tree().create_timer(0.95), "timeout")
+	if is_instance_valid(FactionObj):
+		FactionObj.DeregisterShip(self)
 	call_deferred("queue_free")
 
 func disable_collision_shapes(): # for death
@@ -179,7 +205,7 @@ func _on_FiringArc_area_entered(area):
 		
 
 func _on_FiringArc_body_entered(body):
-	if body.is_in_group("planets") and body.FactionObj != FactionObj:
+	if body.is_in_group("planets") and body.FactionObj != self.FactionObj:
 		# the ship reached it's target planet. Break off from the path and start bombardment
 		
 		if $Weapons.WeaponStatus == $Weapons.Status.READY:
@@ -206,9 +232,7 @@ func _draw():
 	
 func land(planet):
 	planet._on_ship_landed(1, FactionObj)
-	State = States.DEAD
-	call_deferred("disable_collision_shapes")
-	call_deferred("queue_free")
+	die()
 	
 
 func _on_Ship_body_entered(body):
@@ -227,4 +251,13 @@ func _on_Ship_body_entered(body):
 func _on_SwapMagazineTimer_timeout(): #Weapons say they're ready again
 	enable_firingArc()
 	
-	
+func _on_fleet_released_ship():
+	State = States.RETURNING
+
+
+
+func _on_FuelLimitTimer_timeout():
+	# you've been flying around for too long.. disappear now
+	die() # die function also deregisters ship with faction
+	print("FYI: ship.gd is killing another ship due to fuel limit. Ideally this wouldn't happen very often. It might indicate a problem with ships finding a landing site.")
+
