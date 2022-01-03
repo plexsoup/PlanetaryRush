@@ -25,8 +25,10 @@ Current Work Effort:
 
 
 Bugs
-- Sometimes ships don't land. What's that about?
-	- maybe give them a timer or fuel limit
+- planets spawn on top of each other
+- AI draw lines through planets
+- ships should avoid planets
+
 - If player selects any other factions, game freaks out.
 - global.toggle_soft_pause needs a way to restart timers after a pause.
 - AI doesn't realize they've lost a planet before they finish drawing a line
@@ -65,6 +67,14 @@ Game Feel Enhancements to change
 - ships should only move forward.. turn toward desired vector, then go forward.
 
 - need a way to pause the action, but still zoom in and out and look around
+
+
+
+Important Engineering Decisions:
+	- Who's responsible for evaluating and announcing win/loss conditions?
+	- Right now: when a planet switches sides, it notifies faction.
+	- if faction is out of planets, then out of ships, it notifies level
+	- level counts remaining factions and triggers the celebration
 
 
 

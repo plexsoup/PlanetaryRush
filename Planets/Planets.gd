@@ -23,14 +23,16 @@ func start(factionObj):
 
 func spawnPlanets(factionObj, totalNumPlanets):
 	randomize()
-	var startingPlanetSize : float = rand_range(0.8, 1.5)
+	var startingPlanetSize : float = 1.5
 	
+	var p = PlanetaryPatterns
+	var patterns = [p.SIN, p.RANDOM]
+	var pattern = patterns[randi()%patterns.size()]
+
 	for planetNum in range(totalNumPlanets):
-		var p = PlanetaryPatterns
-		var patterns = [p.SIN, p.RANDOM]
-		var pattern = patterns[randi()%patterns.size()]
+		var randScale : float = rand_range(0.75, 1.5)
 		var targetPos : Vector2 = get_target_pos(pattern, planetNum, totalNumPlanets)
-		spawnPlanet(factionObj, startingPlanetSize, targetPos)
+		spawnPlanet(factionObj, startingPlanetSize * randScale, targetPos)
 
 
 func get_target_pos(pattern, planetNum, totalNumPlanets):
@@ -78,12 +80,12 @@ func spawnPlanet(factionObj, planetSize, targetPos):
 	var safe_location_found : bool = false
 	var i : int = 0
 
-	while safe_location_found == false and i < 100:
+	while safe_location_found == false and i < 200:
 
-		var jitterDist = 50
+		var jitterDist = 150
 		var jitter = Vector2(rand_range(-jitterDist, jitterDist), rand_range(-jitterDist, jitterDist))
 		newPlanet.set_global_position(targetPos + jitter)
-		if isColliding(newPlanet) == false:
+		if not isColliding(newPlanet):
 			safe_location_found = true
 		i += 1
 			
@@ -95,6 +97,7 @@ func isColliding(new_planet):
 		if planet != new_planet:
 			var planetPos = planet.get_global_position()
 			if myPos.distance_squared_to(planetPos) < min_distance * min_distance:
+				# collision detected
 				return true
 	return false
 

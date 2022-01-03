@@ -51,10 +51,10 @@ func _process(delta):
 		var remainingPlanets = FactionObj.getRemainingPlanetCount()
 		if remainingPlanets == 0:
 			# ignore the fact that you may have fleets in transit
-			resign()
+			die()
 	else:
 		# dude, your faction quit and queued_free.
-		resign()
+		die()
 	
 	if is_instance_valid(CurrentSourcePlanet):
 		var objective:Vector2 = get_global_position()
@@ -151,29 +151,18 @@ func isStillDrawing():
 	else:
 		return false
 
-
-
 func planets_remaining():
-	#print("AI Faction == ", Faction)
-	var planetsRemaining = FactionObj.getRemainingPlanetCount()
-	print(FactionObj.name + " planets remaining == " + planetsRemaining)
-	return planetsRemaining
+	printerr("AI controller deprecated function? planets_remaining")
+#	#print("AI Faction == ", Faction)
+#	var planetsRemaining = FactionObj.getRemainingPlanetCount()
+#	print(FactionObj.name + " planets remaining == " + planetsRemaining)
+#	return planetsRemaining
 	
-#	var planets = global.planet_container.get_children()
-#	var friendlyPlanets = []
-#	for planet in planets:
-#		if planet.FactionObj == FactionObj:
-#			friendlyPlanets.push_back(planet)
-#	#print("planets_remaining == ", friendlyPlanets.size())
-#	return friendlyPlanets.size()
-	
-func resign():
-	printerr("AIController.gd resign() needs work")
-	print("AI quits! No planets left.")
-	
+func die():
 	State = States.DEAD
 	call_deferred("queue_free") # this is probably safe. no one should expect AI Controller to be around after death.
-
+	# could probably even queue_free my parent. (Cursor), or send a signal to kill itself
+	
 	
 func _on_DecisionTimer_timeout():
 	#print("AI Timer ding")
@@ -181,7 +170,9 @@ func _on_DecisionTimer_timeout():
 		#print("global State == " + global.States.keys()[global.State])
 		restart_timer()
 		return
-	else:
+	else: # paused or dead?
+		# we might need a mechanism to recover from pause..
+		
 		#print("global State == " + global.States.keys()[global.State])
 		pass
 	
@@ -189,8 +180,8 @@ func _on_DecisionTimer_timeout():
 		plot_new_course()
 
 	else:
-		resign()
+		die()
+		# AI Controller is not notifying anyone that it quit. 
+		# It's the faction's job to notify level when no planets or ships remain.
 		
-#func _on_player_lost():
-#	win = true
-	
+

@@ -35,10 +35,11 @@ func start():
 		if factionObj.IsNeutralFaction == false:
 			init_starting_planet(factionObj)
 			spawn_cursor(factionObj)
-			
-			connect("gameplay_started", factionObj, "_on_gameplay_started")
-			emit_signal("gameplay_started")
-			disconnect("gameplay_started", factionObj, "_on_gameplay_started")
+		
+		print("signalling " + factionObj.Name + " that gameplay is starting now.")
+		connect("gameplay_started", factionObj, "_on_gameplay_started")
+		emit_signal("gameplay_started")
+		disconnect("gameplay_started", factionObj, "_on_gameplay_started")
 			
 	print("Level.gd starting gameplay")
 	State = States.PLAYING
@@ -66,7 +67,7 @@ func spawn_factions(numFactions):
 		elif factionNum == global.NeutralFactionNum:
 			isNeutralFaction = true
 		spawn_faction(factionNum, global.FactionColors[factionNum], isHuman, isNeutralFaction)
-		
+		print("spawning faction: " + str(factionNum))
 
 func spawn_faction(factionNum, color, isHuman, isNeutralFaction):
 	var factionScene = load("res://Players/Faction.tscn")
@@ -123,6 +124,7 @@ func start_celebration():
 				planet.celebrate()
 
 func countRemainingFactions():
+	printerr("Level.gd deprecated function countRemainingFactions")
 	var remainingAliveFactions = []
 	for faction in FactionContainer.get_children():
 		if faction.State == faction.States.PLAYING:
@@ -138,14 +140,48 @@ func _on_new_path_requested(planet, factionObj, cursorObj):
 		pathFollowNode.start(planet, factionObj, cursorObj)
 
 func _on_faction_won(factionObj): # coming from faction.gd
-	# verify first
-	print("Level.gd got a request for celebration. ")
-	print("There are " + str(countRemainingFactions()) + " factions left (including Neutral)")
-	
-	if State != States.CELEBRATING:
-		if countRemainingFactions() <= 2: # this is a terrible check
+	# we no longer trust factions announcing that they won. Sorry.
+	printerr("Level.gd: deprecated function _on_faction_won called. We no longer trust factions announcing that they won. Sorry.")
+
+#	print("Level.gd got a request for celebration. ")
+#	print("There are " + str(countRemainingFactions()) + " factions left (including Neutral)")
+#
+#	if State != States.CELEBRATING:
+#		if countRemainingFactions() <= 2: # this is a terrible check
+#			start_celebration()
+
+
+func _on_faction_lost(factionObj):
+	print("Level.gd was notified that " + factionObj.Name + " has no planets or ships remaining.")
+	# figure out which factions remain. 
+	# Trigger celebration if it's only player and neutral
+	# Trigger loss if the player isn't in the list
+	var victory = false
+	var remainingFactions = []
+	for faction in FactionContainer.get_children():
+		if faction.State == faction.States.PLAYING:
+			remainingFactions.push_back(faction)
+	print("remainingFactions:")
+	for faction in remainingFactions:
+		print(faction.Name)
+	if remainingFactions.has(global.PlayerFactionObj):
+		if remainingFactions.size() <= 1:
+			victory = true
+			Winning_faction = global.PlayerFactionObj
+		elif remainingFactions.size() <= 2 and remainingFactions.has(global.NeutralFactionObj):
+			victory = true
+			Winning_faction = global.PlayerFactionObj
+	elif remainingFactions.size() <= 1:
+		victory = true # but not the player
+		Winning_faction = remainingFactions[0]
+		
+		
+	if victory:
+		
+		print("Level.gd _on_faction_lost claims victory is here! Let the celebrations begin.")
+		if State != States.CELEBRATING:
 			start_celebration()
-	
+			
 
 func _on_CelebrationDuration_timeout():
 	# Let main know that the celebration is over. it's ok to show the endscreen
