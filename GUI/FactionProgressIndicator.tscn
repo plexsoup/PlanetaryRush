@@ -1,0 +1,32 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://GUI/FactionProgressIndicator.gd" type="Script" id=1]
+[ext_resource path="res://GUI/CyberTheme.tres" type="Theme" id=2]
+
+[node name="FactionProgressIndicator" type="HSplitContainer"]
+margin_right = 158.0
+margin_bottom = 30.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource( 2 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_top = 2.0
+margin_right = 87.0
+margin_bottom = 27.0
+text = "Faction"
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+margin_left = 99.0
+margin_right = 199.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 100, 30 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+step = 1.0
+value = 50.0
+rounded = true

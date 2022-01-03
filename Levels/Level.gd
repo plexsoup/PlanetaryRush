@@ -10,7 +10,7 @@ var Winning_faction
 enum States { INITIALIZING, PLAYING, PAUSED, CELEBRATING }
 var State = States.INITIALIZING
 
-export var NumPlanets = 20
+export var NumPlanets = 15
 
 signal faction_won(factionObj)
 
@@ -42,6 +42,7 @@ func start():
 		disconnect("gameplay_started", factionObj, "_on_gameplay_started")
 			
 	print("Level.gd starting gameplay")
+	$CanvasLayer/InLevelGUI.start(getRemainingFactions())
 	State = States.PLAYING
 	
 	
@@ -150,18 +151,20 @@ func _on_faction_won(factionObj): # coming from faction.gd
 #		if countRemainingFactions() <= 2: # this is a terrible check
 #			start_celebration()
 
-
+func getRemainingFactions():
+	var remainingFactions = []
+	for faction in FactionContainer.get_children():
+		if faction.State == faction.States.PLAYING:
+			remainingFactions.push_back(faction)
+	return remainingFactions
+	
 func _on_faction_lost(factionObj):
 	print("Level.gd was notified that " + factionObj.Name + " has no planets or ships remaining.")
 	# figure out which factions remain. 
 	# Trigger celebration if it's only player and neutral
 	# Trigger loss if the player isn't in the list
 	var victory = false
-	var remainingFactions = []
-	for faction in FactionContainer.get_children():
-		if faction.State == faction.States.PLAYING:
-			remainingFactions.push_back(faction)
-	print("remainingFactions:")
+	var remainingFactions = getRemainingFactions()
 	for faction in remainingFactions:
 		print(faction.Name)
 	if remainingFactions.has(global.PlayerFactionObj):

@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=13 format=2]
+[gd_resource type="Theme" load_steps=14 format=2]
 
 [ext_resource path="res://GUI/fonts/ButtonFont.tres" type="DynamicFont" id=1]
 [ext_resource path="res://GUI/PanelStyle.tres" type="StyleBox" id=2]
@@ -35,6 +35,8 @@ corner_radius_bottom_left = 4
 [sub_resource type="DynamicFont" id=3]
 size = 24
 font_data = ExtResource( 3 )
+
+[sub_resource type="StyleBoxFlat" id=8]
 
 [sub_resource type="StyleBoxFlat" id=4]
 bg_color = Color( 0, 0.00392157, 0.0470588, 1 )
@@ -124,6 +126,11 @@ OptionButton/styles/pressed = null
 Panel/styles/panel = ExtResource( 2 )
 Panel/styles/panelf = null
 Panel/styles/panelnc = null
+ProgressBar/colors/font_color = Color( 0, 0, 0, 1 )
+ProgressBar/colors/font_color_shadow = Color( 0, 0, 0, 1 )
+ProgressBar/fonts/font = null
+ProgressBar/styles/bg = null
+ProgressBar/styles/fg = SubResource( 8 )
 RichTextLabel/colors/default_color = Color( 0, 0.752941, 0.752941, 1 )
 RichTextLabel/colors/font_color_selected = Color( 0.490196, 0.490196, 0.490196, 1 )
 RichTextLabel/colors/font_color_shadow = Color( 0, 0, 0, 0 )

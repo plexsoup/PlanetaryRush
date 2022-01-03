@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://GUI/PlanetListTree.gd" type="Script" id=2]
+[ext_resource path="res://GUI/InLevelGUI.gd" type="Script" id=3]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0.101961, 0.0862745, 0.0862745, 0.329412 )
@@ -14,11 +15,13 @@ margin_right = 202.0
 margin_bottom = 600.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
+script = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
+visible = false
 margin_right = 192.0
 margin_bottom = 600.0
 size_flags_horizontal = 8
@@ -32,3 +35,18 @@ margin_right = 192.0
 margin_bottom = 600.0
 custom_styles/bg = SubResource( 1 )
 script = ExtResource( 2 )
+
+[node name="TopHUD" type="CenterContainer" parent="."]
+margin_right = 1024.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TopHUD"]
+margin_left = 512.0
+margin_top = 20.0
+margin_right = 512.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
