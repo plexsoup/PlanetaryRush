@@ -26,7 +26,9 @@ func spawnPlanets(factionObj, totalNumPlanets):
 	var startingPlanetSize : float = rand_range(0.8, 1.5)
 	
 	for planetNum in range(totalNumPlanets):
-		var pattern = PlanetaryPatterns.SIN
+		var p = PlanetaryPatterns
+		var patterns = [p.SIN, p.RANDOM]
+		var pattern = patterns[randi()%patterns.size()]
 		var targetPos : Vector2 = get_target_pos(pattern, planetNum, totalNumPlanets)
 		spawnPlanet(factionObj, startingPlanetSize, targetPos)
 
@@ -53,9 +55,10 @@ func get_target_pos(pattern, planetNum, totalNumPlanets):
 	elif pattern == PlanetaryPatterns.GLOBS:
 		pass
 	elif pattern == PlanetaryPatterns.RANDOM:
-		pass
+		targetPos.x += rand_range(0, width)
+		targetPos.y += rand_range(0, height)
 
-	print("get_target_pos " + str(planetNum) + " = " + str(targetPos))
+	
 	return targetPos
 		
 		

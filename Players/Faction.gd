@@ -12,7 +12,7 @@ var Name : String
 var CurrentPlanetList = []
 var CurrentShipList = [] # keep track so we can stay alive until the last ship is dead
 
-enum States { PAUSED, ALIVE, DEAD} # not really using PAUSED yet
+enum States { PAUSED, PLAYING, DEAD} # not really using PAUSED yet
 var State = States.PAUSED
 
 onready var Level = get_parent()
@@ -31,7 +31,7 @@ func start(number, myName, myColor, isLocalHuman, isNeutralFaction):
 	IsLocalHumanPlayer = isLocalHuman
 	IsNeutralFaction = isNeutralFaction
 	set_modulate(myColor)
-	State = States.ALIVE
+
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -69,23 +69,40 @@ func resign():
 	State = States.DEAD
 	#call_deferred("queue_free")
 
-func win_conditions_met():
-	# between you and the neutral faction, all planets are accounted for.
-	if IsNeutralFaction:
-		return # no point winning if you're neutral
-	var totalPlanets = global.planet_container.get_child_count()
-	var totalAlliedPlanets = 0
-	totalAlliedPlanets += CurrentPlanetList.size()
+func countNeutralPlanets():
 	if is_instance_valid(global.NeutralFactionObj):
-		totalAlliedPlanets += global.NeutralFactionObj.CurrentPlanetList.size()
-	
-	if totalAlliedPlanets == totalPlanets:
-		return true
+		var neutralPlanets = 0
+		for planet in global.planet_container.get_children():
+			if planet.FactionObj == global.NeutralFactionObj:
+				neutralPlanets += 1
+		return neutralPlanets
 	else:
-		return false
+		return 0
+
+
+func win_conditions_met():
+	# This can win too early because it doesn't account for ships in flight.
+
+	print("Testing Win Conditions")
+	# between you and the neutral faction, all planets are accounted for.
+	var win :bool = false
+	if IsNeutralFaction == true:
+		return false # no point winning if you're neutral
+	else: # actual player
+		print(self.Name)
+		var totalPlanets = global.planet_container.get_child_count()
+		var totalAlliedPlanets = CurrentPlanetList.size()
+		var neutralPlanets = countNeutralPlanets()
+
+		if totalAlliedPlanets + neutralPlanets == totalPlanets:
+			win = true
+		else:
+			win = false
+			
+	return win
 
 func win():
-		print("faction " + self.name + " thinks it won the game")
+		print("faction " + self.Name + " thinks it won the game")
 		
 		connect("faction_won", global.Main.CurrentLevel, "_on_faction_won")
 		emit_signal("faction_won", self)
@@ -115,10 +132,12 @@ func _on_planet_switched_faction(planetObj, newFaction):
 	elif CurrentPlanetList.has(planetObj) == false:
 		# gained a planet
 		CurrentPlanetList.push_back(planetObj)
-	if win_conditions_met():
-		win()
-	elif lose_conditions_met():
-		lose()
+	
+	if State == States.PLAYING: # the faction thinks it's playing too fast.. on start?
+		if win_conditions_met() == true:
+			win()
+		elif lose_conditions_met():
+			lose()
 
 
 func _on_ship_created(shipObj):
@@ -126,5 +145,11 @@ func _on_ship_created(shipObj):
 	
 func _on_ship_destroyed(shipObj):
 	DeregisterShip(shipObj)
+	
+func _on_gameplay_started():
+	State = States.PLAYING
+	
+func _on_gameplay_paused():
+	State = States.PAUSED
 	
 

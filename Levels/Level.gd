@@ -7,14 +7,16 @@ onready var FactionContainer : Node2D = $Factions
 
 var Winning_faction
 
-enum States { PLAYING, CELEBRATING }
-var State = States.PLAYING
+enum States { INITIALIZING, PLAYING, PAUSED, CELEBRATING }
+var State = States.INITIALIZING
 
 export var NumPlanets = 20
 
 signal faction_won(factionObj)
 
 signal switch_faction(planetObj, factionObj)
+
+signal gameplay_started()
 
 
 func _ready():
@@ -33,6 +35,15 @@ func start():
 		if factionObj.IsNeutralFaction == false:
 			init_starting_planet(factionObj)
 			spawn_cursor(factionObj)
+			
+			connect("gameplay_started", factionObj, "_on_gameplay_started")
+			emit_signal("gameplay_started")
+			disconnect("gameplay_started", factionObj, "_on_gameplay_started")
+			
+	print("Level.gd starting gameplay")
+	State = States.PLAYING
+	
+	
 
 func init_starting_planet(factionObj):
 	var neutralPlanets = global.NeutralFactionObj.CurrentPlanetList
@@ -114,7 +125,7 @@ func start_celebration():
 func countRemainingFactions():
 	var remainingAliveFactions = []
 	for faction in FactionContainer.get_children():
-		if faction.State == faction.States.ALIVE:
+		if faction.State == faction.States.PLAYING:
 			remainingAliveFactions.push_back(faction)
 	return remainingAliveFactions.size()
 

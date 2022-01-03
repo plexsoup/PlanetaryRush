@@ -118,7 +118,7 @@ func switch_faction(newFaction):
 			else:
 				# Probably setting up a new planet.
 				# Or possibly trying to notify a faction that was queued_free already.
-				print("Planet is trying to notify a nonexistent faction about allegiance change. Maybe just initializing the planet?")
+				pass
 
 
 func increase_units():
