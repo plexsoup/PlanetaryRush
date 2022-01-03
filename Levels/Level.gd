@@ -10,9 +10,11 @@ var Winning_faction
 enum States { PLAYING, CELEBRATING }
 var State = States.PLAYING
 
+export var NumPlanets = 20
 
 signal faction_won(factionObj)
-#signal player_lost()
+
+signal switch_faction(planetObj, factionObj)
 
 
 func _ready():
@@ -23,15 +25,24 @@ func _ready():
 	
 
 func start():
+	# spawn a bunch of neutral planets, then change NumFactions to their unique faction.
 	spawn_factions(global.NumFactions + 1)  # produces factionObj's in FactionContainer
+	spawn_planets(global.NeutralFactionObj, NumPlanets)
+	
 	for factionObj in FactionContainer.get_children():
-		print("spawning faction " + str(factionObj.Number))
-		spawn_planets(factionObj)
 		if factionObj.IsNeutralFaction == false:
+			init_starting_planet(factionObj)
 			spawn_cursor(factionObj)
 
-func spawn_planets(factionObj):
-	PlanetContainer.spawnPlanets(factionObj) # make sure this happens after factions are created
+func init_starting_planet(factionObj):
+	var neutralPlanets = global.NeutralFactionObj.CurrentPlanetList
+	var planetObj = neutralPlanets[randi()%neutralPlanets.size()]
+	connect("switch_faction", planetObj, "_on_initialize_faction")
+	emit_signal("switch_faction", factionObj)
+	disconnect("switch_faction", planetObj, "_on_initialize_faction")
+
+func spawn_planets(factionObj, totalNumber):
+	PlanetContainer.spawnPlanets(factionObj, totalNumber) # make sure this happens after factions are created
 
 func spawn_factions(numFactions):
 	print("Level.gd: spawning " + str(numFactions) + " Factions")
@@ -55,11 +66,11 @@ func spawn_faction(factionNum, color, isHuman, isNeutralFaction):
 		factionName = "Player 1"
 	elif isNeutralFaction:
 		factionName = "Neutral"
+		global.NeutralFactionObj = factionNode
 	else:
 		factionName = "Faction " + str(factionNum)
 	factionNode.start(factionNum, factionName, color, isHuman, isNeutralFaction)
-	if isNeutralFaction:
-		global.NeutralFactionObj = factionNode
+		
 	
 
 
@@ -118,7 +129,7 @@ func _on_new_path_requested(planet, factionObj, cursorObj):
 func _on_faction_won(factionObj): # coming from faction.gd
 	# verify first
 	print("Level.gd got a request for celebration. ")
-	print("There are " + str(countRemainingFactions()) + " factions left")
+	print("There are " + str(countRemainingFactions()) + " factions left (including Neutral)")
 	
 	if State != States.CELEBRATING:
 		if countRemainingFactions() <= 2: # this is a terrible check

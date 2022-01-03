@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://GUI/CyberTheme.tres" type="Theme" id=1]
 [ext_resource path="res://GUI/OptionsDetails.gd" type="Script" id=2]
@@ -13,7 +13,6 @@
 [ext_resource path="res://effects/pew.wav" type="AudioStream" id=11]
 [ext_resource path="res://Fleets and Ships/ships/ship1.png" type="Texture" id=12]
 [ext_resource path="res://Fleets and Ships/ships/ship3.png" type="Texture" id=13]
-[ext_resource path="res://GUI/FactionSelect.gd" type="Script" id=14]
 [ext_resource path="res://effects/clickNoise.wav" type="AudioStream" id=15]
 [ext_resource path="res://effects/UISlide.wav" type="AudioStream" id=16]
 [ext_resource path="res://Fleets and Ships/ships/ship4.png" type="Texture" id=17]
@@ -190,33 +189,33 @@ margin_right = 1004.0
 margin_bottom = 153.0
 size_flags_horizontal = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HSplitContainer/RSide"]
+[node name="AudioOptions" type="VBoxContainer" parent="VBoxContainer/HSplitContainer/RSide"]
 margin_right = 496.0
 margin_bottom = 153.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="AudioLabel" type="Label" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer"]
+[node name="AudioLabel" type="Label" parent="VBoxContainer/HSplitContainer/RSide/AudioOptions"]
 margin_right = 496.0
 margin_bottom = 25.0
 custom_styles/normal = ExtResource( 3 )
 text = "Audio"
 align = 1
 
-[node name="Master" type="HSplitContainer" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer"]
+[node name="Master" type="HSplitContainer" parent="VBoxContainer/HSplitContainer/RSide/AudioOptions"]
 margin_top = 29.0
 margin_right = 496.0
 margin_bottom = 54.0
 dragger_visibility = 1
 
-[node name="Label" type="Label" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer/Master"]
+[node name="Label" type="Label" parent="VBoxContainer/HSplitContainer/RSide/AudioOptions/Master"]
 margin_right = 242.0
 margin_bottom = 25.0
 size_flags_horizontal = 3
 text = "Master"
 align = 2
 
-[node name="MasterVolSlider" type="HSlider" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer/Master"]
+[node name="MasterVolSlider" type="HSlider" parent="VBoxContainer/HSplitContainer/RSide/AudioOptions/Master"]
 margin_left = 254.0
 margin_right = 496.0
 margin_bottom = 16.0
@@ -226,20 +225,20 @@ max_value = 24.0
 ticks_on_borders = true
 script = ExtResource( 10 )
 
-[node name="Music" type="HSplitContainer" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer"]
+[node name="Music" type="HSplitContainer" parent="VBoxContainer/HSplitContainer/RSide/AudioOptions"]
 margin_top = 58.0
 margin_right = 496.0
 margin_bottom = 83.0
 dragger_visibility = 1
 
-[node name="Label" type="Label" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer/Music"]
+[node name="Label" type="Label" parent="VBoxContainer/HSplitContainer/RSide/AudioOptions/Music"]
 margin_right = 242.0
 margin_bottom = 25.0
 size_flags_horizontal = 3
 text = "Music"
 align = 2
 
-[node name="MusicVolSlider" type="HSlider" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer/Music"]
+[node name="MusicVolSlider" type="HSlider" parent="VBoxContainer/HSplitContainer/RSide/AudioOptions/Music"]
 margin_left = 254.0
 margin_right = 496.0
 margin_bottom = 16.0
@@ -250,20 +249,20 @@ ticks_on_borders = true
 script = ExtResource( 10 )
 bus = 1
 
-[node name="FX" type="HSplitContainer" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer"]
+[node name="FX" type="HSplitContainer" parent="VBoxContainer/HSplitContainer/RSide/AudioOptions"]
 margin_top = 87.0
 margin_right = 496.0
 margin_bottom = 112.0
 dragger_visibility = 1
 
-[node name="Label" type="Label" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX"]
+[node name="Label" type="Label" parent="VBoxContainer/HSplitContainer/RSide/AudioOptions/FX"]
 margin_right = 242.0
 margin_bottom = 25.0
 size_flags_horizontal = 3
 text = "SoundFX"
 align = 2
 
-[node name="SoundFxVolSlider" type="HSlider" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX"]
+[node name="SoundFxVolSlider" type="HSlider" parent="VBoxContainer/HSplitContainer/RSide/AudioOptions/FX"]
 margin_left = 254.0
 margin_right = 496.0
 margin_bottom = 16.0
@@ -274,32 +273,32 @@ ticks_on_borders = true
 script = ExtResource( 10 )
 bus = 2
 
-[node name="pewpewNoise" type="AudioStreamPlayer" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider"]
+[node name="pewpewNoise" type="AudioStreamPlayer" parent="VBoxContainer/HSplitContainer/RSide/AudioOptions/FX/SoundFxVolSlider"]
 stream = ExtResource( 11 )
 volume_db = -10.68
 bus = "SFX"
 
-[node name="Timer" type="Timer" parent="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider"]
+[node name="Timer" type="Timer" parent="VBoxContainer/HSplitContainer/RSide/AudioOptions/FX/SoundFxVolSlider"]
 wait_time = 0.15
 
-[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer"]
+[node name="spacer" type="CenterContainer" parent="VBoxContainer"]
 margin_top = 157.0
 margin_right = 1004.0
 margin_bottom = 182.0
 rect_min_size = Vector2( 0, 25 )
 
-[node name="HSplitContainer2" type="HSplitContainer" parent="VBoxContainer"]
+[node name="FactionsSection" type="HSplitContainer" parent="VBoxContainer"]
 margin_top = 186.0
 margin_right = 1004.0
 margin_bottom = 308.0
 
-[node name="NumFactionsContainer" type="HSplitContainer" parent="VBoxContainer/HSplitContainer2"]
+[node name="NumFactionsContainer" type="HSplitContainer" parent="VBoxContainer/FactionsSection"]
 margin_right = 496.0
 margin_bottom = 122.0
 grow_horizontal = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="VBoxContainer/HSplitContainer2/NumFactionsContainer"]
+[node name="FactionsLabel" type="Label" parent="VBoxContainer/FactionsSection/NumFactionsContainer"]
 margin_left = 80.0
 margin_top = 48.0
 margin_right = 242.0
@@ -307,7 +306,7 @@ margin_bottom = 73.0
 size_flags_horizontal = 10
 text = "Num Factions"
 
-[node name="NumFactionsButton" type="OptionButton" parent="VBoxContainer/HSplitContainer2/NumFactionsContainer"]
+[node name="NumFactionsButton" type="OptionButton" parent="VBoxContainer/FactionsSection/NumFactionsContainer"]
 margin_left = 254.0
 margin_top = 46.0
 margin_right = 286.0
@@ -318,14 +317,14 @@ text = "2"
 items = [ "2", null, false, 2, null, "3", null, false, 3, null, "4", null, false, 4, null, "5", null, false, 5, null ]
 selected = 0
 
-[node name="Faction" type="HSplitContainer" parent="VBoxContainer/HSplitContainer2"]
+[node name="FactionSelectHSplit" type="HSplitContainer" parent="VBoxContainer/FactionsSection"]
 margin_left = 508.0
 margin_right = 1004.0
 margin_bottom = 122.0
 size_flags_horizontal = 3
 dragger_visibility = 1
 
-[node name="ChooseFactionLabel" type="Label" parent="VBoxContainer/HSplitContainer2/Faction"]
+[node name="ChooseFactionLabel" type="Label" parent="VBoxContainer/FactionsSection/FactionSelectHSplit"]
 margin_top = 48.0
 margin_right = 87.0
 margin_bottom = 73.0
@@ -333,7 +332,7 @@ size_flags_vertical = 6
 text = "Faction"
 align = 2
 
-[node name="FactionSelect" type="ItemList" parent="VBoxContainer/HSplitContainer2/Faction"]
+[node name="FactionSelect" type="ItemList" parent="VBoxContainer/FactionsSection/FactionSelectHSplit"]
 margin_left = 197.0
 margin_right = 397.0
 margin_bottom = 122.0
@@ -342,26 +341,27 @@ grow_vertical = 2
 rect_min_size = Vector2( 200, 0 )
 size_flags_horizontal = 4
 size_flags_vertical = 0
-items = [ "", ExtResource( 12 ), false, "", ExtResource( 19 ), false, "", ExtResource( 13 ), true, "", ExtResource( 17 ), true, "", ExtResource( 18 ), true ]
+items = [ "", ExtResource( 12 ), false, "", ExtResource( 19 ), false, "", ExtResource( 13 ), false, "", ExtResource( 17 ), false, "", ExtResource( 18 ), false ]
 allow_reselect = true
 auto_height = true
 max_columns = 3
 same_column_width = true
 icon_mode = 0
 fixed_icon_size = Vector2( 48, 48 )
-script = ExtResource( 14 )
 
-[node name="ClickNoise" type="AudioStreamPlayer" parent="."]
+[node name="Sounds" type="Node" parent="."]
+
+[node name="ClickNoise" type="AudioStreamPlayer" parent="Sounds"]
 stream = ExtResource( 15 )
 volume_db = -31.515
 bus = "SFX"
 
-[node name="SlideNoise" type="AudioStreamPlayer" parent="."]
+[node name="SlideNoise" type="AudioStreamPlayer" parent="Sounds"]
 stream = ExtResource( 16 )
 volume_db = -24.582
 bus = "SFX"
 
-[node name="ToneNoise" type="AudioStreamPlayer" parent="."]
+[node name="ToneNoise" type="AudioStreamPlayer" parent="Sounds"]
 stream = ExtResource( 9 )
 bus = "SFX"
 
@@ -381,11 +381,10 @@ bus = "SFX"
 [connection signal="value_changed" from="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" to="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/GameSpeedLabel" method="_on_SpeedSlider_value_changed"]
 [connection signal="value_changed" from="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" to="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" method="_on_SpeedSlider_value_changed"]
 [connection signal="visibility_changed" from="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" to="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" method="_on_SpeedSlider_visibility_changed"]
-[connection signal="mouse_entered" from="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" to="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" method="_on_SoundFxVolSlider_mouse_entered"]
-[connection signal="mouse_exited" from="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" to="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" method="_on_SoundFxVolSlider_mouse_exited"]
-[connection signal="value_changed" from="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" to="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" method="_on_SoundFxVolSlider_value_changed"]
-[connection signal="visibility_changed" from="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" to="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" method="_on_SoundFxVolSlider_visibility_changed"]
-[connection signal="timeout" from="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider/Timer" to="VBoxContainer/HSplitContainer/RSide/VBoxContainer/FX/SoundFxVolSlider" method="_on_Timer_timeout"]
-[connection signal="item_selected" from="VBoxContainer/HSplitContainer2/NumFactionsContainer/NumFactionsButton" to="." method="_on_NumFactionsButton_item_selected"]
-[connection signal="item_selected" from="VBoxContainer/HSplitContainer2/Faction/FactionSelect" to="." method="_on_UI_element_clicked"]
-[connection signal="item_selected" from="VBoxContainer/HSplitContainer2/Faction/FactionSelect" to="VBoxContainer/HSplitContainer2/Faction/FactionSelect" method="_on_FactionSelect_item_selected"]
+[connection signal="mouse_entered" from="VBoxContainer/HSplitContainer/RSide/AudioOptions/FX/SoundFxVolSlider" to="VBoxContainer/HSplitContainer/RSide/AudioOptions/FX/SoundFxVolSlider" method="_on_SoundFxVolSlider_mouse_entered"]
+[connection signal="mouse_exited" from="VBoxContainer/HSplitContainer/RSide/AudioOptions/FX/SoundFxVolSlider" to="VBoxContainer/HSplitContainer/RSide/AudioOptions/FX/SoundFxVolSlider" method="_on_SoundFxVolSlider_mouse_exited"]
+[connection signal="value_changed" from="VBoxContainer/HSplitContainer/RSide/AudioOptions/FX/SoundFxVolSlider" to="VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider" method="_on_SoundFxVolSlider_value_changed"]
+[connection signal="visibility_changed" from="VBoxContainer/HSplitContainer/RSide/AudioOptions/FX/SoundFxVolSlider" to="VBoxContainer/HSplitContainer/RSide/AudioOptions/FX/SoundFxVolSlider" method="_on_SoundFxVolSlider_visibility_changed"]
+[connection signal="timeout" from="VBoxContainer/HSplitContainer/RSide/AudioOptions/FX/SoundFxVolSlider/Timer" to="VBoxContainer/HSplitContainer/RSide/AudioOptions/FX/SoundFxVolSlider" method="_on_Timer_timeout"]
+[connection signal="item_selected" from="VBoxContainer/FactionsSection/NumFactionsContainer/NumFactionsButton" to="." method="_on_NumFactionsButton_item_selected"]
+[connection signal="item_selected" from="VBoxContainer/FactionsSection/FactionSelectHSplit/FactionSelect" to="." method="_on_FactionSelect_item_selected"]

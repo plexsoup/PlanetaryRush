@@ -236,3 +236,5 @@ func _on_ship_landed(damage, factionObj):
 			switch_faction(global.NeutralFactionObj)
 			units_present = 1
 
+func _on_initialize_faction(factionObj):
+	switch_faction(factionObj)

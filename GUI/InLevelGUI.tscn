@@ -1,6 +1,13 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://GUI/PlanetListTree.gd" type="Script" id=2]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.101961, 0.0862745, 0.0862745, 0.329412 )
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
 
 [node name="InLevelGUI" type="Control"]
 margin_right = 202.0
@@ -23,4 +30,5 @@ __meta__ = {
 [node name="PlanetListTree" type="Tree" parent="MarginContainer"]
 margin_right = 192.0
 margin_bottom = 600.0
+custom_styles/bg = SubResource( 1 )
 script = ExtResource( 2 )

@@ -2,48 +2,84 @@ extends Node2D
 
 # Declare member variables here. Examples:
 var min_distance : float = 250
+var DeploymentZone : Rect2
+
+
+
+enum PlanetaryPatterns { SIN, CIRCLE, ELLIPSE, SPIRAL, GLOBS, RANDOM }
 
 signal faction_lost(factionObj)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass
+	
+	var AA = Vector2( -1 * global.screen_size )
+	var BB = Vector2( 2 *global.screen_size )
+	DeploymentZone = Rect2(AA, BB)
+	global.planet_container = self # singleton
 	
 func start(factionObj):
 	pass # have to wait for factions to be ready first.
 
-func spawnPlanets(factionObj):
+func spawnPlanets(factionObj, totalNumPlanets):
 	randomize()
-	var numPlanetsToSpawn = 1
-	var startingPlanetSize : float = 1.5
+	var startingPlanetSize : float = rand_range(0.8, 1.5)
 	
-	if factionObj.IsNeutralFaction:
-		numPlanetsToSpawn = 8 + randi()%7
-		startingPlanetSize = rand_range(0.8, 1.5)
+	for planetNum in range(totalNumPlanets):
+		var pattern = PlanetaryPatterns.SIN
+		var targetPos : Vector2 = get_target_pos(pattern, planetNum, totalNumPlanets)
+		spawnPlanet(factionObj, startingPlanetSize, targetPos)
 
-	for i in range(numPlanetsToSpawn):
+
+func get_target_pos(pattern, planetNum, totalNumPlanets):
+	randomize()
+	var targetPos = DeploymentZone.position
+	var width = DeploymentZone.size.x
+	var height = DeploymentZone.size.y
+	
+	if pattern == PlanetaryPatterns.SIN:
+		targetPos.x += ( float(planetNum) / float(totalNumPlanets) * float(width) )
+		if planetNum % 2 == 0:
+			targetPos.y += ( sin(2.0 * PI * float(planetNum) / float(totalNumPlanets)) * float(height/2.0) + height/2)
+		else:
+			targetPos.y -= ( sin(2.0 * PI * float(planetNum) / float(totalNumPlanets)) * float(height/2.0) - height/2)
+
+	elif pattern == PlanetaryPatterns.ELLIPSE:
+		pass
+	elif pattern == PlanetaryPatterns.CIRCLE:
+		pass
+	elif pattern == PlanetaryPatterns.SPIRAL:
+		pass
+	elif pattern == PlanetaryPatterns.GLOBS:
+		pass
+	elif pattern == PlanetaryPatterns.RANDOM:
+		pass
+
+	print("get_target_pos " + str(planetNum) + " = " + str(targetPos))
+	return targetPos
 		
-		spawnPlanet(factionObj, startingPlanetSize)
-	global.planet_container = self
-
+		
+	
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
 
-func spawnPlanet(factionObj, size):
+func spawnPlanet(factionObj, planetSize, targetPos):
 	var planetScene = load("res://Planets/Planet.tscn")
 	var newPlanet = planetScene.instance()
 	add_child(newPlanet)
-	newPlanet.call_deferred("start", factionObj, size)
-
+	#newPlanet.call_deferred("start", factionObj, planetSize)
+	newPlanet.start(factionObj, planetSize) # has to happen right away to build the factions' planet lists
 
 	var safe_location_found : bool = false
 	var i : int = 0
 
 	while safe_location_found == false and i < 100:
-		
-		newPlanet.set_global_position(Vector2(rand_range(-global.screen_size.x, global.screen_size.x), rand_range(-global.screen_size.y, global.screen_size.y)))
+
+		var jitterDist = 50
+		var jitter = Vector2(rand_range(-jitterDist, jitterDist), rand_range(-jitterDist, jitterDist))
+		newPlanet.set_global_position(targetPos + jitter)
 		if isColliding(newPlanet) == false:
 			safe_location_found = true
 		i += 1

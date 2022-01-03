@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=12 format=2]
+[gd_resource type="Theme" load_steps=13 format=2]
 
 [ext_resource path="res://GUI/fonts/ButtonFont.tres" type="DynamicFont" id=1]
 [ext_resource path="res://GUI/PanelStyle.tres" type="StyleBox" id=2]
@@ -65,6 +65,8 @@ expand_margin_left = 12.0
 expand_margin_right = 12.0
 expand_margin_top = 4.0
 expand_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxEmpty" id=7]
 
 [sub_resource type="DynamicFont" id=6]
 size = 22
@@ -177,3 +179,39 @@ Tabs/styles/panel = SubResource( 4 )
 Tabs/styles/tab_bg = SubResource( 5 )
 Tabs/styles/tab_disabled = null
 Tabs/styles/tab_fg = ExtResource( 2 )
+Tree/colors/custom_button_font_highlight = Color( 0, 0, 0, 1 )
+Tree/colors/drop_position_color = Color( 0, 0, 0, 1 )
+Tree/colors/font_color = Color( 0.8, 0.764706, 0.764706, 1 )
+Tree/colors/font_color_selected = Color( 0, 0, 0, 1 )
+Tree/colors/guide_color = Color( 0, 0, 0, 1 )
+Tree/colors/relationship_line_color = Color( 0, 0, 0, 1 )
+Tree/colors/title_button_color = Color( 0, 0, 0, 1 )
+Tree/constants/button_margin = 0
+Tree/constants/draw_guides = 0
+Tree/constants/draw_relationship_lines = 0
+Tree/constants/hseparation = 0
+Tree/constants/item_margin = 0
+Tree/constants/scroll_border = 0
+Tree/constants/scroll_speed = 0
+Tree/constants/vseparation = 0
+Tree/fonts/font = null
+Tree/fonts/title_button_font = null
+Tree/icons/arrow = null
+Tree/icons/arrow_collapsed = null
+Tree/icons/checked = null
+Tree/icons/select_arrow = null
+Tree/icons/unchecked = null
+Tree/icons/updown = null
+Tree/styles/bg = SubResource( 7 )
+Tree/styles/bg_focus = null
+Tree/styles/button_pressed = null
+Tree/styles/cursor = null
+Tree/styles/cursor_unfocused = null
+Tree/styles/custom_button = null
+Tree/styles/custom_button_hover = null
+Tree/styles/custom_button_pressed = null
+Tree/styles/selected = null
+Tree/styles/selected_focus = null
+Tree/styles/title_button_hover = null
+Tree/styles/title_button_normal = null
+Tree/styles/title_button_pressed = null
