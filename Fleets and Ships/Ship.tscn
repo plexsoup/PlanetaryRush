@@ -117,7 +117,6 @@ position = Vector2( 21.6198, -12.4828 )
 position = Vector2( 21.6198, 11.4533 )
 
 [node name="Engines" type="Node2D" parent="."]
-scale = Vector2( 1, 1 )
 
 [node name="FuelLimitTimer" type="Timer" parent="Engines"]
 wait_time = 30.0

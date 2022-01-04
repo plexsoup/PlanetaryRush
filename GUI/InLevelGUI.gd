@@ -12,16 +12,14 @@ func start(factionsList): # called by Level.gd
 	initializeFactionProgressBars(factionsList)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	if global.Ticks % 100 == 0:
-		updateFactionProgressBars()
+#func _process(delta):
+#	pass
 		
 func initializeFactionProgressBars(factionList):
 	for faction in factionList:
 		spawnProgressIndicator(faction)
 
-func updateFactionProgressBars():
-	pass
+
 
 func spawnProgressIndicator(factionObj):
 	var progressScene = load("res://GUI/FactionProgressIndicator.tscn")

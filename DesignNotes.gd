@@ -1,20 +1,15 @@
 """
 Current Work Effort:
-- remove queue_free from faction and ai_controller
-	- change to a DEAD state
-	- allows other objects to continue to reference them.
-	- but you'll have to change:
-		 if is_instance_valid() checks to:
-		 if obj.State == obj.States.DEAD checks
+- planets lose their population too easily.
+	- have the ships go into a bombardment state and work on it a bit more slowly.
+
+- set a destination planet on the fleet's path
+	- avoid all other planets on the way to destination
 	
-- figure out who's the authoritative source of truth for winning and losing.
-	- who declares, who announces?
-	- there's no effective win condition
 
 - sometimes the AI draws from unowned planets
 	- Maybe the Cursor should be a child of the Faction
 
-- finish the SignalsBus.gd and sdEvent.gd effort to generalize signaling
 
 - set the starting planets further apart, if possible
 
@@ -22,6 +17,9 @@ Current Work Effort:
 	- add to group InGameTimers
 	- walk through the group and adjust as required
 	- consider a custom timer object (if required)
+	- you might need a signals bus for this.. so you can subscribe to game_speed changed events.
+
+- move win/lose checks into a referee object?
 
 
 Bugs

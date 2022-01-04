@@ -133,6 +133,7 @@ func collectVelocityVectors():
 	VelocityVectors = []
 	VelocityVectors.push_back(get_peer_avoidance_vector())
 	VelocityVectors.push_back(get_fleet_path_vector())
+	VelocityVectors.push_back(get_planet_avoidance_vector(NavTarget))
 	# later, add:
 		# threat_pursuit_vector
 		# planet_attack_vector
@@ -156,8 +157,20 @@ func get_fleet_path_vector():
 		returnVec += (targetPos - myPos).normalized()
 	return returnVec
 
+func get_planet_avoidance_vector(destinationPlanet):
+	# find the nearest planet, and add a vector away from it if it's too close
 
-
+	var returnVec = Vector2(0,0)
+	var myPos = get_global_position()
+	var avoidDistance = 200.0
+	
+	var nearestPlanet = global.planet_container.get_nearest_planet(myPos)
+	if nearestPlanet != destinationPlanet and nearestPlanet != OriginPlanet: # you're allowed to land on the destination
+		var planetPos = nearestPlanet.get_global_position()
+		if myPos.distance_squared_to(planetPos) < avoidDistance * avoidDistance:
+			returnVec += (myPos - planetPos).normalized()
+	return returnVec
+	
 func get_peer_avoidance_vector():
 	var returnVec = Vector2(0,0)
 	var myPos = get_global_position()

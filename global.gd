@@ -1,3 +1,7 @@
+# global.gd autoload
+# store variables and vital object references
+# for other scripts to refer to
+
 extends Node
 
 var options : Dictionary = {
@@ -10,7 +14,7 @@ enum States { STARTSCREEN, OPTIONS_MENU, FIGHTING, SHOPPING, PAUSED, ENDSCREEN }
 var State = States.STARTSCREEN
 var Ticks : int = 0
 
-var Debug : bool = true
+var Debug : bool = false
 var game_speed: float = 1.2 # normal game is 1.0, fast game is 2.0, paused is 0.0. lower is slower (easier)
 var previous_game_speed: float
 var screen_size : Vector2

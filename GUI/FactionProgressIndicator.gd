@@ -21,6 +21,10 @@ func _process(delta):
 	if global.Ticks % 100 == 0:
 		var factionPlanets = FactionObj.CurrentPlanetList.size()
 		var totalPlanets = global.planet_container.get_child_count()
+		if factionPlanets == 0:
+			Label.set_text("Dead")
+		else:
+			Label.set_text(FactionObj.Name)
 		ProgressBar.set_value(float(factionPlanets)/float(totalPlanets)*100)
 		ProgressBar.update()
 		

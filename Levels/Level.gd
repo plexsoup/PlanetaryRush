@@ -165,18 +165,22 @@ func _on_faction_lost(factionObj):
 	# Trigger loss if the player isn't in the list
 	var victory = false
 	var remainingFactions = getRemainingFactions()
+	var numFactionsRemaining = remainingFactions.size()
 	for faction in remainingFactions:
 		print(faction.Name)
 	if remainingFactions.has(global.PlayerFactionObj):
-		if remainingFactions.size() <= 1:
+		if numFactionsRemaining == 1:
 			victory = true
 			Winning_faction = global.PlayerFactionObj
-		elif remainingFactions.size() <= 2 and remainingFactions.has(global.NeutralFactionObj):
+		elif numFactionsRemaining == 2 and remainingFactions.has(global.NeutralFactionObj):
 			victory = true
 			Winning_faction = global.PlayerFactionObj
-	elif remainingFactions.size() <= 1:
+	elif remainingFactions.size() == 1:
 		victory = true # but not the player
 		Winning_faction = remainingFactions[0]
+	elif numFactionsRemaining == 2 and remainingFactions.has(global.NeutralFactionObj):
+		victory = true
+		Winning_faction = remainingFactions[1] # sketchy logic.. what's the easiest way to identify the non-neutral faction?
 		
 		
 	if victory:
