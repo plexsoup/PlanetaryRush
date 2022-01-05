@@ -3,7 +3,7 @@
 [ext_resource path="res://Fleets and Ships/Ship.gd" type="Script" id=1]
 [ext_resource path="res://Weapons/laser.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Fleets and Ships/ships.png" type="Texture" id=3]
-[ext_resource path="res://Weapons/Weapons.gd" type="Script" id=4]
+[ext_resource path="res://Weapons/ShipToShipLasers.tscn" type="PackedScene" id=4]
 [ext_resource path="res://effects/explosion1.png" type="Texture" id=5]
 [ext_resource path="res://effects/explosion.wav" type="AudioStream" id=6]
 
@@ -97,28 +97,15 @@ position = Vector2( 61.1097, 0 )
 polygon = PoolVector2Array( -14.6054, -16.5883, 437.565, -274.673, 437.331, 270.258, -14.6511, 19.0276 )
 
 [node name="Weapons" type="Node2D" parent="."]
-script = ExtResource( 4 )
-BulletScene = ExtResource( 2 )
+scale = Vector2( 1, 1 )
 
-[node name="ReloadTimer" type="Timer" parent="Weapons" groups=["InGameTimers"]]
-wait_time = 0.33
-one_shot = true
-
-[node name="SwapMagazineTimer" type="Timer" parent="Weapons" groups=["InGameTimers"]]
-wait_time = 2.0
-one_shot = true
-
-[node name="Muzzles" type="Node2D" parent="Weapons"]
-
-[node name="Muzzle1" type="Position2D" parent="Weapons/Muzzles"]
-position = Vector2( 21.6198, -12.4828 )
-
-[node name="Muzzle2" type="Position2D" parent="Weapons/Muzzles"]
-position = Vector2( 21.6198, 11.4533 )
+[node name="ShipToGroundLasers" parent="Weapons" instance=ExtResource( 4 )]
+ShipToShip = false
+ShipToGround = true
 
 [node name="Engines" type="Node2D" parent="."]
 
-[node name="FuelLimitTimer" type="Timer" parent="Engines"]
+[node name="FuelLimitTimer" type="Timer" parent="Engines" groups=["InGameTimers"]]
 wait_time = 30.0
 one_shot = true
 autostart = true
@@ -153,7 +140,4 @@ __meta__ = {
 [connection signal="body_entered" from="." to="." method="_on_Ship_body_entered"]
 [connection signal="area_entered" from="FiringArc" to="." method="_on_FiringArc_area_entered"]
 [connection signal="body_entered" from="FiringArc" to="." method="_on_FiringArc_body_entered"]
-[connection signal="timeout" from="Weapons/ReloadTimer" to="Weapons" method="_on_ReloadTimer_timeout"]
-[connection signal="timeout" from="Weapons/SwapMagazineTimer" to="." method="_on_SwapMagazineTimer_timeout"]
-[connection signal="timeout" from="Weapons/SwapMagazineTimer" to="Weapons" method="_on_SwapMagazineTimer_timeout"]
 [connection signal="timeout" from="Engines/FuelLimitTimer" to="." method="_on_FuelLimitTimer_timeout"]

@@ -36,7 +36,7 @@ func _on_SpeedSlider_mouse_exited():
 
 func _on_NumFactionsButton_item_selected(index):
 	$Sounds/ClickNoise.play()
-	global.NumFactions = index + 2
+	global.NumFactions = index + 1
 	print("OptionDetails.gd: index == " + str(index) + " therefore NumFactions = " + str(global.NumFactions) )
 
 #	var factionSelector : ItemList = get_node("VBoxContainer/FactionsSection/FactionSelectHSplit/FactionSelect")

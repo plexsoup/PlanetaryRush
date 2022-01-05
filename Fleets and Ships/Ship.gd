@@ -19,8 +19,12 @@ export var DefaultFuelTimeLimit : float = 30.0 # seconds
 var Health = 1
 var NavTarget # could be Position2D (FleetTarget) or StaticBody2D (planet)
 var OriginPlanet : StaticBody2D
+var DestinationPlanet : StaticBody2D
 var TimeElapsed : float = 0
-var Ticks: int = 0
+
+var ShipToGroundWeapons = []
+var ShipToShipWeapons = []
+
 onready var FiringArcCollisionShape = $FiringArc/CollisionPolygon2D
 
 var VectorToGoal # for debug drawing
@@ -35,22 +39,32 @@ signal destroyed(shipObj)
 func _ready():
 	add_to_group("ships")
 
+
 # Called by fleet
-func start(factionObj, navTarget, originPlanet):
+func start(factionObj, navTarget, originPlanet, destinationPlanet):
 	FactionObj = factionObj
 	registerShipWithFaction()
 	if FactionObj.IsLocalHumanPlayer:
 		IsHumanPlayer = true
 	set_color(factionObj)
 	OriginPlanet = originPlanet
+	DestinationPlanet = destinationPlanet
 	$Sprite.set_frame(factionObj.Number)
 	MyFleet = get_parent().get_parent() # each fleet has a ShipsContainer node
 	NavTarget = navTarget # FleetTarget
 	startFuelTimer(DefaultFuelTimeLimit)
+	initializeWeapons()
+	
+func initializeWeapons():
+	for weapon in $Weapons.get_children():
+		if weapon.ShipToGround == true:
+			ShipToGroundWeapons.push_back(weapon)
+		if weapon.ShipToShip == true:
+			ShipToShipWeapons.push_back(weapon)
 
 func startFuelTimer(durationInSeconds):
 	# adjusted for game_speed
-	$Engines/FuelLimitTimer.set_wait_time(durationInSeconds / max(global.game_speed, 0.1))
+	$Engines/FuelLimitTimer.set_wait_time(durationInSeconds / max(global.game_speed, 0.0001))
 	$Engines/FuelLimitTimer.start()
 
 
@@ -74,24 +88,22 @@ func set_color(factionObj):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if State == States.DEAD:
-		return
+	var level = global.Main.CurrentLevel
+	if level.State == level.States.PLAYING and self.State != self.States.DEAD:
+		TimeElapsed += delta
+		collectVelocityVectors()
+		move(delta)
 		
-	TimeElapsed += delta
-	Ticks += 1
-	
-	collectVelocityVectors()
-	move(delta)
-	
-	$StatusLabel.text = States.keys()[State]
-	
-	update() # refreshes _draw()
-	
-	if State == States.RETURNING:
-		# hack to prevent hovering around planets you never left
-		land_on_nearby_planet()
+		if global.Debug:
+			$StatusLabel.text = States.keys()[State]
+			update() # refreshes _draw()
+		
+		if State == States.RETURNING:
+			# hack to prevent hovering around planets you never left
+			land_on_nearby_planet()
 	
 func land_on_nearby_planet():
+	printerr("Ship.gd called land_on_nearby target. This doesn't happen often.")
 		#Why aren't we using collision shapes for this?
 
 	if NavTarget == null: # ? why ?
@@ -159,12 +171,13 @@ func get_fleet_path_vector():
 
 func get_planet_avoidance_vector(destinationPlanet):
 	# find the nearest planet, and add a vector away from it if it's too close
-
+	var level = global.Main.CurrentLevel
+	
 	var returnVec = Vector2(0,0)
 	var myPos = get_global_position()
 	var avoidDistance = 200.0
 	
-	var nearestPlanet = global.planet_container.get_nearest_planet(myPos)
+	var nearestPlanet = level.PlanetContainer.get_nearest_planet(myPos)
 	if nearestPlanet != destinationPlanet and nearestPlanet != OriginPlanet: # you're allowed to land on the destination
 		var planetPos = nearestPlanet.get_global_position()
 		if myPos.distance_squared_to(planetPos) < avoidDistance * avoidDistance:
@@ -208,26 +221,33 @@ func disable_firingArc():
 func enable_firingArc():
 	FiringArcCollisionShape.call_deferred("set_disabled", false)
 
+func fireOnPlanet(planet):
+	if planet.FactionObj != self.FactionObj:
+		if planet == DestinationPlanet:
+			for weapon in ShipToGroundWeapons:
+				if weapon.WeaponStatus == weapon.Status.READY:
+					weapon.CommenceFiring()
+					disable_firingArc()
+
+
+
 func _on_FiringArc_area_entered(area):
 	if area.is_in_group("ships") and area.FactionObj != FactionObj:
-		
-		if $Weapons.WeaponStatus == $Weapons.Status.READY:
-			$Weapons.CommenceFiring()
-			disable_firingArc()
-		# TODO: what happens if the weapons aren't ready? should it circle for another pass?
+
+		for weapon in ShipToShipWeapons:
+			if weapon.WeaponStatus == weapon.Status.READY:
+				weapon.CommenceFiring()
+				disable_firingArc()
+			# TODO: what happens if the weapons aren't ready? should it circle for another pass?
 		
 
 func _on_FiringArc_body_entered(body):
-	if body.is_in_group("planets") and body.FactionObj != self.FactionObj:
-		# the ship reached it's target planet. Break off from the path and start bombardment
+	# shoot planets, but not friendly ones
 		
-		if $Weapons.WeaponStatus == $Weapons.Status.READY:
-			$Weapons.CommenceFiring()
-			
-			disable_collision_shapes()
-		# TODO: what happens if the weapons aren't ready? should it circle for another pass?
+	if body.is_in_group("planets"):
+		fireOnPlanet(body)
 		
-		
+
 func _on_hit(damage, factionObj): # is factionObj the attacker or defender?
 	Health -= damage
 	if Health < 0:

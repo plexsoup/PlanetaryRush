@@ -314,8 +314,8 @@ margin_bottom = 75.0
 size_flags_horizontal = 2
 size_flags_vertical = 4
 text = "2"
-items = [ "2", null, false, 2, null, "3", null, false, 3, null, "4", null, false, 4, null, "5", null, false, 5, null ]
-selected = 0
+items = [ "1", null, false, 1, null, "2", null, false, 2, null, "3", null, false, 3, null, "4", null, false, 4, null ]
+selected = 1
 
 [node name="FactionSelectHSplit" type="HSplitContainer" parent="VBoxContainer/FactionsSection"]
 margin_left = 508.0

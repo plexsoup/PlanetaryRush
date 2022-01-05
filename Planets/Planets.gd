@@ -16,7 +16,7 @@ func _ready():
 	var AA = Vector2( -1 * global.screen_size )
 	var BB = Vector2( 2 *global.screen_size )
 	DeploymentZone = Rect2(AA, BB)
-	global.planet_container = self # singleton
+	global.planet_container = self # singleton, but it should be registered in Level, not global.
 	
 func start(factionObj):
 	pass # have to wait for factions to be ready first.
@@ -104,7 +104,7 @@ func isColliding(new_planet):
 func get_nearest_planet(pos):
 	var closest = null
 	var closest_dist_sq = 10000000
-	for planet in global.planet_container.get_children():
+	for planet in self.get_children():
 		var planetPos = planet.get_global_position()
 		var dist_sq_to_planet = pos.distance_squared_to(planetPos)
 		if dist_sq_to_planet < closest_dist_sq:
@@ -117,7 +117,7 @@ func get_nearest_faction_planet(factionObj, pos):
 
 	var closestPlanet = null
 	var closest_dist_sq = 10000000
-	for planet in global.planet_container.get_children():
+	for planet in self.get_children():
 		if planet.FactionObj == factionObj:
 			var planetPos = planet.get_global_position()
 			var dist_sq_to_planet = pos.distance_squared_to(planetPos)

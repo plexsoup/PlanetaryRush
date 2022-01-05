@@ -63,6 +63,9 @@ custom_constants/margin_right = 30
 custom_constants/margin_top = 10
 custom_constants/margin_left = 30
 custom_constants/margin_bottom = 10
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TabContainer/Start/MarginContainer"]
 margin_left = 30.0
@@ -169,8 +172,8 @@ size_flags_vertical = 3
 alignment = 1
 
 [node name="Authoring" type="RichTextLabel" parent="MarginContainer/TabContainer/Licenses/MarginContainer/VBoxContainer"]
-margin_right = 860.0
-margin_bottom = 365.0
+margin_right = 844.0
+margin_bottom = 337.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 bbcode_enabled = true
@@ -202,10 +205,10 @@ Godot, Gimp, Audacity, Inkscape, Blender
 "
 
 [node name="GridContainer" type="GridContainer" parent="MarginContainer/TabContainer/Licenses/MarginContainer/VBoxContainer"]
-margin_left = 262.0
-margin_top = 369.0
-margin_right = 598.0
-margin_bottom = 433.0
+margin_left = 254.0
+margin_top = 341.0
+margin_right = 590.0
+margin_bottom = 405.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
@@ -298,7 +301,7 @@ margin_bottom = 312.0
 size_flags_horizontal = 3
 
 [node name="Threats" type="HSplitContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide"]
-margin_right = 442.0
+margin_right = 416.0
 margin_bottom = 279.0
 size_flags_vertical = 3
 dragger_visibility = 1
@@ -311,45 +314,45 @@ text = "Threats"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/Threats"]
 margin_left = 103.0
-margin_right = 442.0
+margin_right = 416.0
 margin_bottom = 279.0
 
 [node name="Pirates" type="CheckBox" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/Threats/VBoxContainer"]
-margin_right = 309.0
+margin_right = 313.0
 margin_bottom = 29.0
 text = "Pirates"
 
 [node name="BlackHoles" type="CheckBox" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/Threats/VBoxContainer"]
 margin_top = 33.0
-margin_right = 309.0
+margin_right = 313.0
 margin_bottom = 62.0
 text = "Black Holes"
 
 [node name="Nebulae" type="CheckBox" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/Threats/VBoxContainer"]
 margin_top = 66.0
-margin_right = 309.0
+margin_right = 313.0
 margin_bottom = 95.0
 text = "Nebulae"
 
 [node name="ShipCombat" type="HSplitContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide"]
 margin_top = 283.0
-margin_right = 442.0
-margin_bottom = 316.0
+margin_right = 416.0
+margin_bottom = 312.0
 dragger_visibility = 1
 
 [node name="Label" type="Label" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/ShipCombat"]
-margin_top = 4.0
+margin_top = 2.0
 margin_right = 150.0
-margin_bottom = 29.0
+margin_bottom = 27.0
 text = "Ship Combat"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/ShipCombat"]
 margin_left = 162.0
-margin_right = 442.0
-margin_bottom = 33.0
+margin_right = 416.0
+margin_bottom = 29.0
 
 [node name="Bullets" type="OptionButton" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/ShipCombat/VBoxContainer"]
-margin_right = 233.0
+margin_right = 254.0
 margin_bottom = 29.0
 text = "Bullets"
 items = [ "Bullets", null, false, 0, null, "Rays", null, false, 1, null ]

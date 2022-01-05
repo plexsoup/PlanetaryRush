@@ -6,6 +6,7 @@ var NavTarget
 var Speed : float = 160.0 # try to keep the navTarget just a bit faster than the ships
 var FactionObj : Node2D
 var OriginPlanet
+var DestinationPlanet
 var Name : String
 
 enum States { DEPLOYING, MOVING, WAITING, FINISHED }
@@ -24,13 +25,14 @@ func _process(delta):
 		move_fleet_NavTarget(delta)
 
 # called from Planet
-func start(fleetPath, factionObj, numShips, shipScene, originPlanet):
+func start(fleetPath, factionObj, numShips, shipScene, originPlanet, destinationPlanet):
 	FactionObj = factionObj
 	FleetPath = fleetPath
 	NavTarget = FleetPath.get_node("FleetTarget")
 	OriginPlanet = originPlanet
+	DestinationPlanet = destinationPlanet
 	State = States.MOVING
-	addShips(factionObj, numShips, shipScene)
+	spawnShips(factionObj, numShips, shipScene, destinationPlanet)
 
 
 func move_fleet_NavTarget(delta):
@@ -107,11 +109,11 @@ func get_closest_friendly_planet(pos):
 	
 
 
-func addShips(factionObj, numShips, shipScene):
+func spawnShips(factionObj, numShips, shipScene, destinationPlanet):
 	for i in range(numShips):
 		var shipNode = shipScene.instance()
 		$ShipsContainer.add_child(shipNode)
-		shipNode.start(factionObj, NavTarget, OriginPlanet)
+		shipNode.start(factionObj, NavTarget, OriginPlanet, destinationPlanet)
 		# stick to local coords for this
 		shipNode.set_position(Vector2(rand_range(-50, 50), rand_range(-50, 50)))
 

@@ -41,42 +41,45 @@ func start(factionObj):
 	# set up a delay interval so the AI can't make too many Actions per minute.
 	restart_timer()
 	FactionObj = factionObj
+	CurrentSourcePlanet = FactionObj.CurrentPlanetList[0]
 	
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if State == States.DEAD:
-		return
-	elif is_instance_valid(FactionObj):
-		var remainingPlanets = FactionObj.getRemainingPlanetCount()
-		if remainingPlanets == 0:
-			# ignore the fact that you may have fleets in transit
-			die()
-	else:
-		# dude, your faction quit and queued_free.
-		die()
-	
-	if is_instance_valid(CurrentSourcePlanet):
-		var objective:Vector2 = get_global_position()
+	var level = global.Main.CurrentLevel
+	if level.State == level.States.PLAYING and State != States.DEAD:
+		if not is_instance_valid(FactionObj) or FactionObj.getRemainingPlanetCount() == 0:
+			return
+		
+		if is_instance_valid(CurrentSourcePlanet):
+			var objectivePos = getObjectivePos(CurrentSourcePlanet)
+			move_cursor_toward_objective(objectivePos)
+			execute_click_events(objectivePos)
+			
+			$StateLabel.text = States.keys()[State]
+		else:
+			printerr("AIController.gd " + self.name + " has no CurrentSourcePlanet")
+
+func getObjectivePos(sourcePlanet):
+	if is_instance_valid(sourcePlanet):
+		var objectivePos:Vector2 = get_global_position()
 		if State == States.SEEKING:
-			if CurrentSourcePlanet != null and is_instance_valid(CurrentSourcePlanet):
-				objective = CurrentSourcePlanet.get_global_position()
+			if sourcePlanet != null and is_instance_valid(sourcePlanet):
+				objectivePos = sourcePlanet.get_global_position()
 			else:
 				printerr("AIController.gd has invalid source planet")
 		elif State == States.DRAWING_PATH:
 			if CurrentTargetPlanet == null:
 				printerr("AI Controller in _process, has no CurrentPlanet to seek")
 			else:
-				objective = CurrentTargetPlanet.get_global_position()
+				objectivePos = CurrentTargetPlanet.get_global_position()
+		return objectivePos
+	else:
+		return self.get_global_position() # might need a better escape than this
 
-		move_cursor_toward_objective(objective)
-		execute_click_events(objective)
-		
-		$StateLabel.text = States.keys()[State]
-
-func move_cursor_toward_objective(objective):
+func move_cursor_toward_objective(objectivePos):
 	var currentPos = get_parent().get_global_position()
-	var newPos = currentPos + currentPos.direction_to(objective) * PseudoMouseSpeed * global.game_speed
+	var newPos = currentPos + currentPos.direction_to(objectivePos) * PseudoMouseSpeed * global.game_speed
 	get_parent().set_global_position( newPos )
 	
 	
@@ -93,25 +96,34 @@ func execute_click_events(objective):
 			end_path()
 
 
-# refactor: could move this function into the factionObj
-func get_random_planet(factionObj):
-	var rndPlanet = global.planet_container.get_random_planet(factionObj)
-	#print("found random planet: " + str(rndPlanet) + " from " + global.planet_container.name)
-	return rndPlanet
-	
+## refactor: could move this function into the factionObj
+#func get_random_planet(factionObj):
+#	var rndPlanet = global.planet_container.get_random_planet(factionObj)
+#	#print("found random planet: " + str(rndPlanet) + " from " + global.planet_container.name)
+#	return rndPlanet
+
 
 func plot_new_course():
+	var level = global.Main.CurrentLevel
 	var factionToAttack : Node2D
+	var enemyFactionsRemaining = level.getRemainingFactions()
+	enemyFactionsRemaining.remove(enemyFactionsRemaining.find(FactionObj))
+
+	if enemyFactionsRemaining.has(global.PlayerFactionObj):
+		var diceroll = randf()
+		if diceroll < 0.33:
+			factionToAttack = global.PlayerFactionObj
+		else:
+			factionToAttack = enemyFactionsRemaining[randi()%enemyFactionsRemaining.size()]
 	
-	var diceroll = randf()
 	
-	if randf() < 0.6:
-		factionToAttack = global.NeutralFactionObj
+	var originPlanet = level.PlanetContainer.get_random_planet(FactionObj)
+	var destinationPlanet
+	if randf() < 0.66:
+		destinationPlanet = level.PlanetContainer.get_nearest_faction_planet(factionToAttack, self.get_global_position())
 	else:
-		factionToAttack = global.PlayerFactionObj
-	
-	var originPlanet = get_random_planet(FactionObj)
-	var destinationPlanet = get_random_planet(factionToAttack)
+		destinationPlanet = level.PlanetContainer.get_random_planet(factionToAttack)
+
 	# note: this will send ships to your own planets sometimes
 	if originPlanet != destinationPlanet:
 		CurrentTargetPlanet = destinationPlanet
@@ -151,12 +163,6 @@ func isStillDrawing():
 	else:
 		return false
 
-func planets_remaining():
-	printerr("AI controller deprecated function? planets_remaining")
-#	#print("AI Faction == ", Faction)
-#	var planetsRemaining = FactionObj.getRemainingPlanetCount()
-#	print(FactionObj.name + " planets remaining == " + planetsRemaining)
-#	return planetsRemaining
 	
 func die():
 	State = States.DEAD
@@ -165,15 +171,11 @@ func die():
 	
 	
 func _on_DecisionTimer_timeout():
-	#print("AI Timer ding")
 	if global.State != global.States.FIGHTING:
-		#print("global State == " + global.States.keys()[global.State])
 		restart_timer()
 		return
 	else: # paused or dead?
 		# we might need a mechanism to recover from pause..
-		
-		#print("global State == " + global.States.keys()[global.State])
 		pass
 	
 	if FactionObj.getRemainingPlanetCount() > 0 and State != States.DEAD:

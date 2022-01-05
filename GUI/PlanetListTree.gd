@@ -17,6 +17,7 @@ func _process(delta):
 		populateTree()
 
 func populateTree():
+	var level = global.Main.CurrentLevel
 	var tree = self
 	tree.clear()
 	var root = tree.create_item()
@@ -37,6 +38,7 @@ func populateTree():
 	var summaryNode = tree.create_item(root)
 	summaryNode.set_text(0, "Summary")
 	var planetContainerNode = tree.create_item(summaryNode)
+	
 	planetContainerNode.set_text(0, "Planets: " + str(global.planet_container.get_child_count()) )
 	var countNode = tree.create_item(summaryNode)
 	countNode.set_text(0, "Faction count = " + str(numTotalPlanets))

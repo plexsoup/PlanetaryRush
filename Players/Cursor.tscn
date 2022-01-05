@@ -1,7 +1,6 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Players/Cursor.gd" type="Script" id=1]
-[ext_resource path="res://Camera2D.gd" type="Script" id=2]
 [ext_resource path="res://GUI/fleetFollowTarget.png" type="Texture" id=3]
 [ext_resource path="res://Players/PlayerController.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Players/AIController.tscn" type="PackedScene" id=5]
@@ -13,15 +12,6 @@ radius = 23.065
 script = ExtResource( 1 )
 PlayerControllerScene = ExtResource( 4 )
 AIControllerScene = ExtResource( 5 )
-
-[node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2( 3, 3 )
-smoothing_enabled = true
-drag_margin_left = 0.8
-drag_margin_top = 0.8
-drag_margin_right = 0.8
-drag_margin_bottom = 0.8
-script = ExtResource( 2 )
 
 [node name="Sprite" type="Sprite" parent="."]
 scale = Vector2( 0.25, 0.25 )

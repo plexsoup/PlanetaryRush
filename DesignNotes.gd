@@ -1,5 +1,7 @@
 """
 Current Work Effort:
+- there's still a problem with win/lose signalling
+	
 - planets lose their population too easily.
 	- have the ships go into a bombardment state and work on it a bit more slowly.
 
@@ -24,8 +26,10 @@ Current Work Effort:
 
 Bugs
 - planets spawn on top of each other
-- AI draw lines through planets
-- ships should avoid planets
+
+
+
+- can't have 5 factions, not enough sprites?
 
 - If player selects any other factions, game freaks out.
 - global.toggle_soft_pause needs a way to restart timers after a pause.
@@ -57,6 +61,9 @@ Features to add
 Game Feel Enhancements to change
 - move game speed slider to main gameplay window
 
+- ships don't feel like they're trying to achieve their objective..
+	- when they get to their destination planet, they scatter.
+	
 - pausing brings up the new game menu.. feels a bit weird.
 
 - fix some of the lag.. maybe get rid of lasers. maybe make fleets one unit instead of a flock of ships

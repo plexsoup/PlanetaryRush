@@ -10,7 +10,7 @@ var Ticks :int = 0
 var MinZoom = 0.3
 var MaxZoom = 4.5
 
-onready var Cursor = get_node("..")
+onready var Cursor = get_node("../..") # parent of playercontroller
 
 func _ready():
 	DesiredZoom = zoom
@@ -24,12 +24,6 @@ func _process(delta):
 	Ticks += 1
 	
 #	update()
-#
-#	if target != null:
-#		position = target.position
-#	else:
-#		target = global.getPlayerShip()
-		
 	
 	zoom = lerp(zoom, DesiredZoom, 0.2 * delta * 60)
 	#print("zoom: ", str(zoom))
@@ -59,7 +53,6 @@ func _input(event):
 		DesiredZoom = zoom * 0.8
 		var direction = -1
 		#move_toward_mouse(direction)
-		
 		#set_camera_drag_margins()
 		
 	if event is InputEventMouseButton and event.is_action("zoom_out"):

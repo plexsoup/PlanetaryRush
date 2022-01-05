@@ -76,14 +76,15 @@ func find_faction_cursor():
 	
 
 
-func finish_path():
+func finish_path(destinationPlanet):
 	
 	$MousePolling.stop()
 	State = States.FINISHED
+	
 	connect("finished_drawing", MyPlanet, "_on_ShipPath_finished_drawing")
 	connect("finished_drawing", CursorObj, "_on_ShipPath_finished_drawing")
 	
-	emit_signal("finished_drawing", self)
+	emit_signal("finished_drawing", self, destinationPlanet)
 
 	disconnect("finished_drawing", MyPlanet, "_on_ShipPath_finished_drawing")
 	disconnect("finished_drawing", CursorObj, "_on_ShipPath_finished_drawing")
@@ -93,7 +94,9 @@ func _on_MousePolling_timeout():
 	if CursorObj.isStillDrawing():
 		add_point()
 	else:
-		finish_path()
+		var level = global.Main.CurrentLevel
+		var nearestDestinationPlanet = level.PlanetContainer.get_nearest_planet(CursorObj.get_global_position())
+		finish_path(nearestDestinationPlanet)
 		
 		
 func _draw():

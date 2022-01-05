@@ -71,13 +71,29 @@ func toggle_hard_pause():
 		State = States.FIGHTING
 		
 func toggle_soft_pause():
+	# someone pressed the pause button in the game level.
+	# don't show any options menus or anything, just pause the action.
+	
 	#TODO walk through the scene tree and pause/unpause all the timers?
 	if State == States.PAUSED:
 		game_speed = previous_game_speed
 		State = States.FIGHTING
+		updateInGameTimers(State)
 	else: # **** This will cause problems later. Guaranteed. should be elif or "match" (switch/case).
 		previous_game_speed = game_speed
 		game_speed = 0.0
 		State = States.PAUSED
+		updateInGameTimers(State)
 		
-		
+func updateInGameTimers(state):
+	# may not strictly be necessary since they should respect game_speed.. they get very slow as game_speed approaches zero.
+	var timers = get_tree().get_nodes_in_group("InGameTimers")
+	for timer in timers:
+		if state == States.PAUSED:
+			timer.set_paused(true)
+		elif state == States.FIGHTING:
+			timer.set_paused(false)
+	# there's a script called InGameTimers.gd
+	# it has a function called from _on_pause_toggled
+	# you could signal that instead.
+	

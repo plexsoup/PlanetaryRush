@@ -22,9 +22,11 @@ func start(factionObj, isLocalHumanPlayer):
 	check_requirements()
 	
 	set_faction(factionObj)
-	setupCamera(factionObj)
+
+	printerr("think about deprecating global.cursor variable")
 	if isLocalHumanPlayer:
 		global.cursor = self # who uses this? Camera?
+
 	spawn_player_controller(factionObj, isLocalHumanPlayer)
 
 
@@ -35,14 +37,6 @@ func check_requirements():
 	if AIControllerScene == null:
 		printerr("Error in " + self.name + ": AIController needs a scene in the inspector")
 
-func setupCamera(factionObj):
-	if factionObj.IsLocalHumanPlayer:
-		global.camera = $Camera2D
-		$Camera2D.current = true
-
-	else: # AI don't really need a camera
-		$Camera2D.call_deferred("queue_free")
-	# Someday we may have to tweak the camera settings if we add multiplayer / network
 
 func spawn_player_controller(factionObj, isLocalHumanPlayer):
 	#Set up an event listener for the player, or a bot for AI
@@ -117,7 +111,7 @@ func _on_pause_menu_opened():
 func _on_pause_menu_closed():
 	State = States.ACTIVE
 	
-func _on_ShipPath_finished_drawing(path):
+func _on_ShipPath_finished_drawing(path, destinationPlanet):
 	State = States.ACTIVE
 
 func _on_PlayerController_Clicked(): # signal emulates a mouse click, but it could come from AI

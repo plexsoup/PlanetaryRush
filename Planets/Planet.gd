@@ -158,11 +158,11 @@ func popUp(initial_scale, final_scale):
 	if initial_scale.x < final_scale.x:
 		$AudioStreamPlayer2D.play()
 
-func send_ships(number, path):
-	spawn_fleet(number, path)
+func send_ships(number, path, destinationPlanet):
+	spawn_fleet(number, path, destinationPlanet)
 	units_present -= number
 
-func spawn_fleet(numShips, path): # coming from Planet
+func spawn_fleet(numShips, path, destinationPlanet): # coming from Planet
 	var originPlanet = self
 	var shipScene = load("res://Fleets and Ships/Ship.tscn")
 	var fleetScene = load("res://Fleets and Ships/Fleet.tscn")
@@ -170,7 +170,7 @@ func spawn_fleet(numShips, path): # coming from Planet
 	var fleet = fleetScene.instance()
 	global.level.FleetContainer.add_child(fleet)
 	fleet.set_global_position(get_global_position())
-	fleet.start(path.get_node("PathFollow2D"), FactionObj, numShips, shipScene, originPlanet)
+	fleet.start(path.get_node("PathFollow2D"), FactionObj, numShips, shipScene, originPlanet, destinationPlanet)
 
 
 func celebrate():
@@ -197,9 +197,9 @@ func add_units(number):
 	units_present += number
 
 # signal coming from cursor via global.level
-func _on_ShipPath_finished_drawing(path):
+func _on_ShipPath_finished_drawing(path, destinationPlanet):
 	# send half your ships along the path
-	send_ships(units_present/2, path)
+	send_ships(units_present/2, path, destinationPlanet)
 	
 func _on_hit(damage, factionObj, location = get_global_position()):
 	units_present -= damage

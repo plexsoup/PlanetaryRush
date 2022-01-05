@@ -19,8 +19,9 @@ func start(factionObj):
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if global.Ticks % 100 == 0:
+		var level = global.Main.CurrentLevel
 		var factionPlanets = FactionObj.CurrentPlanetList.size()
-		var totalPlanets = global.planet_container.get_child_count()
+		var totalPlanets = level.PlanetContainer.get_child_count()
 		if factionPlanets == 0:
 			Label.set_text("Dead")
 		else:

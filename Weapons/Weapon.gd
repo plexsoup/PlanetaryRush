@@ -13,13 +13,15 @@ var MagazineSize = NumShotsInBurst
 onready var ReloadTimer = $ReloadTimer
 onready var SwapMagazineTimer = $SwapMagazineTimer
 
+export var ShipToShip : bool = true
+export var ShipToGround : bool = false
 
-enum Status {READY, FIRING, RELOADING}
+enum Status {READY, FIRING, RELOADING, SWAPPING_MAGAZINE}
 var WeaponStatus = Status.READY
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	MyShip = get_parent()
+	MyShip = get_parent().get_parent() # all weapons are in a Weapons container
 	DefaultReloadTime = ReloadTimer.get_wait_time()
 	DefaultSwapMagazineTime = SwapMagazineTimer.get_wait_time()
 	
@@ -45,6 +47,7 @@ func fire():
 # fire bursts of 12 shots every time something enters firing arc
 func CommenceFiring():
 	TimesFired = 0
+	ReloadTimer.set_wait_time(DefaultReloadTime / max(global.game_speed, 0.0001))
 	ReloadTimer.start()
 	WeaponStatus = Status.FIRING
 	
@@ -53,15 +56,13 @@ func _on_ReloadTimer_timeout():
 	if MyShip.State != MyShip.States.DEAD:
 		if TimesFired <= MagazineSize:
 			fire()
-			if global.game_speed > 0.0:
-				ReloadTimer.set_wait_time(DefaultReloadTime / global.game_speed)
-				ReloadTimer.start()
-			else:
-				printerr("Weapons.gd needs a pause function in _on_ReloadTimer_timeout")
+			# this might cause issues coming back from pause..
+			ReloadTimer.set_wait_time(DefaultReloadTime / max(global.game_speed, 0.0001) )
+			ReloadTimer.start()
 		elif TimesFired > MagazineSize:
-			WeaponStatus = Status.RELOADING
+			WeaponStatus = Status.SWAPPING_MAGAZINE
 			if global.game_speed > 0.0:
-				SwapMagazineTimer.set_wait_time(DefaultSwapMagazineTime / global.game_speed)
+				SwapMagazineTimer.set_wait_time(DefaultSwapMagazineTime / max(global.game_speed, 0.0001))
 				SwapMagazineTimer.start()
 			else:
 				printerr("Weapons.gd needs a pause function in _on_ReloadTimer_timeout")
