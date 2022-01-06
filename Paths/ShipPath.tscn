@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Paths/ShipPath.gd" type="Script" id=1]
 [ext_resource path="res://GUI/fleetFollowTarget.png" type="Texture" id=2]
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 125.0
 
 [node name="ShipPath" type="Path2D"]
 curve = null
@@ -18,6 +21,13 @@ lookahead = 6.0
 
 [node name="FleetTarget" type="Position2D" parent="PathFollow2D"]
 
+[node name="FleetDogfightZone" type="Area2D" parent="PathFollow2D/FleetTarget"]
+collision_layer = 8
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PathFollow2D/FleetTarget/FleetDogfightZone"]
+shape = SubResource( 1 )
+
 [node name="Sprite" type="Sprite" parent="PathFollow2D"]
 self_modulate = Color( 1, 1, 1, 0.72549 )
 scale = Vector2( 0.1, 0.1 )
@@ -28,4 +38,5 @@ wait_time = 3.0
 one_shot = true
 
 [connection signal="timeout" from="MousePolling" to="." method="_on_MousePolling_timeout"]
+[connection signal="area_entered" from="PathFollow2D/FleetTarget/FleetDogfightZone" to="." method="_on_FleetDogfightZone_area_entered"]
 [connection signal="timeout" from="DestructionTimer" to="." method="_on_DestructionTimer_timeout"]

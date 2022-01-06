@@ -24,8 +24,8 @@ func start(factionObj, isLocalHumanPlayer):
 	set_faction(factionObj)
 
 	printerr("think about deprecating global.cursor variable")
-	if isLocalHumanPlayer:
-		global.cursor = self # who uses this? Camera?
+#	if isLocalHumanPlayer:
+#		global.cursor = self # who uses this? Camera?
 
 	spawn_player_controller(factionObj, isLocalHumanPlayer)
 

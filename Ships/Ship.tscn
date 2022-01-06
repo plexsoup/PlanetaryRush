@@ -1,8 +1,8 @@
 [gd_scene load_steps=9 format=2]
 
-[ext_resource path="res://Fleets and Ships/Ship.gd" type="Script" id=1]
+[ext_resource path="res://Ships/Ship.gd" type="Script" id=1]
 [ext_resource path="res://Weapons/laser.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Fleets and Ships/ships.png" type="Texture" id=3]
+[ext_resource path="res://Ships/ships.png" type="Texture" id=3]
 [ext_resource path="res://Weapons/ShipToShipLasers.tscn" type="PackedScene" id=4]
 [ext_resource path="res://effects/explosion1.png" type="Texture" id=5]
 [ext_resource path="res://effects/explosion.wav" type="AudioStream" id=6]
@@ -75,7 +75,7 @@ tracks/4/keys = {
 "values": [ false, true ]
 }
 
-[node name="Ship" type="Area2D"]
+[node name="Ship" type="Area2D" groups=["ships"]]
 scale = Vector2( 0.33, 0.33 )
 script = ExtResource( 1 )
 BulletScene = ExtResource( 2 )
@@ -97,7 +97,6 @@ position = Vector2( 61.1097, 0 )
 polygon = PoolVector2Array( -14.6054, -16.5883, 437.565, -274.673, 437.331, 270.258, -14.6511, 19.0276 )
 
 [node name="Weapons" type="Node2D" parent="."]
-scale = Vector2( 1, 1 )
 
 [node name="ShipToGroundLasers" parent="Weapons" instance=ExtResource( 4 )]
 ShipToShip = false
@@ -137,6 +136,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[connection signal="area_entered" from="." to="." method="_on_Ship_area_entered"]
 [connection signal="body_entered" from="." to="." method="_on_Ship_body_entered"]
 [connection signal="area_entered" from="FiringArc" to="." method="_on_FiringArc_area_entered"]
 [connection signal="body_entered" from="FiringArc" to="." method="_on_FiringArc_body_entered"]

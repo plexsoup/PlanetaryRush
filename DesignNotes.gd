@@ -1,5 +1,8 @@
 """
 Current Work Effort:
+- in Ship.gd, add mechanism to engage enemy when state == States.ENEMY_ENGAGED
+- how do you know when a dogfight is over?
+	
 - there's still a problem with win/lose signalling
 	
 - planets lose their population too easily.
@@ -25,6 +28,8 @@ Current Work Effort:
 
 
 Bugs
+- if you pause, then restart game: all planets spawn at -1 population
+
 - planets spawn on top of each other
 
 
@@ -39,11 +44,19 @@ Bugs
 - faction list on title screen is wrong / makes no sense
 
 Refactoring Required
+- Pause menu notifies player's cursor about pause/unpause.
+	- instead, it should notify Main or Level then let them worry about it.
+	- pausemenu.gd shouldn't have to be aware of cursors or players
 - Main should instantiate StartScreen and EndScreen as new levels, instead of changing visibility?
 	- This will allow us to add an upgrade/shopping scene as well
 	- PauseMenu can stay as a hidden node
 - OptionsDetails has a ton of little button scripts.. move them into the root of OptionsDetails
 
+- Someday you might have more than one fleet assigned to any given path..
+	- which means each fleet needs a PathFollow2D node assigned to a common ShipPath
+	- but... PathFollow2D nodes must be children of Path nodes.
+	- so each ShipPath might need more than one PathFollow2D node.
+	
 Features to add
 
 - consider having the gamespeed slowly increase over time. reduces some of the late-stage grind other 4x games have

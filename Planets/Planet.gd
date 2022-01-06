@@ -20,6 +20,7 @@ var focused : bool = false
 var FactionObj : Node2D
 
 signal switched_faction(planetObj, newFactionObj)
+signal assigned_fleet(fleetObj)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -164,13 +165,18 @@ func send_ships(number, path, destinationPlanet):
 
 func spawn_fleet(numShips, path, destinationPlanet): # coming from Planet
 	var originPlanet = self
-	var shipScene = load("res://Fleets and Ships/Ship.tscn")
-	var fleetScene = load("res://Fleets and Ships/Fleet.tscn")
+	var shipScene = load("res://Ships/Ship.tscn")
+	var fleetScene = load("res://Ships/Fleet.tscn")
 
 	var fleet = fleetScene.instance()
 	global.level.FleetContainer.add_child(fleet)
 	fleet.set_global_position(get_global_position())
 	fleet.start(path.get_node("PathFollow2D"), FactionObj, numShips, shipScene, originPlanet, destinationPlanet)
+
+	connect( "assigned_fleet", path, "_on_planet_assigned_fleet")
+	emit_signal("assigned_fleet", fleet)
+	disconnect( "assigned_fleet", path, "_on_planet_assigned_fleet")
+	
 
 
 func celebrate():

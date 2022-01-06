@@ -9,10 +9,14 @@ var OriginPlanet
 var DestinationPlanet
 var Name : String
 
-enum States { DEPLOYING, MOVING, WAITING, FINISHED }
+var CurrentlyEngagedEnemyFleet = null
+
+enum States { DEPLOYING, MOVING, ENGAGING_ENEMY, WAITING, FINISHED }
 var State = States.DEPLOYING
 
 signal ship_released()
+signal fleet_engaged(enemyFleet)
+signal resumed_moving()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -22,7 +26,31 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if State == States.MOVING:
-		move_fleet_NavTarget(delta)
+		if is_instance_valid(NavTarget):
+			move_fleet_NavTarget(delta)
+		else: # Why is the NavTarget gone?
+			printerr("in Fleet.gd, NavTarget queued free while fleet was still moving.")
+			die()
+	elif State == States.ENGAGING_ENEMY:
+		if allShipsAreDead():
+			die()
+		if battleIsOver(CurrentlyEngagedEnemyFleet):
+			resumeMoving()
+
+
+func allShipsAreDead():
+	return (GetShipCount() == 0)
+	
+	
+func battleIsOver(enemyFleet):
+	var battleOver : bool = false
+	if is_instance_valid(enemyFleet):
+		if enemyFleet.allShipsAreDead():
+			battleOver = true
+	elif not is_instance_valid(enemyFleet):
+		battleOver = true
+	
+	return battleOver
 
 # called from Planet
 func start(fleetPath, factionObj, numShips, shipScene, originPlanet, destinationPlanet):
@@ -34,7 +62,13 @@ func start(fleetPath, factionObj, numShips, shipScene, originPlanet, destination
 	State = States.MOVING
 	spawnShips(factionObj, numShips, shipScene, destinationPlanet)
 
-
+func die():
+	remove_path()
+	State = States.FINISHED
+	call_deferred("queue_free")
+	
+	
+	
 func move_fleet_NavTarget(delta):
 	if FleetPath != null and is_instance_valid(FleetPath):
 		FleetPath.set_offset(FleetPath.get_offset() + delta * Speed * global.game_speed)
@@ -47,7 +81,40 @@ func move_fleet_NavTarget(delta):
 			State = States.WAITING
 			yield(get_tree().create_timer(1.0), "timeout")
 			release_fleet()
+
+
+#
+#	return nearestEnemyFleet
+
+func GetCurrentPosition():
+	return NavTarget.get_global_position()
 	
+func initiateDogfight(enemyFleetObj):
+	# notify each ship they're free to battle.
+	# pause the NavTarget on ShipPath until the battle is over?
+	
+	State = States.ENGAGING_ENEMY
+	CurrentlyEngagedEnemyFleet = enemyFleetObj
+	
+	for shipObj in $ShipsContainer.get_children():
+		connect("fleet_engaged", shipObj, "_on_fleet_engaged_enemy")
+		emit_signal("fleet_engaged", enemyFleetObj)
+		disconnect("fleet_engaged", shipObj, "_on_fleet_engaged_enemy")
+
+func resumeMoving():
+	State = States.MOVING
+	CurrentlyEngagedEnemyFleet = null
+	for ship in GetShips():
+		connect("resumed_moving", ship, "_on_fleet_resumed_moving")
+		emit_signal("resumed_moving")
+		disconnect("resumed_moving", ship, "_on_fleet_resumed_moving")
+		
+
+func GetShips():
+	return $ShipsContainer.get_children()
+
+func GetShipCount():
+	return GetShips().size()
 
 func release_fleet():
 	#let the ships return to the nearest planet, at their own discretion
@@ -121,3 +188,7 @@ func spawnShips(factionObj, numShips, shipScene, destinationPlanet):
 		shipNode.set_rotation(shipNode.get_angle_to(factionObj.CursorObj.get_global_position()))
 	
 
+func _on_ShipPath_encountered_enemy(enemyFleetObj):
+	if is_instance_valid(enemyFleetObj):
+		initiateDogfight(enemyFleetObj)
+	

@@ -1,0 +1,18 @@
+[remap]
+
+importer="texture_atlas"
+type="Texture"
+path="res://.import/ship3.png-c667be118e3e2d8d87ddd8aa85dbbfe2.res"
+group_file="res://Ships/textures/ShipAtlas.png"
+valid=true
+[deps]
+
+
+source_file="res://Ships/textures/ship3.png"
+dest_files=[ "res://.import/ship3.png-c667be118e3e2d8d87ddd8aa85dbbfe2.res" ]
+
+[params]
+
+atlas_file="res://Ships/textures/ShipAtlas.png"
+import_mode=0
+crop_to_region=true

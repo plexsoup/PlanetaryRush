@@ -70,7 +70,7 @@ func getObjectivePos(sourcePlanet):
 				printerr("AIController.gd has invalid source planet")
 		elif State == States.DRAWING_PATH:
 			if CurrentTargetPlanet == null:
-				printerr("AI Controller in _process, has no CurrentPlanet to seek")
+				printerr("AI Controller in getObjectivePos, has no CurrentTargetPlanet to seek")
 			else:
 				objectivePos = CurrentTargetPlanet.get_global_position()
 		return objectivePos
@@ -119,19 +119,24 @@ func plot_new_course():
 	
 	var originPlanet = level.PlanetContainer.get_random_planet(FactionObj)
 	var destinationPlanet
-	if randf() < 0.66:
+	if randf() < 0.55:
 		destinationPlanet = level.PlanetContainer.get_nearest_faction_planet(factionToAttack, self.get_global_position())
+		if not is_instance_valid(destinationPlanet):
+			printerr("In AIController plot_new_course: destinationPlanet is invalid (case #1)")
 	else:
 		destinationPlanet = level.PlanetContainer.get_random_planet(factionToAttack)
+		if not is_instance_valid(destinationPlanet):
+			printerr("In AIController plot_new_course: destinationPlanet is invalid (case #2)")
 
 	# note: this will send ships to your own planets sometimes
-	if originPlanet != destinationPlanet:
-		CurrentTargetPlanet = destinationPlanet
-		CurrentSourcePlanet = originPlanet
-		State = States.SEEKING
-	else:
-		
-		restart_timer()
+	if is_instance_valid(originPlanet) and is_instance_valid(destinationPlanet):
+		if originPlanet != destinationPlanet:
+			CurrentTargetPlanet = destinationPlanet
+			CurrentSourcePlanet = originPlanet
+			State = States.SEEKING
+		else: # why should we ever get to this?
+			printerr("AI Controller still has some logic issues near the end of plot_new_course.")
+			restart_timer()
 		
 
 func restart_timer():

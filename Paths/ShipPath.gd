@@ -6,13 +6,14 @@ var MyPlanet : StaticBody2D
 
 enum States { DRAWING, FINISHED }
 var State = States.DRAWING
-var FactionObj : Node2D # I wonder why are factions are integers instead of objects?
+var FactionObj : Node2D
 var CursorObj : Node2D
-	
+var AssignedFleet : Node2D # will this ever be an array instead of a single object?
+
 var FrameTicks = 0
 
 signal finished_drawing(path)
-
+signal encountered_enemy(fleetObj)
 
 
 func _ready():
@@ -89,7 +90,9 @@ func finish_path(destinationPlanet):
 	disconnect("finished_drawing", MyPlanet, "_on_ShipPath_finished_drawing")
 	disconnect("finished_drawing", CursorObj, "_on_ShipPath_finished_drawing")
 
+
 	
+
 func _on_MousePolling_timeout():
 	if CursorObj.isStillDrawing():
 		add_point()
@@ -127,4 +130,24 @@ func _draw():
 			draw_circle(point, pointSize, pointColor)
 		i+= 1
 
+
+
+
+func _on_FleetDogfightZone_area_entered(area):
+	# found another fleet. "Hey my fleet, go fight the other fleet".	
+	
+	if is_instance_valid(AssignedFleet) and is_instance_valid(area) and is_instance_valid(FactionObj):
+		# verify that it's another ship first.
+		var isFleetPathArea = area.owner.has_method("_on_FleetDogfightZone_area_entered")
+		if isFleetPathArea and area.owner.FactionObj != self.FactionObj:
+			var myFleet = AssignedFleet
+			var enemyFleet = area.owner.AssignedFleet
+			connect("encountered_enemy", myFleet, "_on_ShipPath_encountered_enemy")
+			emit_signal("encountered_enemy", enemyFleet)
+			disconnect("encountered_enemy", myFleet, "_on_ShipPath_encountered_enemy")
+			print("ShipPath encountered enemy. Signalling to Fleet")
+
+func _on_planet_assigned_fleet(fleetObj):
+	#AssignedFleets.push_back(fleetObj)
+	AssignedFleet = fleetObj
 

@@ -11,13 +11,13 @@
 [ext_resource path="res://effects/tone.ogg" type="AudioStream" id=9]
 [ext_resource path="res://GUI/VolSlider.gd" type="Script" id=10]
 [ext_resource path="res://effects/pew.wav" type="AudioStream" id=11]
-[ext_resource path="res://Fleets and Ships/ships/ship1.png" type="Texture" id=12]
-[ext_resource path="res://Fleets and Ships/ships/ship3.png" type="Texture" id=13]
+[ext_resource path="res://Ships/textures/ship1.png" type="Texture" id=12]
+[ext_resource path="res://Ships/textures/ship3.png" type="Texture" id=13]
 [ext_resource path="res://effects/clickNoise.wav" type="AudioStream" id=15]
 [ext_resource path="res://effects/UISlide.wav" type="AudioStream" id=16]
-[ext_resource path="res://Fleets and Ships/ships/ship4.png" type="Texture" id=17]
-[ext_resource path="res://Fleets and Ships/ships/ship5.png" type="Texture" id=18]
-[ext_resource path="res://Fleets and Ships/ships/ship2.png" type="Texture" id=19]
+[ext_resource path="res://Ships/textures/ship4.png" type="Texture" id=17]
+[ext_resource path="res://Ships/textures/ship5.png" type="Texture" id=18]
+[ext_resource path="res://Ships/textures/ship2.png" type="Texture" id=19]
 
 [node name="OptionsDetails" type="MarginContainer"]
 pause_mode = 2
