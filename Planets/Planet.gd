@@ -31,11 +31,30 @@ func _ready():
 	State = States.READY
 	
 func start(factionObj, size):
+	var myName = generateName()
+	self.name = myName
 	switch_faction(factionObj)
 	set_planet_size(size)
 	set_difficulty(factionObj)
-	$PlanetNameLabel.text = self.name
+
 	
+	if global.Debug:
+		$PlanetNameLabel.text = myName
+		$PlanetNameLabel.set_visible(true)
+
+	else:
+		$PlanetNameLabel.set_visible(false)
+	
+func generateName():
+	var newName = ""
+	var markovElements = [
+		"em", "by", "wo", "pe", "oe", "ly", "thi", "for", "shu", "la", "tae", "mar"
+	]
+	markovElements.shuffle()
+	for i in range(randi()%4+1):
+		newName += markovElements.pop_back()
+	newName = newName.capitalize()
+	return newName
 
 func set_difficulty(factionObj):
 	if factionObj.IsLocalHumanPlayer:

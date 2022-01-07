@@ -1,8 +1,15 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Weapons/laser.gd" type="Script" id=1]
 [ext_resource path="res://effects/laserWhite.png" type="Texture" id=2]
 [ext_resource path="res://effects/pew.wav" type="AudioStream" id=3]
+
+[sub_resource type="Gradient" id=2]
+offsets = PoolRealArray( 0, 0.56, 1 )
+colors = PoolColorArray( 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 )
+
+[sub_resource type="GradientTexture" id=3]
+gradient = SubResource( 2 )
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 22.8218, 2.49942 )
@@ -16,6 +23,14 @@ position = Vector2( -20.768, -0.0833137 )
 scale = Vector2( 0.312729, 0.0923187 )
 texture = ExtResource( 2 )
 offset = Vector2( 127.42, -0.734604 )
+
+[node name="Highlight" type="Sprite" parent="."]
+self_modulate = Color( 1, 1, 1, 0.717647 )
+position = Vector2( 0.148651, 0.371627 )
+rotation = 1.57079
+scale = Vector2( 0.000933187, 37.8402 )
+texture = SubResource( 3 )
+offset = Vector2( -1041.9, -0.501383 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( 15.4407, -0.166336 )

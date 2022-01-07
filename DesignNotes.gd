@@ -1,43 +1,24 @@
 """
 Current Work Effort:
-- in Ship.gd, add mechanism to engage enemy when state == States.ENEMY_ENGAGED
-- how do you know when a dogfight is over?
+
 	
 - there's still a problem with win/lose signalling
 	
 - planets lose their population too easily.
 	- have the ships go into a bombardment state and work on it a bit more slowly.
 
-- set a destination planet on the fleet's path
-	- avoid all other planets on the way to destination
-	
-
 - sometimes the AI draws from unowned planets
 	- Maybe the Cursor should be a child of the Faction
 
-
-- set the starting planets further apart, if possible
-
-- find all the timers and make sure they respect game speed.
-	- add to group InGameTimers
-	- walk through the group and adjust as required
-	- consider a custom timer object (if required)
-	- you might need a signals bus for this.. so you can subscribe to game_speed changed events.
 
 - move win/lose checks into a referee object?
 
 
 Bugs
+- can't select the yellow faction (or likely any faction > numFactions)
+
 - if you pause, then restart game: all planets spawn at -1 population
 
-- planets spawn on top of each other
-
-
-
-- can't have 5 factions, not enough sprites?
-
-- If player selects any other factions, game freaks out.
-- global.toggle_soft_pause needs a way to restart timers after a pause.
 - AI doesn't realize they've lost a planet before they finish drawing a line
 - lines will draw even if the planet has zero or -1 ships
 - AI is paralyzed when there's no gray planets left?
@@ -72,6 +53,12 @@ Features to add
 
 
 Game Feel Enhancements to change
+- instructions say flank fleets for advantage, but ships turn so fast in dogfights that flanking provides no benefit.
+
+- claiming planets feels way worse than it did on the original release webgame on itch.io
+
+- planet bombardment feels weak.. add more juice. Player should know when ships are bombing planets
+
 - move game speed slider to main gameplay window
 
 - ships don't feel like they're trying to achieve their objective..
@@ -86,7 +73,11 @@ Game Feel Enhancements to change
 
 - need a way to pause the action, but still zoom in and out and look around
 
-
+Big design ideas.
+- would it be cooler if planets had visible ships flying around them (sort of like Arcen games "Last Federation")
+- since nav targets have collision areas, should you be able to drag from those and redraw paths for existing fleets?
+- should all the line drawing features be available during game pause, so players can treat it more like a turn-based game?
+	- if you have that, you could add timed pauses so players can redraw without having to worry about pausing. 
 
 Important Engineering Decisions:
 	- Who's responsible for evaluating and announcing win/loss conditions?

@@ -297,6 +297,7 @@ margin_right = 496.0
 margin_bottom = 122.0
 grow_horizontal = 2
 size_flags_horizontal = 3
+dragger_visibility = 1
 
 [node name="FactionsLabel" type="Label" parent="VBoxContainer/FactionsSection/NumFactionsContainer"]
 margin_left = 80.0

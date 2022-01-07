@@ -124,8 +124,9 @@ volume_db = -22.0
 [node name="AnimationPlayer" type="AnimationPlayer" parent="death"]
 anims/explode = SubResource( 2 )
 
-[node name="StatusLabel" type="Label" parent="."]
-visible = false
+[node name="gimbal" type="Node2D" parent="."]
+
+[node name="StatusLabel" type="Label" parent="gimbal"]
 margin_left = -96.9697
 margin_top = -127.273
 margin_right = -17.9697
@@ -136,8 +137,15 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="pilot" type="Node2D" parent="."]
+
+[node name="DecisionTimer" type="Timer" parent="pilot" groups=["InGameTimers"]]
+wait_time = 0.75
+autostart = true
+
 [connection signal="area_entered" from="." to="." method="_on_Ship_area_entered"]
 [connection signal="body_entered" from="." to="." method="_on_Ship_body_entered"]
 [connection signal="area_entered" from="FiringArc" to="." method="_on_FiringArc_area_entered"]
 [connection signal="body_entered" from="FiringArc" to="." method="_on_FiringArc_body_entered"]
 [connection signal="timeout" from="Engines/FuelLimitTimer" to="." method="_on_FuelLimitTimer_timeout"]
+[connection signal="timeout" from="pilot/DecisionTimer" to="." method="_on_DecisionTimer_timeout"]

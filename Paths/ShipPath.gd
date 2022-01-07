@@ -145,7 +145,7 @@ func _on_FleetDogfightZone_area_entered(area):
 			connect("encountered_enemy", myFleet, "_on_ShipPath_encountered_enemy")
 			emit_signal("encountered_enemy", enemyFleet)
 			disconnect("encountered_enemy", myFleet, "_on_ShipPath_encountered_enemy")
-			print("ShipPath encountered enemy. Signalling to Fleet")
+			#print("ShipPath encountered enemy. Signalling to Fleet")
 
 func _on_planet_assigned_fleet(fleetObj):
 	#AssignedFleets.push_back(fleetObj)

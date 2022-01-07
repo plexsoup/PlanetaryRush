@@ -25,7 +25,7 @@ func start(pos, rot, vel, factionObj):
 
 func set_color(factionObj):
 	if is_instance_valid(factionObj):
-		set_modulate(factionObj.fColor)
+		$Sprite.set_modulate(factionObj.fColor)
 	else: die()
 
 

@@ -10,7 +10,7 @@ extends Area2D
 
 var VelocityVectors:Array = []
 var Speed : float = 150.0
-var TurnSpeed : float = 10.0
+var TurnSpeed : float = 5.0
 var FactionObj : Node2D
 var IsHumanPlayer: bool = false
 var MyFleet: Node2D
@@ -18,6 +18,12 @@ export var BulletScene : PackedScene
 export var DefaultFuelTimeLimit : float = 30.0 # seconds
 export var Health = 1
 export var HullStrength = 1 # amount of damage to deal when you hit another ship.
+export var DefaultAggressionToAversionRatio : float = 0.66 # 0.0 to 1.0. Higher is more likely to engage in a dogfight. Lower is more likely to evade.
+var AggressionToAversionRatio = DefaultAggressionToAversionRatio
+enum Attitudes {AGGRESSIVE, EVASIVE}
+var CurrentAttitude = Attitudes.AGGRESSIVE
+var EvasionDistance = 50.0
+
 # export var Shields = 0
 
 var NavTarget # could be Position2D (FleetTarget) or StaticBody2D (planet)
@@ -62,6 +68,21 @@ func start(factionObj, navTarget, originPlanet, destinationPlanet):
 	NavTarget = navTarget # FleetTarget
 	startFuelTimer(DefaultFuelTimeLimit)
 	initializeWeapons()
+	setDogfightAggressiveness()
+	
+func setState(newState):
+	# we could add checks here to make sure things get done.
+	
+	if States.values().has(newState):
+		State = newState
+	else:
+		printerr("Ship.gd trying to set an invalid state")
+	
+func setDogfightAggressiveness():
+	if randf()<AggressionToAversionRatio:
+		CurrentAttitude = Attitudes.AGGRESSIVE
+	else:
+		CurrentAttitude = Attitudes.EVASIVE
 	
 func initializeWeapons():
 	for weapon in $Weapons.get_children():
@@ -104,11 +125,26 @@ func _process(delta):
 		move(delta)
 		
 		if global.Debug:
-			$StatusLabel.text = States.keys()[State]
-			update() # refreshes _draw()
+			updateDebugInfo()
+
 		
-		if State == States.RETURNING and planet_within_landing_distance(NavTarget):
-			land(NavTarget)
+		if State == States.RETURNING and planet_within_landing_distance(DestinationPlanet):
+			land(DestinationPlanet)
+	
+
+func updateDebugInfo():
+	var label = $gimbal/StatusLabel
+	label.text = States.keys()[State] + ": "
+	if State == States.ENGAGING_ENEMY:
+		label.text += Attitudes.keys()[CurrentAttitude]
+	elif State == States.ADVANCING:
+		label.text += NavTarget.name
+	elif State == States.RETURNING:
+		label.text += DestinationPlanet.name
+		
+	
+	$gimbal.set_global_rotation(0.0)
+	update() # refreshes _draw()
 	
 func planet_within_landing_distance(planetObj):
 	if planetObj == null or not is_instance_valid(planetObj): 
@@ -137,24 +173,26 @@ func move(delta):
 
 
 func turnTowardsTarget(vectorToGoal, delta):
+	
 	var myRot = get_global_rotation()
 	var myFwdVector = Vector2.RIGHT.rotated(myRot)
-	var angleToGoal = myFwdVector.angle_to(vectorToGoal)
-	var lerpedRot = lerp_angle(myRot, angleToGoal, 0.8)
+	var desiredRotChange = myFwdVector.angle_to(vectorToGoal)
+	var maxRotChange = desiredRotChange * TurnSpeed * delta * global.game_speed
+	var lerpedRot = lerp_angle(0, maxRotChange, 0.9)
 	
-	self.rotate(angleToGoal * TurnSpeed * delta * global.game_speed)
-	#self.rotate( lerpedRot * TurnSpeed * delta * global.game_speed )
-	# why does lerpedRot send some of them off to the left?
+	self.rotate(lerpedRot)
+	
 
 
 func collectVelocityVectors():
 	VelocityVectors = []
-	VelocityVectors.push_back(get_peer_avoidance_vector())
-	VelocityVectors.push_back(get_planet_avoidance_vector(NavTarget))
+	VelocityVectors.push_back(get_peer_avoidance_vector()) # seems to generate noise if you watch the debug lines
 	if State == States.ADVANCING:
+		VelocityVectors.push_back(get_planet_avoidance_vector(NavTarget)) # seems to generate noise if you watch the debug lines
 		VelocityVectors.push_back(get_fleet_path_vector())
 	elif State == States.ENGAGING_ENEMY:
 		VelocityVectors.push_back(get_dogfighting_vector())
+		VelocityVectors.push_back(get_fleet_path_vector())
 	elif State == States.RETURNING:
 		VelocityVectors.push_back(get_vector_toward_planet(DestinationPlanet))
 
@@ -187,12 +225,18 @@ func get_dogfighting_vector():
 	var dogfightingVector = Vector2.ZERO
 	# turn toward the nearest enemy ship and shoot
 	if is_instance_valid(CurrentEnemyFleetEngaged):
-		var enemyShips = CurrentEnemyFleetEngaged.GetShips()
-		CurrentShipTargeted = utils.GetRandElement(enemyShips)
 		if is_instance_valid(CurrentShipTargeted):
 			var targetPos = CurrentShipTargeted.get_global_position()
 			var myPos = self.get_global_position()
-			dogfightingVector = (targetPos - myPos).normalized()
+			if CurrentAttitude == Attitudes.AGGRESSIVE:
+				dogfightingVector = (targetPos - myPos).normalized()
+			else:
+				if utils.WithinFuzzyProximity(myPos, targetPos, EvasionDistance, 0.1):
+					dogfightingVector = (myPos - targetPos).normalized()
+		else: # need a new target.
+			var enemyShips = CurrentEnemyFleetEngaged.GetShips()
+			CurrentShipTargeted = utils.GetRandElement(enemyShips)
+			
 	else:
 		printerr("ship thinks it's Engaging enemy, but the ship it targeted doesn't exist")
 	return dogfightingVector
@@ -226,7 +270,7 @@ func get_planet_avoidance_vector(destinationPlanet):
 	if is_instance_valid(nearestPlanet):
 		if nearestPlanet != destinationPlanet: # you're allowed to land on the destination
 			var planetPos = nearestPlanet.get_global_position()
-			if utils.WithinFuzzyProximity(self, destinationPlanet, avoidDistance, 0.1):
+			if utils.WithinFuzzyProximity(self, destinationPlanet, avoidDistance, 0.05):
 				returnVec += (myPos - planetPos).normalized()
 	else:
 		# It's ok, there's no planets to worry about within minimum distance_squared.
@@ -243,7 +287,7 @@ func get_peer_avoidance_vector():
 	for ship in get_parent().get_children():
 		var shipPos = ship.get_global_position()
 		if ship != self:
-			if utils.WithinFuzzyProximity(self, ship, avoidDistance, 0.1):
+			if utils.WithinFuzzyProximity(self, ship, avoidDistance, 0.05):
 				returnVec -= shipPos - myPos
 	returnVec = returnVec.normalized()
 	return returnVec
@@ -251,7 +295,7 @@ func get_peer_avoidance_vector():
 func die():
 	deregisterShipWithFaction()
 	call_deferred("disable_collision_shapes")
-	State = States.DEAD
+	setState(States.DEAD)
 	
 	var animPlayer = $death/AnimationPlayer
 	animPlayer.play("explode")
@@ -305,15 +349,21 @@ func _on_hit(damage, factionObj): # is factionObj the attacker or defender?
 		die()
 		
 func _draw():
+	var myColor = FactionObj.fColor
+	myColor.a = 0.5
 	if global.Debug:
 		var myPos = get_global_position()
 		# azure = direction to target
-		draw_line(to_local(myPos), to_local(VectorToGoal*20 + myPos), Color.azure, 3, true)
+		var lineLength = 20.0
+		draw_line(to_local(myPos), to_local(VectorToGoal*lineLength + myPos), Color.azure, 3, true)
 		# green = direction of Vector2.RIGHT
-		draw_line(to_local(myPos), to_local(Vector2.RIGHT * 20 + myPos), Color.green, 3, true)
+		draw_line(to_local(myPos), to_local(Vector2.RIGHT * lineLength + myPos), Color.green, 3, true)
 		# red = direction of self.rotation
-		draw_line(to_local(myPos), to_local(Vector2.RIGHT.rotated(self.rotation) * 20 + myPos), Color.red, 3, true)
+		draw_line(to_local(myPos), to_local(Vector2.RIGHT.rotated(self.rotation) * lineLength + myPos), Color.red, 3, true)
 	
+		if State == States.ENGAGING_ENEMY and CurrentAttitude == Attitudes.EVASIVE:
+			draw_circle(to_local(myPos), EvasionDistance, myColor)
+
 func land(planet):
 	planet._on_ship_landed(1, FactionObj)
 	die()
@@ -338,7 +388,7 @@ func _on_SwapMagazineTimer_timeout(): #Weapons say they're ready again
 	enable_firingArc()
 	
 func _on_fleet_released_ship():
-	State = States.RETURNING
+	setState(States.RETURNING)
 
 
 
@@ -349,11 +399,11 @@ func _on_FuelLimitTimer_timeout():
 
 func _on_fleet_engaged_enemy(enemyFleetObj):
 	if is_instance_valid(enemyFleetObj):
-		State = States.ENGAGING_ENEMY
+		setState(States.ENGAGING_ENEMY)
 		CurrentEnemyFleetEngaged = enemyFleetObj
 
 func _on_fleet_resumed_moving():
-	State = States.ADVANCING
+	setState(States.ADVANCING)
 	CurrentEnemyFleetEngaged = null
 
 
@@ -368,4 +418,12 @@ func _on_Ship_area_entered(area):
 	
 	if enemyShip.has_method("_on_hit"):
 		enemyShip._on_hit(HullStrength, FactionObj)
+
+
+
+func _on_DecisionTimer_timeout():
+	if State == States.ENGAGING_ENEMY:
+		$pilot/DecisionTimer.set_wait_time(rand_range(0.75, 3.0))
+		setDogfightAggressiveness()
+
 

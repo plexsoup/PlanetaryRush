@@ -13,8 +13,8 @@ signal faction_lost(factionObj)
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	
-	var AA = Vector2( -1 * global.screen_size )
-	var BB = Vector2( 2 *global.screen_size )
+	var AA = Vector2( -1.5 * global.screen_size )
+	var BB = Vector2( 3.0 * global.screen_size )
 	DeploymentZone = Rect2(AA, BB)
 	global.planet_container = self # singleton, but it should be registered in Level, not global.
 	
