@@ -25,7 +25,7 @@ func populateTree():
 	var numTotalPlanets:int = 0
 	for factionObj in global.Main.CurrentLevel.FactionContainer.get_children():
 		var factionNode = tree.create_item(root)
-		var factionName = factionObj.Name
+		var factionName = factionObj.name
 		factionNode.set_text(0, "Faction: " + factionName)
 		var numFactionPlanets : int = 0
 		for planet in factionObj.CurrentPlanetList:
@@ -34,7 +34,7 @@ func populateTree():
 			numTotalPlanets += 1
 			numFactionPlanets += 1
 		var factionSummaryNode = tree.create_item(factionNode)
-		factionSummaryNode.set_text(0, "Total " + factionObj.Name + " == " + str(numFactionPlanets))
+		factionSummaryNode.set_text(0, "Total " + factionObj.name + " == " + str(numFactionPlanets))
 	var summaryNode = tree.create_item(root)
 	summaryNode.set_text(0, "Summary")
 	var planetContainerNode = tree.create_item(summaryNode)

@@ -16,13 +16,14 @@ func start(factionsList): # called by Level.gd
 #	pass
 		
 func initializeFactionProgressBars(factionList):
+	factionList.erase(global.NeutralFactionObj)
 	for faction in factionList:
 		spawnProgressIndicator(faction)
 
 
 
 func spawnProgressIndicator(factionObj):
-	var progressScene = load("res://GUI/FactionProgressIndicator.tscn")
+	var progressScene = load("res://GUI/HUD/FactionProgressIndicator.tscn")
 	var progressNode = progressScene.instance()
 	FactionProgressContainer.add_child(progressNode)
 	progressNode.start(factionObj)

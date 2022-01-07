@@ -21,19 +21,10 @@ func start():
 
 func hide_pause_menu():
 	hide()
-#	printerr("PauseMenu.gd is trying to notify the player's cursor about pausing.. It should notify Main or Level instead.")
-#	if global.cursor and global.cursor != null:
-#		if not is_connected("closed", global.cursor, "_on_pause_menu_closed"):
-#			connect("closed", global.cursor, "_on_pause_menu_closed")
-#		emit_signal("closed")
 	global.toggle_hard_pause()
 	
 func show_pause_menu():
 	show()
-#	if global.cursor and global.cursor != null:
-#		if not is_connected("opened", global.cursor, "_on_pause_menu_opened"):
-#			connect("opened", global.cursor, "_on_pause_menu_opened")		
-#		emit_signal("opened")
 	global.toggle_hard_pause()
 
 

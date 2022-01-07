@@ -25,6 +25,8 @@ var CurrentRouteType = RouteTypes.STRAIGHT
 
 var PseudoMouseSpeed : float = 16.0 # just a guess
 
+var TargetHumanPlayerBias : float = 0.33
+
 #signal ships_requested(destinationPlanet) # removed.. all the AI can do is click
 
 #signal faction_lost(factionObj)
@@ -35,7 +37,7 @@ signal release_mouse()
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	Difficulty = float(1.0 + global.options["difficulty"]) # 1, 2, 3
-
+	randomize()
 	
 func start(factionObj):
 	# set up a delay interval so the AI can't make too many Actions per minute.
@@ -83,15 +85,20 @@ func move_cursor_toward_objective(objectivePos):
 	get_parent().set_global_position( newPos )
 	
 	
-func execute_click_events(objective):
+func execute_click_events(objectivePos):
 	var myPos = get_global_position()
 	var acceptableDistanceSquared = 250.0
-	var distSqToObj = myPos.distance_squared_to(objective)
-	# if the cursor is close enough to the objective, send a mouse click or release event
+	var distSqToObj = myPos.distance_squared_to(objectivePos)
+	# if the cursor is close enough to the objectivePos, send a mouse click or release event
 	if distSqToObj < acceptableDistanceSquared:
 		if State == States.SEEKING:
+			#Verify that the planet still belongs to you before you click.
+			var planet = global.planet_container.get_nearest_planet(myPos)
+			if planet.FactionObj == FactionObj:
 			# change the state and execute a click
-			start_path()
+				start_path()
+			else:
+				plot_new_course()
 		elif State == States.DRAWING_PATH:
 			end_path()
 
@@ -107,15 +114,22 @@ func plot_new_course():
 	var level = global.Main.CurrentLevel
 	var factionToAttack : Node2D
 	var enemyFactionsRemaining = level.getRemainingFactions()
-	enemyFactionsRemaining.remove(enemyFactionsRemaining.find(FactionObj))
-
-	if enemyFactionsRemaining.has(global.PlayerFactionObj):
-		var diceroll = randf()
-		if diceroll < 0.33:
-			factionToAttack = global.PlayerFactionObj
-		else:
-			factionToAttack = enemyFactionsRemaining[randi()%enemyFactionsRemaining.size()]
+	enemyFactionsRemaining.erase(self.FactionObj)
 	
+	var enemyFactionsWithPlanets = []
+	for faction in enemyFactionsRemaining:
+		if faction.getRemainingPlanetCount() > 0:
+			enemyFactionsWithPlanets.push_back(faction)
+	
+	factionToAttack = utils.GetRandElement(enemyFactionsWithPlanets)
+
+	# Bias attacking the player first.
+	if enemyFactionsWithPlanets.has(global.PlayerFactionObj):
+		var diceroll = randf()
+		if diceroll < TargetHumanPlayerBias:
+			factionToAttack = global.PlayerFactionObj
+		
+	# technically a faction could be alive, but have no planets (they might still have ships en route).
 	
 	var originPlanet = level.PlanetContainer.get_random_planet(FactionObj)
 	var destinationPlanet
@@ -183,9 +197,8 @@ func _on_DecisionTimer_timeout():
 		# we might need a mechanism to recover from pause..
 		pass
 	
-	if FactionObj.getRemainingPlanetCount() > 0 and State != States.DEAD:
+	if FactionObj.IsAlive():
 		plot_new_course()
-
 	else:
 		die()
 		# AI Controller is not notifying anyone that it quit. 

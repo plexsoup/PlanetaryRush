@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/IconFactionRed.png-9fb0d8fb2d0e2d44d9c37a9bae4bca58.stex"
+path="res://.import/audacityIcon.png-7fbe7faab799f0053c078cd91c498082.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GUI/IconFactionRed.png"
-dest_files=[ "res://.import/IconFactionRed.png-9fb0d8fb2d0e2d44d9c37a9bae4bca58.stex" ]
+source_file="res://GUI/Icons/audacityIcon.png"
+dest_files=[ "res://.import/audacityIcon.png-7fbe7faab799f0053c078cd91c498082.stex" ]
 
 [params]
 

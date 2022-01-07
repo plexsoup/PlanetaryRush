@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/godotIcon.png-10b7c6df07c857671ae1f7cd12bf26e0.stex"
+path="res://.import/BlenderIcon.png-5cf81beb715271243f1c006fd88eb8ae.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GUI/godotIcon.png"
-dest_files=[ "res://.import/godotIcon.png-10b7c6df07c857671ae1f7cd12bf26e0.stex" ]
+source_file="res://GUI/Icons/BlenderIcon.png"
+dest_files=[ "res://.import/BlenderIcon.png-5cf81beb715271243f1c006fd88eb8ae.stex" ]
 
 [params]
 

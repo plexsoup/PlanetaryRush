@@ -15,14 +15,14 @@ var FactionObj : Node2D
 var IsHumanPlayer: bool = false
 var MyFleet: Node2D
 export var BulletScene : PackedScene
-export var DefaultFuelTimeLimit : float = 30.0 # seconds
+export var DefaultFuelTimeLimit : float = 60.0 # seconds
 export var Health = 1
 export var HullStrength = 1 # amount of damage to deal when you hit another ship.
 export var DefaultAggressionToAversionRatio : float = 0.66 # 0.0 to 1.0. Higher is more likely to engage in a dogfight. Lower is more likely to evade.
 var AggressionToAversionRatio = DefaultAggressionToAversionRatio
 enum Attitudes {AGGRESSIVE, EVASIVE}
 var CurrentAttitude = Attitudes.AGGRESSIVE
-var EvasionDistance = 50.0
+var EvasionDistance = 25.0
 
 # export var Shields = 0
 
@@ -37,7 +37,7 @@ var CurrentShipTargeted = null
 var ShipToGroundWeapons = []
 var ShipToShipWeapons = []
 
-onready var FiringArcCollisionShape = $FiringArc/CollisionPolygon2D
+onready var FiringArcCollisionShape = $FiringArc/CollisionShape2D
 
 var VectorToGoal # for debug drawing
 
@@ -70,6 +70,9 @@ func start(factionObj, navTarget, originPlanet, destinationPlanet):
 	initializeWeapons()
 	setDogfightAggressiveness()
 	
+	$gimbal/StatusLabel.set_visible(global.Debug)
+	
+	
 func setState(newState):
 	# we could add checks here to make sure things get done.
 	
@@ -97,17 +100,6 @@ func startFuelTimer(durationInSeconds):
 	$Engines/FuelLimitTimer.start()
 
 
-func registerShipWithFaction():
-	connect("created", FactionObj, "_on_ship_created")
-	emit_signal("created", self)
-	disconnect("created", FactionObj, "_on_ship_created")
-
-
-func deregisterShipWithFaction():
-	connect("destroyed", FactionObj, "_on_ship_destroyed")
-	emit_signal("destroyed", self)
-	disconnect("destroyed", FactionObj, "_on_ship_destroyed")
-	
 
 
 
@@ -127,9 +119,12 @@ func _process(delta):
 		if global.Debug:
 			updateDebugInfo()
 
-		
-		if State == States.RETURNING and planet_within_landing_distance(DestinationPlanet):
+		var distance = 250
+		if State == States.RETURNING and planet_within_distance(DestinationPlanet, distance):
+			setState(States.BOMBARDING)
+		elif State == States.BOMBARDING and planet_within_distance(DestinationPlanet, distance/2.0):
 			land(DestinationPlanet)
+		
 	
 
 func updateDebugInfo():
@@ -146,16 +141,15 @@ func updateDebugInfo():
 	$gimbal.set_global_rotation(0.0)
 	update() # refreshes _draw()
 	
-func planet_within_landing_distance(planetObj):
+func planet_within_distance(planetObj, distance):
 	if planetObj == null or not is_instance_valid(planetObj): 
 		return
 	else:
 		var closeEnough : bool = false
 		var myPos = get_global_position()
 		var targetPos = NavTarget.get_global_position()
-		var landingDistance = 80.0
 		#if utils.WithinFuzzyProximity(myPos, targetPos, landingDistance, 0.1):
-		if utils.WithinFuzzyProximity(self, planetObj, landingDistance, 0.1):
+		if utils.WithinFuzzyProximity(self, planetObj, distance, 0.1):
 			closeEnough = true
 		return closeEnough
 
@@ -169,7 +163,12 @@ func move(delta):
 	turnTowardsTarget(vectorToGoal, delta)
 
 	var fwd = Vector2.RIGHT.rotated(rotation)
-	set_global_position(myPos + fwd * delta * Speed * global.game_speed)
+	
+	var adjustedSpeed = Speed
+	if State == States.BOMBARDING:
+		adjustedSpeed = Speed / 2.0 # shoot the planet a bit before you crash into it.
+	
+	set_global_position(myPos + fwd * delta * adjustedSpeed * global.game_speed)
 
 
 func turnTowardsTarget(vectorToGoal, delta):
@@ -195,12 +194,8 @@ func collectVelocityVectors():
 		VelocityVectors.push_back(get_fleet_path_vector())
 	elif State == States.RETURNING:
 		VelocityVectors.push_back(get_vector_toward_planet(DestinationPlanet))
-
-	# later, add:
-		# threat_pursuit_vector
-		# planet_attack_vector
-		# flanking_vector
-		# etc.
+	elif State == States.BOMBARDING:
+		VelocityVectors.push_back(get_vector_toward_planet(DestinationPlanet))
 
 
 
@@ -293,7 +288,8 @@ func get_peer_avoidance_vector():
 	return returnVec
 
 func die():
-	deregisterShipWithFaction()
+	deregisterShipWithFleet()
+	deregisterShipWithFaction() # refactor opportunity.. perhaps the fleet should handle this.. Faction doesn't need to know if ships are alive, just fleets.
 	call_deferred("disable_collision_shapes")
 	setState(States.DEAD)
 	
@@ -302,8 +298,7 @@ func die():
 	
 	yield(animPlayer, "animation_finished")
 	#yield(get_tree().create_timer(0.95), "timeout")
-	if is_instance_valid(FactionObj):
-		FactionObj.DeregisterShip(self)
+
 	call_deferred("queue_free")
 
 func disable_collision_shapes(): # for death
@@ -326,28 +321,6 @@ func fireOnPlanet(planet):
 
 
 
-func _on_FiringArc_area_entered(area):
-	if area.is_in_group("ships") and area.FactionObj != FactionObj:
-
-		for weapon in ShipToShipWeapons:
-			if weapon.WeaponStatus == weapon.Status.READY:
-				weapon.CommenceFiring()
-				disable_firingArc()
-			# TODO: what happens if the weapons aren't ready? should it circle for another pass?
-		
-
-func _on_FiringArc_body_entered(body):
-	# shoot planets, but not friendly ones
-		
-	if body.is_in_group("planets"):
-		fireOnPlanet(body)
-		
-
-func _on_hit(damage, factionObj): # is factionObj the attacker or defender?
-	Health -= damage
-	if Health <= 0:
-		die()
-		
 func _draw():
 	var myColor = FactionObj.fColor
 	myColor.a = 0.5
@@ -369,6 +342,51 @@ func land(planet):
 	die()
 	
 
+###########################################################
+# Signals outbound
+
+
+func registerShipWithFaction():
+	connect("created", FactionObj, "_on_ship_created")
+	emit_signal("created", self)
+	disconnect("created", FactionObj, "_on_ship_created")
+
+
+func deregisterShipWithFaction():
+	connect("destroyed", FactionObj, "_on_ship_destroyed")
+	emit_signal("destroyed", self)
+	disconnect("destroyed", FactionObj, "_on_ship_destroyed")
+	
+func deregisterShipWithFleet():
+	connect("destroyed", MyFleet, "_on_ship_destroyed")
+	emit_signal("destroyed", self)
+	disconnect("destroyed", MyFleet, "_on_ship_destroyed")
+	
+	
+###########################################################
+# Signals inbound
+
+func _on_FiringArc_area_entered(area):
+	if area.is_in_group("ships") and area.FactionObj != FactionObj:
+
+		for weapon in ShipToShipWeapons:
+			if weapon.WeaponStatus == weapon.Status.READY:
+				weapon.CommenceFiring()
+				disable_firingArc()
+			# TODO: what happens if the weapons aren't ready? should it circle for another pass?
+
+
+func _on_FiringArc_body_entered(body):
+	# shoot planets, but not friendly ones
+		
+	if body.is_in_group("planets"):
+		fireOnPlanet(body)
+
+
+func _on_hit(damage, factionObj): # is factionObj the attacker or defender?
+	Health -= damage
+	if Health <= 0:
+		die()
 
 
 func _on_Ship_body_entered(body):
@@ -383,13 +401,24 @@ func _on_Ship_body_entered(body):
 #			print("Ship.gd - landing now")
 	pass
 
+func _on_Ship_area_entered(area):
+	# refactor ideas: choose one method to verify that it's another ship.
+
+	var enemyShip
+	if area.is_in_group("ships") and area.FactionObj != self.FactionObj:
+		enemyShip = area
+	else:
+		return
+	
+	if enemyShip.has_method("_on_hit"):
+		enemyShip._on_hit(HullStrength, FactionObj)
+
 
 func _on_SwapMagazineTimer_timeout(): #Weapons say they're ready again
 	enable_firingArc()
 	
 func _on_fleet_released_ship():
 	setState(States.RETURNING)
-
 
 
 func _on_FuelLimitTimer_timeout():
@@ -407,23 +436,10 @@ func _on_fleet_resumed_moving():
 	CurrentEnemyFleetEngaged = null
 
 
-func _on_Ship_area_entered(area):
-	# refactor ideas: choose one method to verify that it's another ship.
-
-	var enemyShip
-	if area.is_in_group("ships") and area.FactionObj != self.FactionObj:
-		enemyShip = area
-	else:
-		return
-	
-	if enemyShip.has_method("_on_hit"):
-		enemyShip._on_hit(HullStrength, FactionObj)
-
-
-
 func _on_DecisionTimer_timeout():
 	if State == States.ENGAGING_ENEMY:
-		$pilot/DecisionTimer.set_wait_time(rand_range(0.75, 3.0))
+		var waitTime = rand_range(0.75 / max(global.game_speed, 0.0001), 1.5 / max(global.game_speed, 0.0001))
+		$pilot/DecisionTimer.set_wait_time(rand_range(0.75, 1.5))
 		setDogfightAggressiveness()
 
 

@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/GimpLogowilber-big.png-8f1e4c369d6c5acfe73168f3c4ba4cb2.stex"
+path="res://.import/cursorTarget.png-0ee889419df80b2e252fcc725c1cbb29.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GUI/GimpLogowilber-big.png"
-dest_files=[ "res://.import/GimpLogowilber-big.png-8f1e4c369d6c5acfe73168f3c4ba4cb2.stex" ]
+source_file="res://GUI/HUD/cursorTarget.png"
+dest_files=[ "res://.import/cursorTarget.png-0ee889419df80b2e252fcc725c1cbb29.stex" ]
 
 [params]
 

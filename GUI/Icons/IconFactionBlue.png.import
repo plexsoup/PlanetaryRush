@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/BlenderIcon.png-6e132226a924825eda8d73f2795853f9.stex"
+path="res://.import/IconFactionBlue.png-80603e4fa652beb7e64e4f387ec8a75f.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GUI/BlenderIcon.png"
-dest_files=[ "res://.import/BlenderIcon.png-6e132226a924825eda8d73f2795853f9.stex" ]
+source_file="res://GUI/Icons/IconFactionBlue.png"
+dest_files=[ "res://.import/IconFactionBlue.png-80603e4fa652beb7e64e4f387ec8a75f.stex" ]
 
 [params]
 

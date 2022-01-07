@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Levels/Level.gd" type="Script" id=1]
 [ext_resource path="res://Scenery/stars.jpg" type="Texture" id=2]
-[ext_resource path="res://GUI/InLevelGUI.tscn" type="PackedScene" id=3]
+[ext_resource path="res://GUI/HUD/InLevelGUI.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Planets/Planets.gd" type="Script" id=4]
 
 [node name="Level" type="Node2D"]

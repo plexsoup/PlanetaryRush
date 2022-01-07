@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/astronautGodot.png-f8419b195fbf790ad8b6c4bf431f71e2.stex"
+path="res://.import/IconFactionBlue2.png-a86128e7965c6be0ee617544f4e05cd6.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GUI/astronautGodot.png"
-dest_files=[ "res://.import/astronautGodot.png-f8419b195fbf790ad8b6c4bf431f71e2.stex" ]
+source_file="res://GUI/Icons/IconFactionBlue2.png"
+dest_files=[ "res://.import/IconFactionBlue2.png-a86128e7965c6be0ee617544f4e05cd6.stex" ]
 
 [params]
 

@@ -16,7 +16,7 @@ _global_script_class_icons={
 
 config/name="Planetary Rush"
 run/main_scene="res://Main.tscn"
-config/icon="res://GUI/icon.png"
+config/icon="res://GUI/Icons/icon.png"
 
 [autoload]
 

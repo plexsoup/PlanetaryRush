@@ -4,7 +4,7 @@ enum States { PAUSED, ACTIVE, LOCKED, DRAWING, SEEKING }
 var State = States.ACTIVE
 
 var cursor_range : float = 3000
-
+var Level
 
 var current_planet : StaticBody2D
 var FactionObj : Node2D
@@ -19,13 +19,11 @@ func _ready():
 	pass
 
 func start(factionObj, isLocalHumanPlayer):
+	Level = global.Main.CurrentLevel
+	
 	check_requirements()
 	
 	set_faction(factionObj)
-
-	printerr("think about deprecating global.cursor variable")
-#	if isLocalHumanPlayer:
-#		global.cursor = self # who uses this? Camera?
 
 	spawn_player_controller(factionObj, isLocalHumanPlayer)
 
@@ -72,13 +70,13 @@ func spawnPath(planet):
 		emit_signal("new_path_requested", planet, FactionObj, self)
 		disconnect("new_path_requested", global.level, "_on_new_path_requested")
 	elif FactionObj.State == FactionObj.States.PLAYING:
-		printerr("Cursor.gd: " + FactionObj.Name + " is trying to draw paths from unowned planets")
+		printerr("Cursor.gd: " + FactionObj.name + " is trying to draw paths from unowned planets")
 
 func get_closest_friendly_planet():
-	return global.planet_container.get_nearest_faction_planet(get_global_position(), FactionObj)
+	return Level.PlanetContainer.get_nearest_faction_planet(get_global_position(), FactionObj)
 
 func get_closest_planet():
-	return global.planet_container.get_nearest_planet(get_global_position())
+	return Level.PlanetContainer.get_nearest_planet(get_global_position())
 
 func is_inside_margins():
 	if get_global_mouse_position().length_squared() >= cursor_range * cursor_range:

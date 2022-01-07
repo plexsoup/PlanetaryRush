@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=2]
 
-[ext_resource path="res://GUI/CyberTheme.tres" type="Theme" id=1]
-[ext_resource path="res://GUI/Instructions.gd" type="Script" id=2]
-[ext_resource path="res://GUI/InstructionsTheme.tres" type="Theme" id=3]
+[ext_resource path="res://GUI/Themes/CyberTheme.tres" type="Theme" id=1]
+[ext_resource path="res://GUI/Menus/Instructions.gd" type="Script" id=2]
+[ext_resource path="res://GUI/Themes/InstructionsTheme.tres" type="Theme" id=3]
 [ext_resource path="res://Instructions/Galaxy.png" type="Texture" id=4]
 [ext_resource path="res://Instructions/drawLines.png" type="Texture" id=5]
 

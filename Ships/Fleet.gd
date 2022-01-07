@@ -11,7 +11,7 @@ var Name : String
 
 var CurrentlyEngagedEnemyFleet = null
 
-enum States { DEPLOYING, MOVING, ENGAGING_ENEMY, WAITING, FINISHED }
+enum States { DEPLOYING, MOVING, ENGAGING_ENEMY, WAITING, FINISHED, DESTROYED }
 var State = States.DEPLOYING
 
 signal ship_released()
@@ -25,6 +25,11 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	if allShipsAreDead(): # Why is this fleet still alive?
+		State = States.DESTROYED
+		return
+
+		
 	if State == States.MOVING:
 		if is_instance_valid(NavTarget):
 			move_fleet_NavTarget(delta)
@@ -70,7 +75,7 @@ func die():
 	
 	
 func move_fleet_NavTarget(delta):
-	if FleetPath != null and is_instance_valid(FleetPath):
+	if is_instance_valid(FleetPath):
 		FleetPath.set_offset(FleetPath.get_offset() + delta * Speed * global.game_speed)
 		# tell the path how far we've gotten, so the path can remove the line behind us
 		
@@ -83,9 +88,6 @@ func move_fleet_NavTarget(delta):
 			release_fleet()
 
 
-#
-#	return nearestEnemyFleet
-
 func GetCurrentPosition():
 	return NavTarget.get_global_position()
 	
@@ -95,6 +97,7 @@ func initiateDogfight(enemyFleetObj):
 	
 	State = States.ENGAGING_ENEMY
 	CurrentlyEngagedEnemyFleet = enemyFleetObj
+
 	
 	for shipObj in $ShipsContainer.get_children():
 		connect("fleet_engaged", shipObj, "_on_fleet_engaged_enemy")
@@ -110,35 +113,23 @@ func resumeMoving():
 		disconnect("resumed_moving", ship, "_on_fleet_resumed_moving")
 		
 
-func GetShips():
-	return $ShipsContainer.get_children()
 
-func GetShipCount():
-	return GetShips().size()
 
 func release_fleet():
 	#let the ships return to the nearest planet, at their own discretion
 	
-	# spawn a position2D node at the planet
-	# tell each ship (child) to follow that
-	#FleetPath.set_offset(0)
 	for ship in $ShipsContainer.get_children():
 		ship.NavTarget = get_closest_friendly_planet(ship.get_global_position())
 		
 		notifyShipItsReleased(ship)
 		
-		
 	remove_path()
 	State = States.FINISHED
 
-func notifyShipItsReleased(shipObj):
-	#ship.State = ship.States.RETURNING	
-	connect("ship_released", shipObj, "_on_fleet_released_ship")
-	emit_signal("ship_released")
-	disconnect("ship_released", shipObj, "_on_fleet_released_ship")
 
 
 func remove_path():
+	# refactor opportunity: change this to a signal
 	if FleetPath != null and is_instance_valid(FleetPath):
 		FleetPath.get_parent().end()
 
@@ -188,7 +179,41 @@ func spawnShips(factionObj, numShips, shipScene, destinationPlanet):
 		shipNode.set_rotation(shipNode.get_angle_to(factionObj.CursorObj.get_global_position()))
 	
 
+####################################################
+# Global Functions, may be called from other objects
+
+func GetShips():
+	return $ShipsContainer.get_children()
+
+func GetShipCount():
+	return GetShips().size()
+
+
+#################################################
+# Outbound Signals
+
+func notifyShipItsReleased(shipObj):
+	connect("ship_released", shipObj, "_on_fleet_released_ship")
+	emit_signal("ship_released")
+	disconnect("ship_released", shipObj, "_on_fleet_released_ship")
+
+
+#################################################
+# Incoming Signals
+
 func _on_ShipPath_encountered_enemy(enemyFleetObj):
 	if is_instance_valid(enemyFleetObj):
 		initiateDogfight(enemyFleetObj)
 	
+func _on_ship_destroyed(shipObj):
+	# why do we care?
+	# just check the remaining ship count.
+	# not sure what happens if we use erase with a null reference
+	# not sure how long it takes the ship to queue_free after we get the signal
+	
+	
+#	var remainingShips = $ShipsContainer.get_children()
+#	if remainingShips.erase(shipObj).size == 0:
+#		die()
+	if GetShipCount() == 0: # could it be one?
+		die()

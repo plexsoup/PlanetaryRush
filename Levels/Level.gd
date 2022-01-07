@@ -36,7 +36,7 @@ func start():
 			init_starting_planet(factionObj)
 			spawn_cursor(factionObj)
 		
-		print("signalling " + factionObj.Name + " that gameplay is starting now.")
+		print("signalling " + factionObj.name + " that gameplay is starting now.")
 		connect("gameplay_started", factionObj, "_on_gameplay_started")
 		emit_signal("gameplay_started")
 		disconnect("gameplay_started", factionObj, "_on_gameplay_started")
@@ -124,13 +124,7 @@ func start_celebration():
 			if planet.has_method("celebrate"):
 				planet.celebrate()
 
-func countRemainingFactions():
-	printerr("Level.gd deprecated function countRemainingFactions")
-	var remainingAliveFactions = []
-	for faction in FactionContainer.get_children():
-		if faction.State == faction.States.PLAYING:
-			remainingAliveFactions.push_back(faction)
-	return remainingAliveFactions.size()
+
 
 func _on_new_path_requested(planet, factionObj, cursorObj):
 	if State == States.PLAYING:
@@ -158,29 +152,36 @@ func getRemainingFactions():
 			remainingFactions.push_back(faction)
 	return remainingFactions
 	
+
+func countRemainingFactions():
+	printerr("Level.gd deprecated function countRemainingFactions")
+	var remainingAliveFactions = []
+	for faction in FactionContainer.get_children():
+		if faction.State == faction.States.PLAYING:
+			remainingAliveFactions.push_back(faction)
+	return remainingAliveFactions.size()
+
 func _on_faction_lost(factionObj):
-	print("Level.gd was notified that " + factionObj.Name + " has no planets or ships remaining.")
+	print("Level.gd was notified that " + factionObj.name + " has no planets or ships remaining.")
 	# figure out which factions remain. 
 	# Trigger celebration if it's only player and neutral
 	# Trigger loss if the player isn't in the list
+	if factionObj == global.PlayerFactionObj:
+		# player lost.. show the end screen
+		print("Sorry Player, you lost.") # but we probably don't care, because we want to watch the fireworks
+		return
+
 	var victory = false
 	var remainingFactions = getRemainingFactions()
-	var numFactionsRemaining = remainingFactions.size()
-	for faction in remainingFactions:
-		print(faction.Name)
-	if remainingFactions.has(global.PlayerFactionObj):
-		if numFactionsRemaining == 1:
-			victory = true
-			Winning_faction = global.PlayerFactionObj
-		elif numFactionsRemaining == 2 and remainingFactions.has(global.NeutralFactionObj):
+
+	remainingFactions.erase(global.PlayerFactionObj)
+	remainingFactions.erase(global.NeutralFactionObj)
+	if remainingFactions.size() == 0:
 			victory = true
 			Winning_faction = global.PlayerFactionObj
 	elif remainingFactions.size() == 1:
 		victory = true # but not the player
 		Winning_faction = remainingFactions[0]
-	elif numFactionsRemaining == 2 and remainingFactions.has(global.NeutralFactionObj):
-		victory = true
-		Winning_faction = remainingFactions[1] # sketchy logic.. what's the easiest way to identify the non-neutral faction?
 		
 		
 	if victory:

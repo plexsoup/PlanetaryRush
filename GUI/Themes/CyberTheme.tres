@@ -1,9 +1,10 @@
 [gd_resource type="Theme" load_steps=14 format=2]
 
-[ext_resource path="res://GUI/fonts/ButtonFont.tres" type="DynamicFont" id=1]
-[ext_resource path="res://GUI/PanelStyle.tres" type="StyleBox" id=2]
-[ext_resource path="res://GUI/fonts/GoogleFonts/Gugi/Gugi-Regular.ttf" type="DynamicFontData" id=3]
-[ext_resource path="res://GUI/fonts/droid-sans/DroidSans.ttf" type="DynamicFontData" id=4]
+[ext_resource path="res://GUI/fonts/GoogleFonts/Gugi/Gugi-Regular.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://GUI/fonts/droid-sans/DroidSans.ttf" type="DynamicFontData" id=2]
+[ext_resource path="res://GUI/Themes/PanelStyle.tres" type="StyleBox" id=3]
+[ext_resource path="res://GUI/Themes/rounded_styleboxflat.tres" type="StyleBox" id=4]
+[ext_resource path="res://GUI/fonts/ButtonFont.tres" type="DynamicFont" id=5]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0.141176, 0.141176, 0.141176, 1 )
@@ -33,15 +34,11 @@ corner_radius_bottom_left = 4
 
 [sub_resource type="DynamicFont" id=3]
 size = 24
-font_data = ExtResource( 3 )
+font_data = ExtResource( 1 )
 
-[sub_resource type="StyleBoxEmpty" id=4]
+[sub_resource type="StyleBoxFlat" id=8]
 
-[sub_resource type="StyleBoxEmpty" id=5]
-
-[sub_resource type="StyleBoxEmpty" id=6]
-
-[sub_resource type="StyleBoxFlat" id=7]
+[sub_resource type="StyleBoxFlat" id=4]
 bg_color = Color( 0, 0.00392157, 0.0470588, 1 )
 border_width_left = 2
 border_width_top = 2
@@ -51,7 +48,7 @@ border_blend = true
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 
-[sub_resource type="StyleBoxFlat" id=8]
+[sub_resource type="StyleBoxFlat" id=5]
 content_margin_left = 12.0
 content_margin_right = 12.0
 content_margin_top = 12.0
@@ -71,18 +68,20 @@ expand_margin_right = 12.0
 expand_margin_top = 4.0
 expand_margin_bottom = 4.0
 
-[sub_resource type="DynamicFont" id=9]
+[sub_resource type="StyleBoxEmpty" id=7]
+
+[sub_resource type="DynamicFont" id=6]
 size = 22
-font_data = ExtResource( 4 )
+font_data = ExtResource( 2 )
 
 [resource]
-default_font = SubResource( 9 )
+default_font = SubResource( 6 )
 Button/colors/font_color = Color( 0, 0.501961, 0.25098, 1 )
 Button/colors/font_color_disabled = Color( 0.9, 0.9, 0.9, 0.2 )
 Button/colors/font_color_hover = Color( 0.941176, 0.941176, 0.941176, 1 )
 Button/colors/font_color_pressed = Color( 1, 1, 1, 1 )
 Button/constants/hseparation = 2
-Button/fonts/font = ExtResource( 1 )
+Button/fonts/font = ExtResource( 5 )
 Button/styles/disabled = null
 Button/styles/focus = null
 Button/styles/hover = SubResource( 1 )
@@ -95,8 +94,8 @@ ItemList/constants/hseparation = 4
 ItemList/constants/icon_margin = 4
 ItemList/constants/line_separation = 2
 ItemList/constants/vseparation = 2
-ItemList/fonts/font = ExtResource( 1 )
-ItemList/styles/bg = ExtResource( 2 )
+ItemList/fonts/font = ExtResource( 5 )
+ItemList/styles/bg = ExtResource( 3 )
 ItemList/styles/bg_focus = null
 ItemList/styles/cursor = null
 ItemList/styles/cursor_unfocused = null
@@ -124,9 +123,14 @@ OptionButton/styles/focus = null
 OptionButton/styles/hover = null
 OptionButton/styles/normal = null
 OptionButton/styles/pressed = null
-Panel/styles/panel = ExtResource( 2 )
+Panel/styles/panel = ExtResource( 3 )
 Panel/styles/panelf = null
 Panel/styles/panelnc = null
+ProgressBar/colors/font_color = Color( 0, 0, 0, 1 )
+ProgressBar/colors/font_color_shadow = Color( 0, 0, 0, 1 )
+ProgressBar/fonts/font = null
+ProgressBar/styles/bg = null
+ProgressBar/styles/fg = SubResource( 8 )
 RichTextLabel/colors/default_color = Color( 0, 0.752941, 0.752941, 1 )
 RichTextLabel/colors/font_color_selected = Color( 0.490196, 0.490196, 0.490196, 1 )
 RichTextLabel/colors/font_color_shadow = Color( 0, 0, 0, 0 )
@@ -137,7 +141,7 @@ RichTextLabel/constants/shadow_offset_x = 1
 RichTextLabel/constants/shadow_offset_y = 1
 RichTextLabel/constants/table_hseparation = 3
 RichTextLabel/constants/table_vseparation = 3
-RichTextLabel/fonts/bold_font = ExtResource( 1 )
+RichTextLabel/fonts/bold_font = ExtResource( 5 )
 RichTextLabel/fonts/bold_italics_font = null
 RichTextLabel/fonts/italics_font = null
 RichTextLabel/fonts/mono_font = null
@@ -152,17 +156,17 @@ TabContainer/constants/label_valign_bg = 2
 TabContainer/constants/label_valign_fg = 0
 TabContainer/constants/side_margin = 8
 TabContainer/constants/top_margin = 24
-TabContainer/fonts/font = ExtResource( 1 )
+TabContainer/fonts/font = ExtResource( 5 )
 TabContainer/icons/decrement = null
 TabContainer/icons/decrement_highlight = null
 TabContainer/icons/increment = null
 TabContainer/icons/increment_highlight = null
 TabContainer/icons/menu = null
 TabContainer/icons/menu_highlight = null
-TabContainer/styles/panel = SubResource( 4 )
-TabContainer/styles/tab_bg = SubResource( 5 )
+TabContainer/styles/panel = ExtResource( 4 )
+TabContainer/styles/tab_bg = ExtResource( 3 )
 TabContainer/styles/tab_disabled = null
-TabContainer/styles/tab_fg = SubResource( 6 )
+TabContainer/styles/tab_fg = ExtResource( 3 )
 Tabs/colors/font_color_bg = Color( 0.12549, 0.494118, 0.513726, 1 )
 Tabs/colors/font_color_disabled = Color( 0.9, 0.9, 0.9, 0.2 )
 Tabs/colors/font_color_fg = Color( 0.12549, 0.494118, 0.513726, 1 )
@@ -170,15 +174,51 @@ Tabs/constants/hseparation = 24
 Tabs/constants/label_valign_bg = 2
 Tabs/constants/label_valign_fg = 0
 Tabs/constants/top_margin = 24
-Tabs/fonts/font = ExtResource( 1 )
+Tabs/fonts/font = ExtResource( 5 )
 Tabs/icons/close = null
 Tabs/icons/decrement = null
 Tabs/icons/decrement_highlight = null
 Tabs/icons/increment = null
 Tabs/icons/increment_highlight = null
-Tabs/styles/button = ExtResource( 2 )
+Tabs/styles/button = ExtResource( 3 )
 Tabs/styles/button_pressed = null
-Tabs/styles/panel = SubResource( 7 )
-Tabs/styles/tab_bg = SubResource( 8 )
+Tabs/styles/panel = SubResource( 4 )
+Tabs/styles/tab_bg = SubResource( 5 )
 Tabs/styles/tab_disabled = null
-Tabs/styles/tab_fg = ExtResource( 2 )
+Tabs/styles/tab_fg = ExtResource( 3 )
+Tree/colors/custom_button_font_highlight = Color( 0, 0, 0, 1 )
+Tree/colors/drop_position_color = Color( 0, 0, 0, 1 )
+Tree/colors/font_color = Color( 0.8, 0.764706, 0.764706, 1 )
+Tree/colors/font_color_selected = Color( 0, 0, 0, 1 )
+Tree/colors/guide_color = Color( 0, 0, 0, 1 )
+Tree/colors/relationship_line_color = Color( 0, 0, 0, 1 )
+Tree/colors/title_button_color = Color( 0, 0, 0, 1 )
+Tree/constants/button_margin = 0
+Tree/constants/draw_guides = 0
+Tree/constants/draw_relationship_lines = 0
+Tree/constants/hseparation = 0
+Tree/constants/item_margin = 0
+Tree/constants/scroll_border = 0
+Tree/constants/scroll_speed = 0
+Tree/constants/vseparation = 0
+Tree/fonts/font = null
+Tree/fonts/title_button_font = null
+Tree/icons/arrow = null
+Tree/icons/arrow_collapsed = null
+Tree/icons/checked = null
+Tree/icons/select_arrow = null
+Tree/icons/unchecked = null
+Tree/icons/updown = null
+Tree/styles/bg = SubResource( 7 )
+Tree/styles/bg_focus = null
+Tree/styles/button_pressed = null
+Tree/styles/cursor = null
+Tree/styles/cursor_unfocused = null
+Tree/styles/custom_button = null
+Tree/styles/custom_button_hover = null
+Tree/styles/custom_button_pressed = null
+Tree/styles/selected = null
+Tree/styles/selected_focus = null
+Tree/styles/title_button_hover = null
+Tree/styles/title_button_normal = null
+Tree/styles/title_button_pressed = null

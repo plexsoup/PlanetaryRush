@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/GodotLogoWhite.png-a4cbd96f543428e97ee93f5cd2ba3108.stex"
+path="res://.import/IconFactionRed2.png-1072041195666c2cfba8b9df9e36e74b.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GUI/GodotLogoWhite.png"
-dest_files=[ "res://.import/GodotLogoWhite.png-a4cbd96f543428e97ee93f5cd2ba3108.stex" ]
+source_file="res://GUI/Icons/IconFactionRed2.png"
+dest_files=[ "res://.import/IconFactionRed2.png-1072041195666c2cfba8b9df9e36e74b.stex" ]
 
 [params]
 

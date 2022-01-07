@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/fleetFollowTarget.png-551eaacf838874599aee8cd5db1cfe54.stex"
+path="res://.import/godotIcon.png-e5848740ab8d8493fc41b41e77c04b22.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GUI/fleetFollowTarget.png"
-dest_files=[ "res://.import/fleetFollowTarget.png-551eaacf838874599aee8cd5db1cfe54.stex" ]
+source_file="res://GUI/Icons/godotIcon.png"
+dest_files=[ "res://.import/godotIcon.png-e5848740ab8d8493fc41b41e77c04b22.stex" ]
 
 [params]
 
@@ -28,6 +28,7 @@ process/fix_alpha_border=true
 process/premult_alpha=false
 process/HDR_as_SRGB=false
 process/invert_color=false
+process/normal_map_invert_y=false
 stream=false
 size_limit=0
 detect_3d=true

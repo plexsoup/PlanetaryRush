@@ -1,9 +1,19 @@
 """
 Current Work Effort:
+- there's still a problem with win/loss signalling
+	- I just had a win when another faction was still alive.
 
-	
-- there's still a problem with win/lose signalling
-	
+- dogfights feel bad
+
+- planetary bombardment feels bad
+
+- planets still spawn on top of each other
+
+- if a faction loses a planet while they're still draing the path, the path freezes.
+	- it should be released instead. Or something.
+
+- Feels weird how ships explode when they claim a planet.
+
 - planets lose their population too easily.
 	- have the ships go into a bombardment state and work on it a bit more slowly.
 
@@ -15,6 +25,9 @@ Current Work Effort:
 
 
 Bugs
+- in multiplayer games, one of the AI will eventually get stuck with a path that won't release.
+	- possibly after their ships died due to fuel loss?
+
 - can't select the yellow faction (or likely any faction > numFactions)
 
 - if you pause, then restart game: all planets spawn at -1 population

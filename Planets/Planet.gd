@@ -229,13 +229,15 @@ func _on_ShipPath_finished_drawing(path, destinationPlanet):
 func _on_hit(damage, factionObj, location = get_global_position()):
 	units_present -= damage
 	if units_present <= 0:
+		switch_faction(factionObj)
+
 		# become neutral when population is zero
-		if FactionObj != global.NeutralFactionObj:
-			if is_instance_valid(global.NeutralFactionObj):
-				# sometimes the neutral faction has already quit.
-				switch_faction(global.NeutralFactionObj)
-			else:
-				switch_faction(factionObj)
+#		if FactionObj != global.NeutralFactionObj:
+#			if is_instance_valid(global.NeutralFactionObj):
+#				# sometimes the neutral faction has already quit.
+#				switch_faction(global.NeutralFactionObj)
+#			else:
+#				switch_faction(factionObj)
 			
 		units_present = 0
 		

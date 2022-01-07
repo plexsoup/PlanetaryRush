@@ -7,7 +7,7 @@ var IsLocalHumanPlayer : bool = false
 var IsNeutralFaction : bool = false
 var fColor : Color
 var CursorObj : Node2D
-var Name : String
+
 
 var CurrentPlanetList = []
 var CurrentShipList = [] # keep track so we can stay alive until the last ship is dead
@@ -26,7 +26,7 @@ func _ready():
 
 func start(number, myName, myColor, isLocalHuman, isNeutralFaction):
 	Number = number
-	Name = myName
+	name = myName
 	fColor = myColor
 	if isLocalHuman:
 		IsLocalHumanPlayer = true
@@ -40,14 +40,13 @@ func start(number, myName, myColor, isLocalHuman, isNeutralFaction):
 #func _process(delta):
 #	pass
 
-func RegisterShip(shipObj):
+func registerShip(shipObj):
 	CurrentShipList.push_back(shipObj)
 	
-func DeregisterShip(shipObj):
-	var shipIndex = CurrentShipList.find(shipObj)
-	if shipIndex != -1:
-		CurrentShipList.remove(shipIndex)
-
+func deregisterShip(shipObj):
+	CurrentShipList.erase(shipObj)
+	if lose_conditions_met():
+		lose()
 
 
 func getRemainingPlanetCount():
@@ -68,9 +67,11 @@ func get_nearest_planet(pos):
 	return closestPlanet
 
 func die():
-	print("Faction " + self.Name + " is dead now.")
+	print("Faction " + self.name + " is dead now.")
 	State = States.DEAD
 	#call_deferred("queue_free")
+
+
 
 func countNeutralPlanets():
 	if is_instance_valid(global.NeutralFactionObj):
@@ -128,6 +129,18 @@ func lose():
 	emit_signal("faction_lost", self)
 	disconnect("faction_lost", Level, "_on_faction_lost")
 
+
+#####################################################################
+# "Public" functions
+
+func IsAlive():
+	if State == States.DEAD:
+		return false
+	else:
+		return true
+
+#####################################################################
+# Incoming Signals
 	
 func _on_planet_switched_faction(planetObj, newFaction):
 	#print("Faction.gd: _on_planet_switched_faction: " + planetObj.name + ": " + str(newFaction.Number))
@@ -135,7 +148,7 @@ func _on_planet_switched_faction(planetObj, newFaction):
 		printerr("Faction trying to add a pre-owned planet to its planet list") #nothing to be done?
 	elif CurrentPlanetList.has(planetObj) and newFaction != self:
 		# lost a planet
-		CurrentPlanetList.remove(CurrentPlanetList.find(planetObj))
+		CurrentPlanetList.erase(planetObj)
 	elif CurrentPlanetList.has(planetObj) == false:
 		# gained a planet
 		CurrentPlanetList.push_back(planetObj)
@@ -146,10 +159,10 @@ func _on_planet_switched_faction(planetObj, newFaction):
 
 
 func _on_ship_created(shipObj):
-	RegisterShip(shipObj)
+	registerShip(shipObj)
 	
 func _on_ship_destroyed(shipObj):
-	DeregisterShip(shipObj)
+	deregisterShip(shipObj)
 	
 func _on_gameplay_started():
 	State = States.PLAYING

@@ -1,9 +1,9 @@
 [gd_scene load_steps=8 format=2]
 
-[ext_resource path="res://GUI/CyberTheme.tres" type="Theme" id=1]
-[ext_resource path="res://GUI/EndScreen.gd" type="Script" id=2]
+[ext_resource path="res://GUI/Themes/CyberTheme.tres" type="Theme" id=1]
+[ext_resource path="res://GUI/Menus/EndScreen.gd" type="Script" id=2]
 [ext_resource path="res://GUI/fonts/GoogleFonts/Gugi/Gugi-Regular.ttf" type="DynamicFontData" id=3]
-[ext_resource path="res://GUI/OptionsDetails.tscn" type="PackedScene" id=4]
+[ext_resource path="res://GUI/Menus/OptionsDetails.tscn" type="PackedScene" id=4]
 [ext_resource path="res://effects/UISlide.wav" type="AudioStream" id=5]
 [ext_resource path="res://effects/clickNoise.wav" type="AudioStream" id=6]
 

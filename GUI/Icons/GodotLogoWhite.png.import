@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/inkscapeIcon.png-5b1314310f0f5cfcafdb3b7a2639fb39.stex"
+path="res://.import/GodotLogoWhite.png-1514e604438a4d78dede848d418171b1.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GUI/inkscapeIcon.png"
-dest_files=[ "res://.import/inkscapeIcon.png-5b1314310f0f5cfcafdb3b7a2639fb39.stex" ]
+source_file="res://GUI/Icons/GodotLogoWhite.png"
+dest_files=[ "res://.import/GodotLogoWhite.png-1514e604438a4d78dede848d418171b1.stex" ]
 
 [params]
 

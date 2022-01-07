@@ -10,7 +10,6 @@ var FactionObj : Node2D
 var CursorObj : Node2D
 var AssignedFleet : Node2D # will this ever be an array instead of a single object?
 
-var FrameTicks = 0
 
 signal finished_drawing(path)
 signal encountered_enemy(fleetObj)
@@ -44,10 +43,6 @@ func _on_DestructionTimer_timeout():
 
 func _process(delta):
 	update() # triggers _draw function
-	#if FrameTicks % 250 == 0:
-		#print("hi: " + str(FrameTicks) + " /t FrameTicks in " + self.name) 
-		
-	FrameTicks += 1
 	
 
 
@@ -74,7 +69,9 @@ func add_point():
 		
 func find_faction_cursor():
 	return null
-	
+
+###############################################################################
+# Outbound Signals
 
 
 func finish_path(destinationPlanet):
@@ -90,8 +87,9 @@ func finish_path(destinationPlanet):
 	disconnect("finished_drawing", MyPlanet, "_on_ShipPath_finished_drawing")
 	disconnect("finished_drawing", CursorObj, "_on_ShipPath_finished_drawing")
 
+###############################################################################
+# Incoming Signals
 
-	
 
 func _on_MousePolling_timeout():
 	if CursorObj.isStillDrawing():

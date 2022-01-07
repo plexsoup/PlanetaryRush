@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/IconFactionRed2.png-de533b3ff6104c5879bcb37c6df15e1f.stex"
+path="res://.import/fleetFollowTarget.png-a05de707b5bd42db8fc83fb64f956df8.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GUI/IconFactionRed2.png"
-dest_files=[ "res://.import/IconFactionRed2.png-de533b3ff6104c5879bcb37c6df15e1f.stex" ]
+source_file="res://GUI/HUD/fleetFollowTarget.png"
+dest_files=[ "res://.import/fleetFollowTarget.png-a05de707b5bd42db8fc83fb64f956df8.stex" ]
 
 [params]
 

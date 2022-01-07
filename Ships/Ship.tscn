@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Ships/Ship.gd" type="Script" id=1]
 [ext_resource path="res://Weapons/laser.tscn" type="PackedScene" id=2]
@@ -9,6 +9,9 @@
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 34.8188, 35.9784 )
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 424.242, 233.333 )
 
 [sub_resource type="Animation" id=2]
 resource_name = "explode"
@@ -93,8 +96,9 @@ shape = SubResource( 1 )
 [node name="FiringArc" type="Area2D" parent="."]
 position = Vector2( 61.1097, 0 )
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="FiringArc"]
-polygon = PoolVector2Array( -14.6054, -16.5883, 437.565, -274.673, 437.331, 270.258, -14.6511, 19.0276 )
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FiringArc"]
+position = Vector2( 490.405, -2.16744e-06 )
+shape = SubResource( 3 )
 
 [node name="Weapons" type="Node2D" parent="."]
 
