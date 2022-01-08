@@ -1,6 +1,8 @@
 """
 Current Work Effort:
 
+- ships aren't avoiding planets when they're travelling
+
 - neutral planets add population when they get hit? that's weird.
 
 - there's a big flaw in fleet engagement: once a fleet has been released from it's path, it no longer has a dogfightzone collision area, so other ships can't engage it.

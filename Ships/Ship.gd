@@ -189,7 +189,13 @@ func collectVelocityVectors():
 	VelocityVectors = []
 	VelocityVectors.push_back(get_peer_avoidance_vector()) # seems to generate noise if you watch the debug lines
 	if State == States.ADVANCING:
-		VelocityVectors.push_back(get_planet_avoidance_vector(DestinationPlanet)) # seems to generate noise if you watch the debug lines
+		var planetAvoidVec = get_planet_avoidance_vector(DestinationPlanet)
+		if planetAvoidVec.length_squared() > 0.0 and global.Ticks % 25 == 0:
+			$gimbal/DebugInfoSprite.set_visible(true)
+			
+		else:
+			$gimbal/DebugInfoSprite.set_visible(false)
+		VelocityVectors.push_back(get_planet_avoidance_vector(DestinationPlanet)*2) # seems to generate noise if you watch the debug lines
 		VelocityVectors.push_back(get_fleet_path_vector())
 	elif State == States.ENGAGING_ENEMY:
 		VelocityVectors.push_back(get_planet_avoidance_vector(DestinationPlanet))
@@ -264,13 +270,17 @@ func get_planet_avoidance_vector(destinationPlanet):
 	
 	var returnVec = Vector2(0,0)
 	var myPos = get_global_position()
-	var avoidDistance = 200.0
+	var avoidDistance = 135.0
 	
 	var nearestPlanet = level.PlanetContainer.get_nearest_planet(myPos)
 	if is_instance_valid(nearestPlanet):
-		if nearestPlanet != destinationPlanet: # you're allowed to land on the destination
+		
+		if nearestPlanet != destinationPlanet and nearestPlanet != OriginPlanet: # you're allowed to land on the destination
 			var planetPos = nearestPlanet.get_global_position()
-			if utils.WithinFuzzyProximity(self, destinationPlanet, avoidDistance, 0.05):
+			
+#			if myPos.distance_squared_to(planetPos) < avoidDistance * avoidDistance:
+#				returnVec += Vector2(myPos - planetPos).normalized()
+			if utils.WithinFuzzyProximity(self, nearestPlanet, avoidDistance, 0.05):
 				returnVec += (myPos - planetPos).normalized()
 	else:
 		# It's ok, there's no planets to worry about within minimum distance_squared.
@@ -330,16 +340,29 @@ func _draw():
 	myColor.a = 0.5
 	if global.Debug:
 		var myPos = get_global_position()
-		# azure = direction to target
 		var lineLength = 20.0
-		draw_line(to_local(myPos), to_local(VectorToGoal*lineLength + myPos), Color.azure, 3, true)
+
+		# purple = planet avoidance vector
+		var vectorsToDraw = {
+			"avoid_planet" : [get_planet_avoidance_vector(DestinationPlanet), Color.orangered],
+			"vector2_right" : [Vector2.RIGHT, Color.green],
+			"Vector_to_goal" : [VectorToGoal, Color.white]
+		}
+
+		for vector in vectorsToDraw.values():
+			draw_line(to_local(myPos), to_local(myPos + vector[0])*30,vector[1], 5, true) 
+		
+		# azure = direction to target
+		#draw_line(to_local(myPos), to_local(VectorToGoal*lineLength + myPos), Color.azure, 3, true)
 		# green = direction of Vector2.RIGHT
-		draw_line(to_local(myPos), to_local(Vector2.RIGHT * lineLength + myPos), Color.green, 3, true)
+		#draw_line(to_local(myPos), to_local(Vector2.RIGHT * lineLength + myPos), Color.green, 3, true)
 		# red = direction of self.rotation
-		draw_line(to_local(myPos), to_local(Vector2.RIGHT.rotated(self.rotation) * lineLength + myPos), Color.red, 3, true)
+		#draw_line(to_local(myPos), to_local(Vector2.RIGHT.rotated(self.rotation) * lineLength + myPos), Color.red, 3, true)
 	
 		if State == States.ENGAGING_ENEMY and CurrentAttitude == Attitudes.EVASIVE:
 			draw_circle(to_local(myPos), EvasionDistance, myColor)
+	
+	
 
 func land(planet):
 	var damageToPlanet = 1

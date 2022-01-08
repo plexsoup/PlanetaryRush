@@ -23,6 +23,9 @@ var CurrentSourcePlanet = null # planet from which to grab ships
 enum RouteTypes { STRAIGHT, CURVED, SINE }
 var CurrentRouteType = RouteTypes.STRAIGHT
 
+enum AttackStrategies { ATTACK_PLAYER, LOWEST_POPULATION, NEAREST_PLANET }
+var CurrentAttackStrategy
+
 var PseudoMouseSpeed : float = 16.0 # just a guess
 
 var TargetHumanPlayerBias : float = 0.33
@@ -126,49 +129,35 @@ func getSuitableOriginPlanet():
 	
 
 func plot_new_course():
+	randomize()
 	var level = global.Main.CurrentLevel
+	var planetContainer = level.PlanetContainer
+	
 	var factionToAttack : Node2D
-	var enemyFactionsRemaining = level.getRemainingFactions()
-	enemyFactionsRemaining.erase(self.FactionObj)
-	
-	var enemyFactionsWithPlanets = []
-	for faction in enemyFactionsRemaining:
-		if faction.getRemainingPlanetCount() > 0:
-			enemyFactionsWithPlanets.push_back(faction)
-	
-	factionToAttack = utils.GetRandElement(enemyFactionsWithPlanets)
+	var originPlanet : StaticBody2D
+	var destinationPlanet : StaticBody2D
 
-	# biases to consider: 
-		# do I have a planet with sufficient population to send ships?
-		# do I attack nearest planet, biggest planet, or player?
-		
-
-	# Bias attacking the player first.
-	if enemyFactionsWithPlanets.has(global.PlayerFactionObj):
-		var diceroll = randf()
-		if diceroll < TargetHumanPlayerBias:
-			factionToAttack = global.PlayerFactionObj
-		
-	# technically a faction could be alive, but have no planets (they might still have ships en route).
+	originPlanet = getSuitableOriginPlanet()
 	
-	var originPlanet = level.PlanetContainer.get_random_planet(FactionObj)
-	var destinationPlanet
-	if randf() < 0.75:
-		# bias attacking nearby planets first
-		destinationPlanet = level.PlanetContainer.get_nearest_faction_planet(factionToAttack, self.get_global_position())
-		if not is_instance_valid(destinationPlanet):
-			printerr("In AIController plot_new_course: destinationPlanet is invalid (case #1)")
-	else:
-		destinationPlanet = level.PlanetContainer.get_random_planet(factionToAttack)
-		if not is_instance_valid(destinationPlanet):
-			printerr("In AIController plot_new_course: destinationPlanet is invalid (case #2)")
+	if originPlanet.get_population() < 5:
+		# wait until you have some troops to send.
+		restart_timer()
+		return
 
-	# note: this will send ships to your own planets sometimes
+	CurrentAttackStrategy = randi()%AttackStrategies.size()
+
+	if CurrentAttackStrategy == AttackStrategies.ATTACK_PLAYER:
+		destinationPlanet = planetContainer.get_random_planet(global.PlayerFactionObj)
+	elif CurrentAttackStrategy == AttackStrategies.LOWEST_POPULATION:
+		destinationPlanet = planetContainer.get_lowest_population_adversary(FactionObj)
+	elif CurrentAttackStrategy == AttackStrategies.NEAREST_PLANET:
+		destinationPlanet = planetContainer.get_nearest_enemy_planet(FactionObj, originPlanet.get_global_position())
+
 	if is_instance_valid(originPlanet) and is_instance_valid(destinationPlanet):
 		if originPlanet != destinationPlanet:
 			CurrentTargetPlanet = destinationPlanet
 			CurrentSourcePlanet = originPlanet
-			State = States.SEEKING
+			State = States.SEEKING # start moving the cursor toward the origin planet
 		else: # why should we ever get to this?
 			printerr("AI Controller still has some logic issues near the end of plot_new_course.")
 			restart_timer()

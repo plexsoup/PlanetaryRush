@@ -58,6 +58,7 @@ func _on_laser_body_entered(body):
 	# hit a planet. kill some population
 	if body.is_in_group("planets"):
 		if body.FactionObj != FactionObj and ShipToGround == true:
+			printerr("We shouldn't have any Ship to Ground missiles in play yet")
 			var enemyPlanet = body
 			if enemyPlanet.has_method("_on_hit"):
 				connect("hit", enemyPlanet, "_on_hit")

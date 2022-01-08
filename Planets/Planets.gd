@@ -143,8 +143,6 @@ func get_nearest_planet(pos):
 	
 
 func get_nearest_faction_planet(factionObj, pos):
-	
-
 	var closestPlanet = null
 	var closest_dist_sq = 10000000000
 	var planets = get_faction_planets(factionObj)
@@ -159,6 +157,23 @@ func get_nearest_faction_planet(factionObj, pos):
 			closestPlanet = planet
 	return closestPlanet
 	
+func get_nearest_enemy_planet(factionObj, pos):
+	var closestPlanet = null
+	var closest_dist_sq = 10000000000
+	var planets = get_enemy_planets(factionObj)
+	if planets.size() == 0:
+		printerr("someone requested a planet for a faction with none.")
+		return false
+	for planet in planets:
+		var planetPos = planet.get_global_position()
+		var dist_sq_to_planet = pos.distance_squared_to(planetPos)
+		if dist_sq_to_planet < closest_dist_sq:
+			closest_dist_sq = dist_sq_to_planet
+			closestPlanet = planet
+	return closestPlanet
+
+
+
 # refactor: should move this into FactionObj
 func get_faction_planets(factionObj):
 	var factionPlanets :Array = []
@@ -166,6 +181,14 @@ func get_faction_planets(factionObj):
 		if planet.FactionObj == factionObj:
 			factionPlanets.push_back(planet)
 	return factionPlanets
+
+func get_enemy_planets(enemyFactionObj):
+	var enemyFactionPlanets :Array = []
+	for planet in get_children():
+		if planet.FactionObj != enemyFactionObj:
+			enemyFactionPlanets.push_back(planet)
+	return enemyFactionPlanets
+	
 
 func get_random_planet(factionObj):
 	var returnPlanet : StaticBody2D
@@ -182,5 +205,18 @@ func get_random_planet(factionObj):
 	
 	return returnPlanet
 
+func get_lowest_population_adversary(factionObj):
+	var planets = get_children()
+	var enemyPlanets = []
+	var lowestPopulation = 100
+	var lowestPopPlanet
+	for planet in planets:
+		if planet.FactionObj != factionObj:
+			if planet.get_population() < lowestPopulation:
+				lowestPopPlanet = planet
+				lowestPopulation = planet.get_population()
+	return lowestPopPlanet
+	
+	
 
 

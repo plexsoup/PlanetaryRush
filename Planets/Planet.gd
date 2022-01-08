@@ -94,11 +94,10 @@ func set_planet_size(size):
 	original_scale = newScale
 
 	$CollisionShape2D.get_shape().set_radius(size * scale_factor)
-	base_production = size / 5.0
+	base_production = size / 5.0 # units_present and size have to be floats
 	
 func set_initial_population(size):
-	print("Planet.gd setting initial population: " + str(size*10))
-	units_present = size * 10
+	units_present = size * 10.0
 	
 	
 func update_unit_label():
@@ -130,22 +129,17 @@ func switch_faction(newFaction):
 		return
 		
 	var oldFaction = FactionObj
-	if oldFaction == newFaction:
-		printerr("Planet is trying to switch factions from itself to itself.")
-		return
-	else:
+	if oldFaction != newFaction:
 		set_faction(newFaction)
 		units_present = 1
+		update_unit_label()
 		# notify factions about the change in planets
 		for faction in [newFaction, oldFaction]:
 			if is_instance_valid(faction):
 				connect("switched_faction", faction, "_on_planet_switched_faction")
 				emit_signal("switched_faction", self, newFaction)
 				disconnect("switched_faction", faction, "_on_planet_switched_faction")
-			else:
-				# Probably setting up a new planet.
-				# Or possibly trying to notify a faction that was queued_free already.
-				pass
+
 
 
 func increase_units_from_timed_production():
