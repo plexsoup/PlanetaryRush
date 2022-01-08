@@ -4,6 +4,9 @@ var Velocity : Vector2
 var FactionObj : Node2D
 var Damage : float = 0.5
 var DefaultLifespan : float = 0.25
+export var ShipToShip: bool = true
+export var ShipToGround: bool = false
+
 signal hit(damage)
 
 # Called when the node enters the scene tree for the first time.
@@ -41,22 +44,28 @@ func die():
 func _on_laser_area_entered(area):
 	# hit a ship, kill it
 	if area.is_in_group("ships") and area.FactionObj != FactionObj:
-		if area.has_method("_on_hit"):
-			if not is_connected("hit", area, "_on_hit"):
+		if ShipToShip == true:
+			if area.has_method("_on_hit"):
 				connect("hit", area, "_on_hit")
-			emit_signal("hit", Damage, FactionObj)
+				emit_signal("hit", Damage, FactionObj)
+				disconnect("hit", area, "_on_hit")
+				die()
+		else: # should you die if you hit another laser?
 			die()
-			
 
 
 func _on_laser_body_entered(body):
 	# hit a planet. kill some population
-	if body.is_in_group("planets") and body.FactionObj != FactionObj:
-		var enemyPlanet = body
-		if enemyPlanet.has_method("_on_hit"):
-			if not is_connected("hit", enemyPlanet, "_on_hit"):
+	if body.is_in_group("planets"):
+		if body.FactionObj != FactionObj and ShipToGround == true:
+			var enemyPlanet = body
+			if enemyPlanet.has_method("_on_hit"):
 				connect("hit", enemyPlanet, "_on_hit")
-			emit_signal("hit", Damage, FactionObj)
+				emit_signal("hit", Damage, FactionObj)
+				disconnect("hit", enemyPlanet, "_on_hit")
+				die()
+					
+		else: # should you die if you hit any other kind of body? Maybe one of your own planets blocked the shot?
 			die()
 
 

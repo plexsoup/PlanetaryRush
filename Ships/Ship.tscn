@@ -102,9 +102,7 @@ shape = SubResource( 3 )
 
 [node name="Weapons" type="Node2D" parent="."]
 
-[node name="ShipToGroundLasers" parent="Weapons" instance=ExtResource( 4 )]
-ShipToShip = false
-ShipToGround = true
+[node name="ShipToShipLasers" parent="Weapons" instance=ExtResource( 4 )]
 
 [node name="Engines" type="Node2D" parent="."]
 

@@ -109,6 +109,21 @@ func execute_click_events(objectivePos):
 #	#print("found random planet: " + str(rndPlanet) + " from " + global.planet_container.name)
 #	return rndPlanet
 
+func getSuitableOriginPlanet():
+	# consider these biases: planet with largest population, planets currently in danger, planets with an opportunity for victory
+	var level = global.Main.CurrentLevel
+	var bestOrigin
+	var planetList = level.PlanetContainer.get_faction_planets(FactionObj)
+	var highestPopulation = 0
+	var highestPopPlanet
+	for planet in planetList: # ties go to the first one discovered
+		if planet.get_population() > highestPopulation:
+			highestPopulation = planet.get_population()
+			highestPopPlanet = planet
+	bestOrigin = highestPopPlanet
+	
+	return bestOrigin
+	
 
 func plot_new_course():
 	var level = global.Main.CurrentLevel
@@ -122,6 +137,11 @@ func plot_new_course():
 			enemyFactionsWithPlanets.push_back(faction)
 	
 	factionToAttack = utils.GetRandElement(enemyFactionsWithPlanets)
+
+	# biases to consider: 
+		# do I have a planet with sufficient population to send ships?
+		# do I attack nearest planet, biggest planet, or player?
+		
 
 	# Bias attacking the player first.
 	if enemyFactionsWithPlanets.has(global.PlayerFactionObj):

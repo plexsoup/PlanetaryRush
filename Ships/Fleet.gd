@@ -14,6 +14,7 @@ var CurrentlyEngagedEnemyFleet = null
 
 enum States { DEPLOYING, MOVING, ENGAGING_ENEMY, WAITING, FINISHED, DESTROYED }
 var State = States.DEPLOYING
+var CurrentShips = []
 
 signal ship_released()
 signal fleet_engaged(enemyFleet)
@@ -85,10 +86,10 @@ func move_fleet_NavTarget(delta):
 		
 		
 		if FleetPathFollowNode.get_unit_offset() > 0.98:
-			# move the fleet somewhere else so I can queue_free
+			# move the fleet somewhere else so the path can can queue_free
 			# send the ships home
 			State = States.WAITING
-			yield(get_tree().create_timer(1.0), "timeout")
+			#yield(get_tree().create_timer(1.0), "timeout")
 			release_fleet()
 
 
@@ -128,7 +129,7 @@ func release_fleet():
 		notifyShipItsReleased(ship)
 		
 	notifyPathFleetReleased()
-	State = States.FINISHED
+	State = States.FINISHED # just because the fleet is released from the path, doesn't mean the fleet is finished.. merely that they've completed their intended path
 
 
 
@@ -177,7 +178,7 @@ func spawnShips(factionObj, numShips, shipScene, destinationPlanet):
 		# added the next line so ships orient themselves toward the cursor.
 		shipNode.set_rotation(shipNode.get_angle_to(factionObj.CursorObj.get_global_position()))
 
-func countAliveShips():
+func countAliveShips(): # may not need this anymore.. we maintain an array of live ships: CurrentShips
 	var numAlive = 0
 	var ships = GetShips()
 	for ship in ships:
@@ -223,12 +224,23 @@ func notifyPathFleetReleased():
 #################################################
 # Incoming Signals
 
+func _on_ship_created(shipObj):
+	if not CurrentShips.has(shipObj):
+		CurrentShips.push_back(shipObj)
+	else:
+		printerr("Ship is trying to register itself with fleet, but it's already registered.")
+	
+func _on_ship_destroyed(shipObj):
+	CurrentShips.erase(shipObj)
+	if CurrentShips.size() == 0:
+		die()
+
 func _on_ShipPath_encountered_enemy(enemyFleetObj):
 	if is_instance_valid(enemyFleetObj):
 		initiateDogfight(enemyFleetObj)
 	
-func _on_ship_destroyed(shipObj):
-	# if we have no ships left, we have no reason to live.
-	
-	if countAliveShips() == 0:
-		die() # die will notify the path that the fleet was destroyed.
+#func _on_ship_destroyed(shipObj):
+#	# if we have no ships left, we have no reason to live.
+#
+#	if countAliveShips() == 0:
+#		die() # die will notify the path that the fleet was destroyed.

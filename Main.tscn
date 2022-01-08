@@ -20,6 +20,7 @@ modulate = Color( 1, 1, 1, 0.376471 )
 
 [node name="EndScreen" parent="CanvasLayer" instance=ExtResource( 4 )]
 visible = false
+modulate = Color( 1, 1, 1, 0.537255 )
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 pause_mode = 2

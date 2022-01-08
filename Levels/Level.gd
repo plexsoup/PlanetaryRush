@@ -15,7 +15,7 @@ export var NumPlanets = 15
 
 signal faction_won(factionObj)
 
-signal switch_faction(planetObj, factionObj)
+signal set_initial_faction(factionObj)
 
 signal gameplay_started()
 
@@ -51,10 +51,12 @@ func start():
 
 func init_starting_planet(factionObj):
 	var neutralPlanets = global.NeutralFactionObj.CurrentPlanetList
-	var planetObj = neutralPlanets[randi()%neutralPlanets.size()]
-	connect("switch_faction", planetObj, "_on_initialize_faction")
-	emit_signal("switch_faction", factionObj)
-	disconnect("switch_faction", planetObj, "_on_initialize_faction")
+	var planetObj = utils.GetRandElement(neutralPlanets)
+	connect("set_initial_faction", planetObj, "_on_initialize_faction")
+	emit_signal("set_initial_faction", factionObj)
+	disconnect("set_initial_faction", planetObj, "_on_initialize_faction")
+
+
 
 func spawn_planets(factionObj, totalNumber):
 	PlanetContainer.spawnPlanets(factionObj, totalNumber) # make sure this happens after factions are created
@@ -175,16 +177,17 @@ func _on_faction_lost(factionObj):
 
 	var victory = false
 	var remainingFactions = getRemainingFactions()
-
-	remainingFactions.erase(global.PlayerFactionObj)
-	remainingFactions.erase(global.NeutralFactionObj)
-	if remainingFactions.size() == 0:
-			victory = true
-			Winning_faction = global.PlayerFactionObj
-	elif remainingFactions.size() == 1:
+	if not remainingFactions.has(global.PlayerFactionObj) and remainingFactions.size() == 1:
+		# player lost
 		victory = true # but not the player
 		Winning_faction = remainingFactions[0]
-		
+	else:
+		remainingFactions.erase(global.PlayerFactionObj)
+		remainingFactions.erase(global.NeutralFactionObj)
+		if remainingFactions.size() == 0: # all enemy factions gone
+				victory = true
+				Winning_faction = global.PlayerFactionObj
+			
 		
 	if victory:
 		

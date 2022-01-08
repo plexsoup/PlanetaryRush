@@ -15,7 +15,7 @@ var State = States.STARTSCREEN
 var Ticks : int = 0
 
 var Debug : bool = false
-var game_speed: float = 1.2 # normal game is 1.0, fast game is 2.0, paused is 0.0. lower is slower (easier)
+var game_speed: float = 1.7 # normal game is 1.0, fast game is 2.0, paused is 0.0. lower is slower (easier)
 var previous_game_speed: float
 var screen_size : Vector2
 
@@ -25,7 +25,7 @@ var BulletContainer : Node2D
 var planet_container : Node2D
 
 
-var NumFactions : int = 2 # active factions only.. neutral doesn't count.
+var NumFactions : int = 4 # active factions only.. neutral doesn't count.
 
 var FactionColors : PoolColorArray = [
 		Color.darkcyan,

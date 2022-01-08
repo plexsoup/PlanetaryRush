@@ -1,7 +1,10 @@
 extends StaticBody2D
+# Note. The inspector complains about a missing collision shape, but we build them dynamically because each planet has a different size
+	# godot likes to share a collision shape across instanced clones. So you can't easily adjust the size on the fly. Better to generate new shape for each object.
 
 # Declare member variables here. Examples:
-var units_present : float = -1.0
+var Size : float = 1.0
+var units_present : float = 1.0 # billions of people
 var original_scale: Vector2
 var scale_factor: float = 70.0
 var base_production: float = 1.0 # based on planet size
@@ -32,12 +35,14 @@ func _ready():
 	State = States.READY
 	
 func start(factionObj, size):
+	Size = size
 	var myName = generateName()
 	self.name = myName
-	switch_faction(factionObj)
+	switch_faction(factionObj) # note: switch_faction sets units_present == 1
 	set_planet_size(size)
+	set_initial_population(size) # must come after switch_faction
 	set_difficulty(factionObj)
-
+	update_unit_label()
 	
 	if global.Debug:
 		$PlanetNameLabel.text = myName
@@ -74,10 +79,6 @@ func initialize_collision_shape():
 # **** Not sure what to do here.
 func set_random_properties():
 	set_random_texture()
-	#var colors = global.FactionColors
-	#set_faction(global.NeutralFactionObj) # most will start grey
-	#printerr("Planet.set_random_properties requires refactor")
-
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -93,8 +94,12 @@ func set_planet_size(size):
 	original_scale = newScale
 
 	$CollisionShape2D.get_shape().set_radius(size * scale_factor)
-	units_present = int(size * 10)
 	base_production = size / 5.0
+	
+func set_initial_population(size):
+	print("Planet.gd setting initial population: " + str(size*10))
+	units_present = size * 10
+	
 	
 func update_unit_label():
 	$Production/ProductionLabel.set_text(str(floor(units_present)))
@@ -121,7 +126,7 @@ func set_faction(factionObj):
 	
 func switch_faction(newFaction):
 	if not is_instance_valid(newFaction):
-		# ships tried to claim a planet after your faction disappeared
+		printerr("Planet.gd: dead faction trying to claim a planet. Something wrong with logic.")
 		return
 		
 	var oldFaction = FactionObj
@@ -130,6 +135,7 @@ func switch_faction(newFaction):
 		return
 	else:
 		set_faction(newFaction)
+		units_present = 1
 		# notify factions about the change in planets
 		for faction in [newFaction, oldFaction]:
 			if is_instance_valid(faction):
@@ -158,9 +164,7 @@ func remove_units(number):
 	units_present -= number
 	update_unit_label()
 
-func _on_ProductionTimer_timeout():
-	if not FactionObj.IsNeutralFaction: # grey planets don't produce
-		increase_units_from_timed_production()
+
 
 
 
@@ -227,7 +231,11 @@ func spawn_firework():
 func spawn_explosion():
 	pass
 	
+##################################################################################
+# Global functions: may be called by other scripts
 
+func get_population():
+	return units_present
 
 ##################################################################################
 # Outgoing Signals
@@ -241,6 +249,9 @@ func notifyPath_PlanetCannotSendShips(path):
 ##################################################################################
 # Incoming Signals
 
+func _on_ProductionTimer_timeout():
+	if not FactionObj.IsNeutralFaction: # grey planets don't produce
+		increase_units_from_timed_production()
 
 # signal coming from cursor via global.level
 func _on_ShipPath_finished_drawing(path, destinationPlanet):
@@ -266,22 +277,24 @@ func _on_hit(damage, factionObj, location = get_global_position()):
 func _on_ship_landed(damage, factionObj):
 	# switch to the new faction if you're neutral
 	
-	if FactionObj == global.NeutralFactionObj:
+	if self.FactionObj.IsNeutralFaction:
 		if units_present <= 0: # empty neutral, claim it
 			switch_faction(factionObj)
-			#add_units(damage)
-			
 		else: # populated neutral, reduce population
 			remove_units(damage)
 			if units_present <= 0:
 				switch_faction(factionObj)
+				
+				
 	elif FactionObj == factionObj: # friendly planet, add population
 		add_units(damage)
 	else: # enemy planet, reduce population
 		remove_units(damage)
 		if units_present <= 0:
 			switch_faction(global.NeutralFactionObj)
-			#units_present = 1
+			# not sure if it's necessary to switch to neutral before switching to the new faction?
+
 
 func _on_initialize_faction(factionObj):
 	switch_faction(factionObj)
+	set_initial_population(Size)

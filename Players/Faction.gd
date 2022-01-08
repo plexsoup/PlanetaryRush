@@ -10,7 +10,8 @@ var CursorObj : Node2D
 
 
 var CurrentPlanetList = []
-var CurrentShipList = [] # keep track so we can stay alive until the last ship is dead
+#var CurrentShipList = [] 
+var CurrentFleetList = [] # keep track so we can stay alive until the last fleet is gone
 
 enum States { PAUSED, PLAYING, DEAD} # not really using PAUSED yet
 var State = States.PAUSED
@@ -40,14 +41,21 @@ func start(number, myName, myColor, isLocalHuman, isNeutralFaction):
 #func _process(delta):
 #	pass
 
-func registerShip(shipObj):
-	CurrentShipList.push_back(shipObj)
+#func registerShip(shipObj):
+#	CurrentShipList.push_back(shipObj)
+#
+#func deregisterShip(shipObj):
+#	CurrentShipList.erase(shipObj)
+#	if lose_conditions_met():
+#		lose()
+
+func registerFleet(fleetObj):
+	CurrentFleetList.push_back(fleetObj)
 	
-func deregisterShip(shipObj):
-	CurrentShipList.erase(shipObj)
+func deregisterFleet(fleetObj):
+	CurrentFleetList.erase(fleetObj)
 	if lose_conditions_met():
 		lose()
-
 
 func getRemainingPlanetCount():
 	var remainingPlanetCount = CurrentPlanetList.size()
@@ -116,9 +124,9 @@ func win():
 func lose_conditions_met():
 	# no planets and no ships left
 	var remainingPlanets = CurrentPlanetList.size()
-	var remainingShips = CurrentShipList.size()
-	if remainingPlanets == 0 and remainingShips == 0:
-		print(self.name + " says: Yep, no ships left. Quitting")
+	var remainingFleets = CurrentFleetList.size()
+	if remainingPlanets == 0 and remainingFleets == 0:
+		print(self.name + " says: Yep, no fleets or planets left. Quitting")
 		return true
 	else:
 		return false
@@ -157,12 +165,17 @@ func _on_planet_switched_faction(planetObj, newFaction):
 		if lose_conditions_met():
 			lose()
 
+func _on_fleet_created(fleetObj):
+	registerFleet(fleetObj)
 
-func _on_ship_created(shipObj):
-	registerShip(shipObj)
+func _on_fleet_destroyed(fleetObj):
+	deregisterFleet(fleetObj)
 	
-func _on_ship_destroyed(shipObj):
-	deregisterShip(shipObj)
+#func _on_ship_created(shipObj):
+#	registerShip(shipObj)
+#
+#func _on_ship_destroyed(shipObj):
+#	deregisterShip(shipObj)
 	
 func _on_gameplay_started():
 	State = States.PLAYING

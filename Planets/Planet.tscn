@@ -21,7 +21,6 @@ hframes = 3
 vframes = 3
 
 [node name="ProductionTimer" type="Timer" parent="."]
-wait_time = 0.5
 autostart = true
 
 [node name="Tween" type="Tween" parent="."]

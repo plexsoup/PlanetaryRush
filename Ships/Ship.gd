@@ -44,8 +44,9 @@ var VectorToGoal # for debug drawing
 enum States { ADVANCING, RETURNING, ENGAGING_ENEMY, BOMBARDING, DEAD }
 var State = States.ADVANCING
 
-signal created(shipObj)
-signal destroyed(shipObj)
+signal created(shipObj) # sent to fleet
+signal destroyed(shipObj) # sent to fleet
+signal landed(damage, faction) # sent to planets
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -57,14 +58,15 @@ func _ready():
 func start(factionObj, navTarget, originPlanet, destinationPlanet):
 	Level = global.Main.CurrentLevel
 	FactionObj = factionObj
-	registerShipWithFaction()
+	MyFleet = get_parent().get_parent() # each fleet has a ShipsContainer node
+	registerShipWithFleet()
 	if FactionObj.IsLocalHumanPlayer:
 		IsHumanPlayer = true
 	set_color(factionObj)
 	OriginPlanet = originPlanet
 	DestinationPlanet = destinationPlanet
 	$Sprite.set_frame(factionObj.Number)
-	MyFleet = get_parent().get_parent() # each fleet has a ShipsContainer node
+	
 	NavTarget = navTarget # FleetTarget
 	startFuelTimer(DefaultFuelTimeLimit)
 	initializeWeapons()
@@ -292,7 +294,6 @@ func get_peer_avoidance_vector():
 
 func die():
 	deregisterShipWithFleet()
-	deregisterShipWithFaction() # refactor opportunity.. perhaps the fleet should handle this.. Faction doesn't need to know if ships are alive, just fleets.
 	call_deferred("disable_collision_shapes")
 	setState(States.DEAD)
 	
@@ -341,8 +342,9 @@ func _draw():
 			draw_circle(to_local(myPos), EvasionDistance, myColor)
 
 func land(planet):
-	planet._on_ship_landed(1, FactionObj)
-	die()
+	var damageToPlanet = 1
+	notifyPlanetShipLanded(planet, damageToPlanet)
+	die() # die will deregister ship with fleet
 	
 ###########################################################
 # Global Functions to be called elsewhere
@@ -358,16 +360,29 @@ func IsAlive():
 # Signals outbound
 
 
-func registerShipWithFaction():
-	connect("created", FactionObj, "_on_ship_created")
+#func registerShipWithFaction():
+#	connect("created", FactionObj, "_on_ship_created")
+#	emit_signal("created", self)
+#	disconnect("created", FactionObj, "_on_ship_created")
+
+
+#func deregisterShipWithFaction():
+#	printerr("Factions should only care about fleets, not ships")
+#	connect("destroyed", FactionObj, "_on_ship_destroyed")
+#	emit_signal("destroyed", self)
+#	disconnect("destroyed", FactionObj, "_on_ship_destroyed")
+
+func notifyPlanetShipLanded(planet, damage):
+	connect("landed", planet, "_on_ship_landed")
+	emit_signal("landed", damage, FactionObj)
+	disconnect("landed", planet, "_on_ship_landed")
+	
+
+func registerShipWithFleet(): # seems unnecessary, since fleet created us?
+	connect("created", MyFleet, "_on_ship_created")
 	emit_signal("created", self)
-	disconnect("created", FactionObj, "_on_ship_created")
-
-
-func deregisterShipWithFaction():
-	connect("destroyed", FactionObj, "_on_ship_destroyed")
-	emit_signal("destroyed", self)
-	disconnect("destroyed", FactionObj, "_on_ship_destroyed")
+	disconnect("created", MyFleet, "_on_ship_created")
+	
 	
 func deregisterShipWithFleet():
 	connect("destroyed", MyFleet, "_on_ship_destroyed")
