@@ -38,7 +38,6 @@ func start():
 			init_starting_planet(factionObj)
 			spawn_cursor(factionObj)
 		
-		print("signalling " + factionObj.name + " that gameplay is starting now.")
 		connect("gameplay_started", factionObj, "_on_gameplay_started")
 		emit_signal("gameplay_started")
 		disconnect("gameplay_started", factionObj, "_on_gameplay_started")

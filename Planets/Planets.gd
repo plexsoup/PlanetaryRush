@@ -112,7 +112,7 @@ func spawnPlanet(factionObj, planetSize, targetPos):
 		if not isColliding(newPlanet):
 			safe_location_found = true
 		i += 1
-		if i > 1 and i % 10 == 0:
+		if i > 1 and i % 50 == 0:
 			print("newPlanet " + newPlanet.name + " still looking for safe space after " + str(i) + " attempts")
 	if not safe_location_found:
 		# kill it. If you can't find a non-colliding space after 200 attempts, just die.

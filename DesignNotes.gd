@@ -1,13 +1,15 @@
 """
 Current Work Effort:
 
-- ships aren't avoiding planets when they're travelling
-
-- neutral planets add population when they get hit? that's weird.
+- AI doesn't know it's won after the player is dead.
+- AI sometimes quits before it lost
+	- might need a referee object still. To wake up dead AI or kill losers
+- AI sometimes stops planning routes once the player is dead.
 
 - there's a big flaw in fleet engagement: once a fleet has been released from it's path, it no longer has a dogfightzone collision area, so other ships can't engage it.
+	- revisit the bombardment State
 	
-- there's still a problem with win/loss signalling
+- there may still be a problem with win/loss signalling
 	- I just had a win when another faction was still alive.
 
 - dogfights feel bad
@@ -18,7 +20,8 @@ Current Work Effort:
 	- maybe you wnat to move the camera off the player controller, so it doesn't follow the mouse around.
 	- put it back on level
 	
-
+- strategy is weird.. AI loses easily because they don't consider the strength of the planet they're attacking.
+	- they might need coordinated strategy, where they plan a few moves ahead.
 
 - if a faction loses a planet while they're still draing the path, the path freezes.
 	- it should be released instead. Or something.
