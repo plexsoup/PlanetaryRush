@@ -1,7 +1,7 @@
 extends Node2D
 
 # Declare member variables here. Examples:
-var min_distance : float = 250
+var min_distance : float = 325
 var DeploymentZone : Rect2
 
 
@@ -26,20 +26,26 @@ func spawnPlanets(factionObj, totalNumPlanets):
 	var startingPlanetSize : float = 1.5
 	
 	var p = PlanetaryPatterns
-	var patterns = [p.SIN, p.RANDOM]
+	var patterns = [p.SIN, p.RANDOM, p.GLOBS]
+	
 	var pattern = patterns[randi()%patterns.size()]
 
 	for planetNum in range(totalNumPlanets):
 		var randScale : float = rand_range(0.75, 1.5)
 		var targetPos : Vector2 = get_target_pos(pattern, planetNum, totalNumPlanets)
+		
 		spawnPlanet(factionObj, startingPlanetSize * randScale, targetPos)
 
 
 func get_target_pos(pattern, planetNum, totalNumPlanets):
+	# must return a single Vector2 position
 	randomize()
-	var targetPos = DeploymentZone.position
+
+	var targetPos = DeploymentZone.position # the position to return
+
 	var width = DeploymentZone.size.x
 	var height = DeploymentZone.size.y
+	var deploymentZoneCenter = DeploymentZone.position + (DeploymentZone.size/2)
 	
 	if pattern == PlanetaryPatterns.SIN:
 		targetPos.x += ( float(planetNum) / float(totalNumPlanets) * float(width) )
@@ -47,7 +53,8 @@ func get_target_pos(pattern, planetNum, totalNumPlanets):
 			targetPos.y += ( sin(2.0 * PI * float(planetNum) / float(totalNumPlanets)) * float(height/2.0) + height/2)
 		else:
 			targetPos.y -= ( sin(2.0 * PI * float(planetNum) / float(totalNumPlanets)) * float(height/2.0) - height/2)
-
+			
+			
 	elif pattern == PlanetaryPatterns.ELLIPSE:
 		pass
 	elif pattern == PlanetaryPatterns.CIRCLE:
@@ -55,7 +62,24 @@ func get_target_pos(pattern, planetNum, totalNumPlanets):
 	elif pattern == PlanetaryPatterns.SPIRAL:
 		pass
 	elif pattern == PlanetaryPatterns.GLOBS:
-		pass
+		targetPos = deploymentZoneCenter
+		# choose 2 to 5 locations and cluster around them
+		var numFoci = 3 # can't be random, because it has to be consistent for each planet
+		var fociLocations : PoolVector2Array = []
+		for fociNum in range(numFoci):
+			var currentFociLocation = deploymentZoneCenter
+			#var currentFociLocation = global.camera.get_camera_screen_center() # could also work.
+			currentFociLocation += Vector2.RIGHT.rotated(2*PI * fociNum / numFoci) * (DeploymentZone.size.x/3)
+			fociLocations.push_back(currentFociLocation)
+
+		# grab a random glob focus and spawn the planet nearby
+		# random means they may not be evenly distributed
+		targetPos += utils.GetRandElement(fociLocations)
+		var spread = DeploymentZone.size.x / 4
+		targetPos.x += rand_range(-spread, spread)
+		targetPos.y += rand_range(-spread, spread)
+			
+			
 	elif pattern == PlanetaryPatterns.RANDOM:
 		targetPos.x += rand_range(0, width)
 		targetPos.y += rand_range(0, height)
@@ -75,12 +99,12 @@ func spawnPlanet(factionObj, planetSize, targetPos):
 	var newPlanet = planetScene.instance()
 	add_child(newPlanet)
 	#newPlanet.call_deferred("start", factionObj, planetSize)
-	newPlanet.start(factionObj, planetSize) # has to happen right away to build the factions' planet lists
+
 
 	var safe_location_found : bool = false
 	var i : int = 0
 
-	while safe_location_found == false and i < 200:
+	while not safe_location_found and i < 200:
 
 		var jitterDist = 150
 		var jitter = Vector2(rand_range(-jitterDist, jitterDist), rand_range(-jitterDist, jitterDist))
@@ -88,9 +112,14 @@ func spawnPlanet(factionObj, planetSize, targetPos):
 		if not isColliding(newPlanet):
 			safe_location_found = true
 		i += 1
-			
-	
-		
+		if i > 1 and i % 10 == 0:
+			print("newPlanet " + newPlanet.name + " still looking for safe space after " + str(i) + " attempts")
+	if not safe_location_found:
+		# kill it. If you can't find a non-colliding space after 200 attempts, just die.
+		newPlanet.queue_free()
+	else:
+		newPlanet.start(factionObj, planetSize) # has to happen right away to build the factions' planet lists	
+
 func isColliding(new_planet):	
 	var myPos = new_planet.get_global_position()
 	for planet in get_children():

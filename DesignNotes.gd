@@ -7,10 +7,18 @@ Current Work Effort:
 
 - planetary bombardment feels bad
 
-- planets still spawn on top of each other
+- camera feels bad
+	- maybe you wnat to move the camera off the player controller, so it doesn't follow the mouse around.
+	- put it back on level
+	
+
 
 - if a faction loses a planet while they're still draing the path, the path freezes.
 	- it should be released instead. Or something.
+
+- if a faction loses all their planets while a fleet is in transit, the paths remain
+	- someone's not receiving a notification that all ships are gone
+
 
 - Feels weird how ships explode when they claim a planet.
 
@@ -25,6 +33,9 @@ Current Work Effort:
 
 
 Bugs
+
+- every other hard pause, the camera zoom fails to work.
+
 - in multiplayer games, one of the AI will eventually get stuck with a path that won't release.
 	- possibly after their ships died due to fuel loss?
 

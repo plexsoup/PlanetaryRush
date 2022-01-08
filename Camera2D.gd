@@ -8,12 +8,13 @@ var DesiredZoom = Vector2(1, 1)
 var Ticks :int = 0
 
 var MinZoom = 0.3
-var MaxZoom = 4.5
+var MaxZoom = 15.0
 
 onready var Cursor = get_node("../..") # parent of playercontroller
 
 func _ready():
 	DesiredZoom = zoom
+	
 	self.drag_margin_h_enabled = true
 	self.drag_margin_v_enabled = true
 	
@@ -31,7 +32,7 @@ func _process(delta):
 	check_for_keyboard_movement(delta)
 	
 func check_for_keyboard_movement(delta):
-	var scrollSpeed = 500.0 * delta
+	var scrollSpeed = 800.0 * delta
 	if Input.is_action_pressed("ui_up"):
 		offset.y -= scrollSpeed
 	if Input.is_action_pressed("ui_left"):

@@ -33,12 +33,14 @@ func warp_to_planet(planet):
 	if FactionObj.IsLocalHumanPlayer:
 		Input.warp_mouse_position(planet.get_global_transform_with_canvas().get_origin())
 
-func end():
+
+func die():
+	$DestructionTimer.set_wait_time(0.1)
 	$DestructionTimer.start()
 
 func _on_DestructionTimer_timeout():
 	self.set_curve(Curve2D.new())
-	update()
+	update() # trigger the draw function to clear the previous path
 	call_deferred("queue_free")
 
 func _process(delta):
@@ -149,3 +151,13 @@ func _on_planet_assigned_fleet(fleetObj):
 	#AssignedFleets.push_back(fleetObj)
 	AssignedFleet = fleetObj
 
+func _on_planet_cannot_send_ships():
+	# oh well, better luck next time. Either the planet has no units or it switched factions before you requested ships.
+	die()
+
+func _on_fleet_destroyed():
+	die()
+	
+func _on_fleet_released():
+	die()
+	

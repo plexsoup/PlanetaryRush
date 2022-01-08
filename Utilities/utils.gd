@@ -47,7 +47,9 @@ func WithinFuzzyProximity(origin, destination, distance, tolerance):
 	return withinProximity
 
 func GetRandElement(array):
-	if typeof(array) != TYPE_ARRAY:
+	var acceptableTypes = [TYPE_ARRAY, TYPE_VECTOR2_ARRAY]
+	if not acceptableTypes.has(typeof(array)):
+		printerr("GetRandElement got a type it didn't expect")
 		return
 	elif array.size() > 0:
 		return(array[randi()%array.size()])

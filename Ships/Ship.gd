@@ -187,14 +187,17 @@ func collectVelocityVectors():
 	VelocityVectors = []
 	VelocityVectors.push_back(get_peer_avoidance_vector()) # seems to generate noise if you watch the debug lines
 	if State == States.ADVANCING:
-		VelocityVectors.push_back(get_planet_avoidance_vector(NavTarget)) # seems to generate noise if you watch the debug lines
+		VelocityVectors.push_back(get_planet_avoidance_vector(DestinationPlanet)) # seems to generate noise if you watch the debug lines
 		VelocityVectors.push_back(get_fleet_path_vector())
 	elif State == States.ENGAGING_ENEMY:
+		VelocityVectors.push_back(get_planet_avoidance_vector(DestinationPlanet))
 		VelocityVectors.push_back(get_dogfighting_vector())
 		VelocityVectors.push_back(get_fleet_path_vector())
 	elif State == States.RETURNING:
+		VelocityVectors.push_back(get_planet_avoidance_vector(DestinationPlanet))
 		VelocityVectors.push_back(get_vector_toward_planet(DestinationPlanet))
 	elif State == States.BOMBARDING:
+		VelocityVectors.push_back(get_planet_avoidance_vector(DestinationPlanet))
 		VelocityVectors.push_back(get_vector_toward_planet(DestinationPlanet))
 
 
@@ -341,6 +344,15 @@ func land(planet):
 	planet._on_ship_landed(1, FactionObj)
 	die()
 	
+###########################################################
+# Global Functions to be called elsewhere
+
+func IsAlive():
+	if State == States.DEAD:
+		return false
+	else:
+		return true
+
 
 ###########################################################
 # Signals outbound

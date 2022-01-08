@@ -133,7 +133,8 @@ func plot_new_course():
 	
 	var originPlanet = level.PlanetContainer.get_random_planet(FactionObj)
 	var destinationPlanet
-	if randf() < 0.55:
+	if randf() < 0.75:
+		# bias attacking nearby planets first
 		destinationPlanet = level.PlanetContainer.get_nearest_faction_planet(factionToAttack, self.get_global_position())
 		if not is_instance_valid(destinationPlanet):
 			printerr("In AIController plot_new_course: destinationPlanet is invalid (case #1)")

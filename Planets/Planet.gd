@@ -21,6 +21,7 @@ var FactionObj : Node2D
 
 signal switched_faction(planetObj, newFactionObj)
 signal assigned_fleet(fleetObj)
+signal no_ships_available()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -141,17 +142,26 @@ func switch_faction(newFaction):
 				pass
 
 
-func increase_units():
+func increase_units_from_timed_production():
 	
 	var baseProd = base_production * difficulty_factor * global.game_speed
 	var popGrowth = ((units_present * production_factor) - units_present) * global.game_speed
 	units_present = clamp( units_present + baseProd + popGrowth, 1, max_population)
-		
+	update_unit_label()
+
+
+func add_units(number):
+	units_present += number
+	update_unit_label()
+
+func remove_units(number):
+	units_present -= number
+	update_unit_label()
 
 func _on_ProductionTimer_timeout():
 	if not FactionObj.IsNeutralFaction: # grey planets don't produce
-		increase_units()
-	update_unit_label()
+		increase_units_from_timed_production()
+
 
 
 
@@ -190,7 +200,7 @@ func spawn_fleet(numShips, path, destinationPlanet): # coming from Planet
 	var fleet = fleetScene.instance()
 	global.level.FleetContainer.add_child(fleet)
 	fleet.set_global_position(get_global_position())
-	fleet.start(path.get_node("PathFollow2D"), FactionObj, numShips, shipScene, originPlanet, destinationPlanet)
+	fleet.start(path, FactionObj, numShips, shipScene, originPlanet, destinationPlanet)
 
 	connect( "assigned_fleet", path, "_on_planet_assigned_fleet")
 	emit_signal("assigned_fleet", fleet)
@@ -218,26 +228,35 @@ func spawn_explosion():
 	pass
 	
 
-func add_units(number):
-	units_present += number
+
+##################################################################################
+# Outgoing Signals
+
+func notifyPath_PlanetCannotSendShips(path):
+	connect("no_ships_available", path, "_on_planet_cannot_send_ships")
+	emit_signal("no_ships_available")
+	disconnect("no_ships_available", path, "_on_planet_cannot_send_ships")
+
+
+##################################################################################
+# Incoming Signals
+
 
 # signal coming from cursor via global.level
 func _on_ShipPath_finished_drawing(path, destinationPlanet):
 	# send half your ships along the path
-	send_ships(units_present/2, path, destinationPlanet)
+	if path.FactionObj == FactionObj and units_present >= 2:
+		send_ships(units_present/2, path, destinationPlanet)
+	else:
+		# respond with a denial so the path can kill itself.
+		notifyPath_PlanetCannotSendShips(path)
 	
 func _on_hit(damage, factionObj, location = get_global_position()):
-	units_present -= damage
-	if units_present <= 0:
-		switch_faction(factionObj)
-
-		# become neutral when population is zero
-#		if FactionObj != global.NeutralFactionObj:
-#			if is_instance_valid(global.NeutralFactionObj):
-#				# sometimes the neutral faction has already quit.
-#				switch_faction(global.NeutralFactionObj)
-#			else:
-#				switch_faction(factionObj)
+	# maybe ships lasers are too powerful
+	if factionObj != FactionObj:
+		remove_units(damage)
+		if units_present <= 0:
+			switch_faction(factionObj)
 			
 		units_present = 0
 		
@@ -250,18 +269,19 @@ func _on_ship_landed(damage, factionObj):
 	if FactionObj == global.NeutralFactionObj:
 		if units_present <= 0: # empty neutral, claim it
 			switch_faction(factionObj)
-			units_present += damage
+			#add_units(damage)
+			
 		else: # populated neutral, reduce population
-			units_present -= damage
+			remove_units(damage)
 			if units_present <= 0:
 				switch_faction(factionObj)
 	elif FactionObj == factionObj: # friendly planet, add population
-		units_present += damage
+		add_units(damage)
 	else: # enemy planet, reduce population
-		units_present -= damage
+		remove_units(damage)
 		if units_present <= 0:
 			switch_faction(global.NeutralFactionObj)
-			units_present = 1
+			#units_present = 1
 
 func _on_initialize_faction(factionObj):
 	switch_faction(factionObj)

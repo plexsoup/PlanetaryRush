@@ -4,6 +4,7 @@ onready var FleetContainer : Node2D = $Fleets
 onready var BulletContainer : Node2D = $Bullets
 onready var PlanetContainer : Node2D = $Planets
 onready var FactionContainer : Node2D = $Factions
+onready var PathContainer : Node2D = $Paths
 
 var Winning_faction
 
@@ -18,6 +19,7 @@ signal switch_faction(planetObj, factionObj)
 
 signal gameplay_started()
 
+var PathFollowScene = preload("res://Paths/ShipPath.tscn")
 
 func _ready():
 	global.level = self
@@ -83,8 +85,6 @@ func spawn_faction(factionNum, color, isHuman, isNeutralFaction):
 	else:
 		factionName = "Faction " + str(factionNum)
 	factionNode.start(factionNum, factionName, color, isHuman, isNeutralFaction)
-		
-	
 
 
 func spawn_cursor(factionObj): # this could probably be moved into Faction
@@ -96,6 +96,14 @@ func spawn_cursor(factionObj): # this could probably be moved into Faction
 	$Cursors.add_child(cursorNode)
 	cursorNode.start(factionObj, factionObj.IsLocalHumanPlayer)
 	factionObj.CursorObj = cursorNode
+
+func spawn_path(planet, factionObj, cursorObj):
+	
+	var pathFollowNode = PathFollowScene.instance()
+	pathFollowNode.set_global_position(planet.get_global_position())
+	PathContainer.add_child(pathFollowNode)
+	pathFollowNode.start(planet, factionObj, cursorObj)
+
 
 
 func end():
@@ -125,26 +133,6 @@ func start_celebration():
 				planet.celebrate()
 
 
-
-func _on_new_path_requested(planet, factionObj, cursorObj):
-	if State == States.PLAYING:
-		var pathFollowScene = load("res://Paths/ShipPath.tscn")
-		var pathFollowNode = pathFollowScene.instance()
-		pathFollowNode.set_global_position(planet.get_global_position())
-		$Paths.add_child(pathFollowNode)
-		pathFollowNode.start(planet, factionObj, cursorObj)
-
-func _on_faction_won(factionObj): # coming from faction.gd
-	# we no longer trust factions announcing that they won. Sorry.
-	printerr("Level.gd: deprecated function _on_faction_won called. We no longer trust factions announcing that they won. Sorry.")
-
-#	print("Level.gd got a request for celebration. ")
-#	print("There are " + str(countRemainingFactions()) + " factions left (including Neutral)")
-#
-#	if State != States.CELEBRATING:
-#		if countRemainingFactions() <= 2: # this is a terrible check
-#			start_celebration()
-
 func getRemainingFactions():
 	var remainingFactions = []
 	for faction in FactionContainer.get_children():
@@ -160,6 +148,20 @@ func countRemainingFactions():
 		if faction.State == faction.States.PLAYING:
 			remainingAliveFactions.push_back(faction)
 	return remainingAliveFactions.size()
+
+###############################################################################
+# Incoming Signals
+
+func _on_new_path_requested(planet, factionObj, cursorObj):
+	if State == States.PLAYING:
+		spawn_path(planet, factionObj, cursorObj)
+		
+#func _on_path_no_longer_required(planet, factionObj):
+#	# find a path for faction, from planet, with no fleets.
+#	var paths = PathContainer.get_children()
+#	for path in paths:
+#		if path.FactionObj = factionObj and AssignedFleet == null:
+#			printerr("hmm.. how do we identify paths?")
 
 func _on_faction_lost(factionObj):
 	print("Level.gd was notified that " + factionObj.name + " has no planets or ships remaining.")

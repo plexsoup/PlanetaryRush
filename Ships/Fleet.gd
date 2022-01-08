@@ -1,7 +1,8 @@
 extends Node2D
 
 # Declare member variables here. Examples:
-var FleetPath : PathFollow2D
+var FleetPath : Path2D
+var FleetPathFollowNode : PathFollow2D
 var NavTarget
 var Speed : float = 160.0 # try to keep the navTarget just a bit faster than the ships
 var FactionObj : Node2D
@@ -17,6 +18,8 @@ var State = States.DEPLOYING
 signal ship_released()
 signal fleet_engaged(enemyFleet)
 signal resumed_moving()
+signal fleet_destroyed()
+signal fleet_released()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -61,26 +64,27 @@ func battleIsOver(enemyFleet):
 func start(fleetPath, factionObj, numShips, shipScene, originPlanet, destinationPlanet):
 	FactionObj = factionObj
 	FleetPath = fleetPath
-	NavTarget = FleetPath.get_node("FleetTarget")
+	FleetPathFollowNode = fleetPath.get_node("PathFollow2D") # this is fragile
+	NavTarget = FleetPathFollowNode.get_node("FleetTarget")
 	OriginPlanet = originPlanet
 	DestinationPlanet = destinationPlanet
 	State = States.MOVING
 	spawnShips(factionObj, numShips, shipScene, destinationPlanet)
 
 func die():
-	remove_path()
+	notifyPathFleetDestroyed()
 	State = States.FINISHED
 	call_deferred("queue_free")
 	
 	
 	
 func move_fleet_NavTarget(delta):
-	if is_instance_valid(FleetPath):
-		FleetPath.set_offset(FleetPath.get_offset() + delta * Speed * global.game_speed)
+	if is_instance_valid(FleetPathFollowNode):
+		FleetPathFollowNode.set_offset(FleetPathFollowNode.get_offset() + delta * Speed * global.game_speed)
 		# tell the path how far we've gotten, so the path can remove the line behind us
 		
 		
-		if FleetPath.get_unit_offset() > 0.98:
+		if FleetPathFollowNode.get_unit_offset() > 0.98:
 			# move the fleet somewhere else so I can queue_free
 			# send the ships home
 			State = States.WAITING
@@ -123,15 +127,10 @@ func release_fleet():
 		
 		notifyShipItsReleased(ship)
 		
-	remove_path()
+	notifyPathFleetReleased()
 	State = States.FINISHED
 
 
-
-func remove_path():
-	# refactor opportunity: change this to a signal
-	if FleetPath != null and is_instance_valid(FleetPath):
-		FleetPath.get_parent().end()
 
 func get_closest_friendly_planet(pos):
 	# this code is a bit of a mess as of Jan 2, 2022
@@ -177,6 +176,14 @@ func spawnShips(factionObj, numShips, shipScene, destinationPlanet):
 
 		# added the next line so ships orient themselves toward the cursor.
 		shipNode.set_rotation(shipNode.get_angle_to(factionObj.CursorObj.get_global_position()))
+
+func countAliveShips():
+	var numAlive = 0
+	var ships = GetShips()
+	for ship in ships:
+		if is_instance_valid(ship) and ship.IsAlive():
+			numAlive += 1
+	return numAlive
 	
 
 ####################################################
@@ -189,15 +196,30 @@ func GetShipCount():
 	return GetShips().size()
 
 
+
 #################################################
 # Outbound Signals
 
 func notifyShipItsReleased(shipObj):
-	connect("ship_released", shipObj, "_on_fleet_released_ship")
-	emit_signal("ship_released")
-	disconnect("ship_released", shipObj, "_on_fleet_released_ship")
+	if is_instance_valid(shipObj):
+		connect("ship_released", shipObj, "_on_fleet_released_ship")
+		emit_signal("ship_released")
+		disconnect("ship_released", shipObj, "_on_fleet_released_ship")
 
+func notifyPathFleetDestroyed():
+	if is_instance_valid(FleetPath):
+		connect("fleet_destroyed", FleetPath, "_on_fleet_destroyed")
+		emit_signal("fleet_destroyed")
+		disconnect("fleet_destroyed", FleetPath, "_on_fleet_destroyed")
 
+func notifyPathFleetReleased():
+	if is_instance_valid(FleetPath):
+		connect("fleet_released", FleetPath, "_on_fleet_released")
+		emit_signal("fleet_released")
+		disconnect("fleet_released", FleetPath, "_on_fleet_released")
+
+	
+	
 #################################################
 # Incoming Signals
 
@@ -206,14 +228,7 @@ func _on_ShipPath_encountered_enemy(enemyFleetObj):
 		initiateDogfight(enemyFleetObj)
 	
 func _on_ship_destroyed(shipObj):
-	# why do we care?
-	# just check the remaining ship count.
-	# not sure what happens if we use erase with a null reference
-	# not sure how long it takes the ship to queue_free after we get the signal
+	# if we have no ships left, we have no reason to live.
 	
-	
-#	var remainingShips = $ShipsContainer.get_children()
-#	if remainingShips.erase(shipObj).size == 0:
-#		die()
-	if GetShipCount() == 0: # could it be one?
-		die()
+	if countAliveShips() == 0:
+		die() # die will notify the path that the fleet was destroyed.
