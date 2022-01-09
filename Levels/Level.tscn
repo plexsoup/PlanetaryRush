@@ -38,11 +38,12 @@ texture = ExtResource( 2 )
 region_enabled = true
 region_rect = Rect2( 0, 0, 8912, 6420 )
 
-[node name="CelebrationDuration" type="Timer" parent="."]
+[node name="CelebrationTimer" type="Timer" parent="."]
 wait_time = 2.5
 one_shot = true
 
-[node name="LoseCheckTimer_Delete" type="Timer" parent="."]
+[node name="LamentationTimer" type="Timer" parent="."]
+one_shot = true
 
-[connection signal="timeout" from="CelebrationDuration" to="." method="_on_CelebrationDuration_timeout"]
-[connection signal="timeout" from="LoseCheckTimer_Delete" to="." method="_on_LoseCheckTimer_timeout"]
+[connection signal="timeout" from="CelebrationTimer" to="." method="_on_CelebrationDuration_timeout"]
+[connection signal="timeout" from="LamentationTimer" to="." method="_on_LamentationTimer_timeout"]

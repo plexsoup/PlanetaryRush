@@ -138,11 +138,14 @@ func plot_new_course():
 	var destinationPlanet : StaticBody2D
 
 	originPlanet = getSuitableOriginPlanet()
-	
-	if originPlanet.get_population() < 5:
-		# wait until you have some troops to send.
-		restart_timer()
-		return
+
+	if not is_instance_valid(originPlanet):
+		printerr("AIController, can't get a suitable origin planet.")
+	else:
+		if originPlanet.get_population() < 5:
+			# wait until you have some troops to send.
+			restart_timer()
+			return
 
 	CurrentAttackStrategy = randi()%AttackStrategies.size()
 

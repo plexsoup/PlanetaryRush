@@ -17,28 +17,6 @@ script = ExtResource( 1 )
 [node name="DesignNotes" type="Node" parent="."]
 script = ExtResource( 2 )
 
-[node name="Foreground" type="CanvasLayer" parent="."]
-
-[node name="PauseMenu" parent="Foreground" instance=ExtResource( 3 )]
-visible = false
-
-[node name="EndScreen" parent="Foreground" instance=ExtResource( 4 )]
-visible = false
-
-[node name="UpgradeShop" type="Control" parent="Foreground"]
-margin_right = 40.0
-margin_bottom = 40.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="LevelSelectScreen" type="Control" parent="Foreground"]
-margin_right = 40.0
-margin_bottom = 40.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 pause_mode = 2
 stream = ExtResource( 5 )
@@ -54,17 +32,11 @@ autostart = true
 [node name="Scenes" type="Node2D" parent="."]
 
 [node name="TitleScreen" type="Node2D" parent="Scenes"]
-
-[node name="TitleScreenUI" type="Control" parent="Scenes/TitleScreen"]
-margin_right = 1023.0
-margin_bottom = 602.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-__meta__ = {
-"_edit_use_anchors_": false
-}
+visible = false
+position = Vector2( 530, 288 )
 
 [node name="ParallaxBackground" type="Node2D" parent="Scenes/TitleScreen"]
+position = Vector2( -512, -264 )
 
 [node name="ParallaxLayer" type="Node2D" parent="Scenes/TitleScreen/ParallaxBackground"]
 
@@ -128,11 +100,16 @@ position = Vector2( 509, 283 )
 scale = Vector2( 0.6, 0.6 )
 texture = ExtResource( 10 )
 
+[node name="TitleScreenUI" parent="Scenes/TitleScreen" instance=ExtResource( 3 )]
+
 [node name="Tutorial" type="Node2D" parent="Scenes"]
+visible = false
 
 [node name="QuickPlay" type="Node2D" parent="Scenes"]
+visible = false
 
 [node name="Campaign" type="Node2D" parent="Scenes"]
+visible = false
 
 [node name="Shopping" type="Node2D" parent="Scenes/Campaign"]
 
@@ -143,15 +120,80 @@ texture = ExtResource( 10 )
 [node name="PlanetMap" type="Node2D" parent="Scenes/Campaign"]
 
 [node name="EndCredits" type="Node2D" parent="Scenes"]
+visible = false
 
-[node name="Foreground" type="CanvasLayer" parent="Scenes/EndCredits"]
-layer = 2
+[node name="EndScreen" parent="Scenes/EndCredits" instance=ExtResource( 4 )]
+margin_left = 3.0
+margin_top = 3.0
+margin_right = 1023.0
+margin_bottom = 596.0
 
-[node name="EndCreditsUI" type="Control" parent="Scenes/EndCredits"]
-margin_right = 40.0
-margin_bottom = 40.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="ParallaxBackground2" type="Node2D" parent="Scenes/EndCredits"]
+position = Vector2( 18, 24 )
+
+[node name="ParallaxLayer" type="Node2D" parent="Scenes/EndCredits/ParallaxBackground2"]
+
+[node name="Sprite" type="Sprite" parent="Scenes/EndCredits/ParallaxBackground2/ParallaxLayer"]
+position = Vector2( 1214.5, 177.5 )
+rotation = -3.14159
+scale = Vector2( 1, -1 )
+texture = ExtResource( 8 )
+script = ExtResource( 6 )
+
+[node name="Sprite2" type="Sprite" parent="Scenes/EndCredits/ParallaxBackground2/ParallaxLayer"]
+position = Vector2( 1095, 84 )
+rotation = -3.14159
+scale = Vector2( 1, -1 )
+texture = ExtResource( 8 )
+script = ExtResource( 6 )
+
+[node name="ParallaxLayer2" type="Node2D" parent="Scenes/EndCredits/ParallaxBackground2"]
+modulate = Color( 0.658824, 0.658824, 0.658824, 1 )
+scale = Vector2( 0.66, 0.66 )
+z_index = -1
+
+[node name="Sprite" type="Sprite" parent="Scenes/EndCredits/ParallaxBackground2/ParallaxLayer2"]
+position = Vector2( 1387.88, 72.7273 )
+rotation = -3.14159
+scale = Vector2( 1, -1 )
+texture = ExtResource( 7 )
+script = ExtResource( 6 )
+
+[node name="Sprite2" type="Sprite" parent="Scenes/EndCredits/ParallaxBackground2/ParallaxLayer2"]
+position = Vector2( 1580.3, 169.697 )
+rotation = -3.14159
+scale = Vector2( 1, -1 )
+texture = ExtResource( 7 )
+script = ExtResource( 6 )
+
+[node name="ParallaxLayer3" type="Node2D" parent="Scenes/EndCredits/ParallaxBackground2"]
+modulate = Color( 0.360784, 0.360784, 0.360784, 1 )
+scale = Vector2( 0.5, 0.5 )
+z_index = -2
+
+[node name="Sprite" type="Sprite" parent="Scenes/EndCredits/ParallaxBackground2/ParallaxLayer3"]
+position = Vector2( 1738, 126 )
+rotation = -3.14159
+scale = Vector2( 1, -1 )
+texture = ExtResource( 9 )
+script = ExtResource( 6 )
+
+[node name="Sprite2" type="Sprite" parent="Scenes/EndCredits/ParallaxBackground2/ParallaxLayer3"]
+position = Vector2( 1476, 110 )
+rotation = -3.14159
+scale = Vector2( 1, -1 )
+texture = ExtResource( 9 )
+script = ExtResource( 6 )
+
+[node name="FinalBackground" type="Node2D" parent="Scenes/EndCredits/ParallaxBackground2"]
+z_index = -10
+
+[node name="Sprite" type="Sprite" parent="Scenes/EndCredits/ParallaxBackground2/FinalBackground"]
+position = Vector2( 509, 283 )
+scale = Vector2( 0.6, 0.6 )
+texture = ExtResource( 10 )
+
+[node name="MainCamera" type="Camera2D" parent="."]
+position = Vector2( 512, 303 )
 
 [connection signal="timeout" from="DebugPrintTimer" to="." method="_on_DebugTimer_timeout"]

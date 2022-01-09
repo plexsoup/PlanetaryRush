@@ -8,15 +8,14 @@ onready var PathContainer : Node2D = $Paths
 
 var Winning_faction
 
-enum States { INITIALIZING, PLAYING, PAUSED, CELEBRATING }
+enum States { INITIALIZING, PLAYING, PAUSED, CELEBRATING, LAMENTING }
 var State = States.INITIALIZING
 
 export var NumPlanets = 15
 
 signal faction_won(factionObj)
-
+signal player_lost()
 signal set_initial_faction(factionObj)
-
 signal gameplay_started()
 
 var PathFollowScene = preload("res://Paths/ShipPath.tscn")
@@ -127,12 +126,20 @@ func start_celebration():
 	else:
 		State = States.CELEBRATING
 			 
-		$CelebrationDuration.start()
+		$CelebrationTimer.start()
 		
 		for planet in PlanetContainer.get_children():
 			if planet.has_method("celebrate"):
 				planet.celebrate()
 
+func start_lamentation():
+	# Player lost. Start a timer and play some animations/music
+	if State == States.LAMENTING:
+		return
+	else:
+		State = States.LAMENTING
+		$LamentationTimer.start()
+		
 
 func getRemainingFactions():
 	var remainingFactions = []
@@ -149,6 +156,10 @@ func countRemainingFactions():
 		if faction.State == faction.States.PLAYING:
 			remainingAliveFactions.push_back(faction)
 	return remainingAliveFactions.size()
+
+###############################################################################
+# Outbound Signals
+
 
 ###############################################################################
 # Incoming Signals
@@ -172,7 +183,7 @@ func _on_faction_lost(factionObj):
 	if factionObj == global.PlayerFactionObj:
 		# player lost.. show the end screen
 		print("Sorry Player, you lost.") # but we probably don't care, because we want to watch the fireworks
-		return
+		start_lamentation()
 
 	var victory = false
 	var remainingFactions = getRemainingFactions()
@@ -202,3 +213,9 @@ func _on_CelebrationDuration_timeout():
 	disconnect("faction_won", global.Main, "_on_faction_won")
 	
 	
+
+
+func _on_LamentationTimer_timeout():
+	connect("player_lost", global.Main, "_on_player_lost")
+	emit_signal("player_lost")
+	disconnect("player_lost", global.Main, "_on_player_lost")

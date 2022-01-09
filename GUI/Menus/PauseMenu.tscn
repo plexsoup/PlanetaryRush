@@ -12,7 +12,7 @@
 [ext_resource path="res://effects/UISlide.wav" type="AudioStream" id=10]
 [ext_resource path="res://effects/clickNoise.wav" type="AudioStream" id=11]
 
-[node name="PauseMenu" type="Control"]
+[node name="TitleScreen" type="Control"]
 pause_mode = 2
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -79,6 +79,7 @@ custom_constants/separation = 30
 margin_right = 300.0
 margin_bottom = 29.0
 rect_min_size = Vector2( 300, 0 )
+action_mode = 0
 text = "Quick Play"
 
 [node name="Tutorial" type="Button" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer"]
@@ -223,7 +224,7 @@ rect_min_size = Vector2( 64, 64 )
 texture_normal = ExtResource( 9 )
 expand = true
 
-[node name="More Options" type="Tabs" parent="MarginContainer/TabContainer"]
+[node name="Options" type="Tabs" parent="MarginContainer/TabContainer"]
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -232,20 +233,20 @@ margin_top = 55.0
 margin_right = -10.0
 margin_bottom = -10.0
 
-[node name="Panel3" type="Panel" parent="MarginContainer/TabContainer/More Options"]
+[node name="Panel3" type="Panel" parent="MarginContainer/TabContainer/Options"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/Panel3"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/TabContainer/Options/Panel3"]
 margin_left = 10.0
 margin_top = 10.0
 margin_right = 894.0
 margin_bottom = 425.0
 
-[node name="OptionsDetails" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2" instance=ExtResource( 3 )]
+[node name="OptionsDetails" parent="MarginContainer/TabContainer/Options/Panel3/VBoxContainer2" instance=ExtResource( 3 )]
 anchor_right = 0.0
 anchor_bottom = 0.0
 margin_left = 0.0
@@ -253,7 +254,7 @@ margin_top = 0.0
 margin_right = 884.0
 margin_bottom = 308.0
 
-[node name="HSplitContainer2" type="HSplitContainer" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2"]
+[node name="HSplitContainer2" type="HSplitContainer" parent="MarginContainer/TabContainer/Options/Panel3/VBoxContainer2"]
 margin_top = 312.0
 margin_right = 884.0
 margin_bottom = 381.0
@@ -262,7 +263,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/TabContainer/Options/Panel3/VBoxContainer2/HSplitContainer2"]
 margin_right = 436.0
 margin_bottom = 69.0
 size_flags_horizontal = 3
@@ -271,19 +272,19 @@ custom_constants/margin_top = 20
 custom_constants/margin_left = 20
 custom_constants/margin_bottom = 20
 
-[node name="LeftSide" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer"]
+[node name="LeftSide" type="VBoxContainer" parent="MarginContainer/TabContainer/Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer"]
 margin_left = 20.0
 margin_top = 20.0
 margin_right = 416.0
 margin_bottom = 49.0
 size_flags_horizontal = 3
 
-[node name="RestartButton" type="Button" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer/LeftSide"]
+[node name="RestartButton" type="Button" parent="MarginContainer/TabContainer/Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer/LeftSide"]
 margin_right = 396.0
 margin_bottom = 29.0
 text = "New Game"
 
-[node name="MarginContainer2" type="MarginContainer" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2"]
+[node name="MarginContainer2" type="MarginContainer" parent="MarginContainer/TabContainer/Options/Panel3/VBoxContainer2/HSplitContainer2"]
 margin_left = 448.0
 margin_right = 884.0
 margin_bottom = 69.0
@@ -293,21 +294,21 @@ custom_constants/margin_top = 20
 custom_constants/margin_left = 20
 custom_constants/margin_bottom = 20
 
-[node name="RightSide" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer2"]
+[node name="RightSide" type="VBoxContainer" parent="MarginContainer/TabContainer/Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer2"]
 margin_left = 20.0
 margin_top = 20.0
 margin_right = 416.0
 margin_bottom = 49.0
 size_flags_horizontal = 3
 
-[node name="QuitButton" type="Button" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer2"]
+[node name="QuitButton" type="Button" parent="MarginContainer/TabContainer/Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer2"]
 margin_left = 20.0
 margin_top = 20.0
 margin_right = 416.0
 margin_bottom = 49.0
 text = "Quit"
 
-[node name="ColorRect" type="ColorRect" parent="MarginContainer/TabContainer/More Options"]
+[node name="ColorRect" type="ColorRect" parent="MarginContainer/TabContainer/Options"]
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -328,5 +329,5 @@ volume_db = -29.823
 [connection signal="pressed" from="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/RestartButton" to="." method="_on_RestartButton_pressed"]
 [connection signal="pressed" from="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
 [connection signal="meta_clicked" from="MarginContainer/TabContainer/Licenses/MarginContainer/VBoxContainer/Authoring" to="." method="_on_RichText_meta_clicked"]
-[connection signal="pressed" from="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer/LeftSide/RestartButton" to="." method="_on_RestartButton_pressed"]
-[connection signal="pressed" from="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer2/QuitButton" to="." method="_on_QuitButton_pressed"]
+[connection signal="pressed" from="MarginContainer/TabContainer/Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer/LeftSide/RestartButton" to="." method="_on_RestartButton_pressed"]
+[connection signal="pressed" from="MarginContainer/TabContainer/Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer2/QuitButton" to="." method="_on_QuitButton_pressed"]

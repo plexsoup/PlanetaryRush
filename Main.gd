@@ -9,19 +9,54 @@ extends Node2D
 
 var CurrentLevel : Node2D
 var levels: Array = ["res://Levels/Level.tscn"]
-onready var ForegroundLayer = $Foreground
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# load_level(levels[0]) # this happens when start button is pushed
 	randomize()
 	global.Main = self
-	hide_end_screen()
+	show_single_scene("TitleScreen")
 
-func hide_end_screen():
-	ForegroundLayer.get_node("EndScreen").hide()
+func show_single_scene(desiredSceneNodeName):
+	print("showing scene now: " + desiredSceneNodeName)
+	if desiredSceneNodeName == "QuickPlay":
+		$MainCamera._set_current(false)
+		load_level(levels[0])
+
+	else:
+		$MainCamera._set_current(true)
+		global.camera = $MainCamera # do we actually really need this?
+		$MainCamera.set_zoom(Vector2(1,1))
+		remove_level()
+
+	for sceneNode in $Scenes.get_children():
+		if sceneNode.name == desiredSceneNodeName:
+			sceneNode.show()
+		else:
+			sceneNode.hide()
+		
+	
+	
+func show_end_screen(playerWon):
+	if playerWon:
+		$Scenes/EndCredits/EndScreen.win()
+	else:
+		$Scenes/EndCredits/EndScreen.lose()
+	show_single_scene("EndCredits")
+
+
+#func hide_end_screen():
+#	$Scenes/EndCredits.hide()
+
+
+#func show_start_screen():
+#	$Scenes/TitleScreen.show()
+
+
 
 func load_level(level_path):
+	$MainCamera._set_current(false)
 	var level_scene = load(level_path)
 	var newLevel = level_scene.instance()
 	$Scenes/QuickPlay.add_child(newLevel)
@@ -54,32 +89,32 @@ func updateInGameTimers(speed):
 
 	
 func restart():
+	show_single_scene("QuickPlay")
 
-	var scenes = $Scenes.get_children()
-	for scene in scenes:
-		scene.hide()
+
 	
-	var overlays = $Foreground.get_children()
-	for overlay in overlays:
-		overlay.hide()
-	
-	remove_level()
-	load_level(levels[0])
-	$Scenes/QuickPlay.set_visible(true)
 	
 	#global.State = global.States.FIGHTING
 
+################################################################################
+# Incoming Signals
+
+# HMM.. Why does main ever care when a single faction lost?
+# They should only care that the player lost.
 func _on_faction_lost(factionObj):
-	
-#	#global.toggle_hard_pause() # the pause menu does this
-#
+	printerr("Main.gd _on_faction_lost. Consider deprecating in favour of _on_player_lost")
 	if factionObj.IsLocalHumanPlayer:
-		var endScreen = get_node("CanvasLayer/EndScreen")
-		endScreen.show()
-		endScreen.lose()
-#	else:
-#		if CurrentLevel.FactionContainer.get_child_count() <= 1:
-#			endScreen.win()
+		var playerWon = false
+		show_end_screen(playerWon)
+	else:
+		pass # cause, who cares?
+
+
+func _on_player_lost(): # coming from Level
+	print("Main.gd got notified that player lost. _on_player_lost()")
+	# should we just trust that Level got it right?
+	var playerWon = false
+	show_end_screen(playerWon)
 
 func _on_faction_won(factionObj):
 	# This should come after the planets all celebrate.
@@ -90,30 +125,24 @@ func _on_faction_won(factionObj):
 		printerr("A faction queued free before it won?")
 		return
 	else: # factionObj is valid
-		var endScreen = ForegroundLayer.get_node("EndScreen")
-		endScreen.show()
-		#global.toggle_hard_pause() # the pause menu does this
-		
 		if factionObj.IsLocalHumanPlayer:
-			endScreen.win()
+			show_end_screen(true)
 		else:
 			if CurrentLevel.FactionContainer.get_child_count() <= 1:
-				endScreen.lose()
+				show_end_screen(false)
 
 func _on_Quit_pressed():
 	$AudioStreamPlayer.stop()
 	remove_level()
-	ForegroundLayer.get_node("PauseMenu").hide()
-	ForegroundLayer.get_node("EndScreen").hide()
+	$Scenes/TitleScreen.hide()
+	$Scenes/EndCredits.hide()
 	get_tree().quit()
 
 func _on_restart_button_pressed():
 	restart()
 
 func _on_main_menu_requested():
-	remove_level()
-	ForegroundLayer.get_node("PauseMenu").show()
-	ForegroundLayer.get_node("EndScreen").hide()
+	show_single_scene("TitleScreen")
 	
 func _on_Restart_pressed():
 		

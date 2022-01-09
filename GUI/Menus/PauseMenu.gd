@@ -55,9 +55,9 @@ func _on_RestartButton_pressed():
 		emit_signal("restart_button_pressed")
 		disconnect( "restart_button_pressed", global.Main, "_on_restart_button_pressed")
 		
-		global.Main.restart()
-		hide_pause_menu()
-		global.toggle_hard_pause()
+#		global.Main.restart()
+#		hide_pause_menu()
+#		global.toggle_hard_pause()
 		$ClickNoise.play()
 
 

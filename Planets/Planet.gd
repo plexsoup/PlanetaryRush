@@ -98,6 +98,9 @@ func set_planet_size(size):
 	
 func set_initial_population(size):
 	units_present = size * 10.0
+#	printerr("Planet.gd has a temporary hack to give the player advantage for testing")
+#	if FactionObj == global.PlayerFactionObj:
+#		units_present = 40
 	
 	
 func update_unit_label():

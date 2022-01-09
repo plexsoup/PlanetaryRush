@@ -1,5 +1,13 @@
 """
 Current Work Effort:
+- refactoring title screen and pause screen, etc.
+	- when player loses, game freezes. No end screen shows.
+
+
+- when we have campaigns, it won't make sense for level to signal main that the player won or lost..
+	- the campaign object will need to handle that.
+	- main can still handle it for quickplay games though?
+	
 
 - AI doesn't know it's won after the player is dead.
 - AI sometimes quits before it lost
@@ -43,8 +51,12 @@ Current Work Effort:
 
 
 Bugs
-- The game options screen displayed values should reflect global.. 
-	- change them on start, not just on on-click
+- pauses no longer work. After moving title card scenes around.
+	- pause/unpause is probably due for a refactor
+- after restarting the game, the planet fonts are really small.
+
+
+
 
 - every other hard pause, the camera zoom fails to work.
 
@@ -118,12 +130,24 @@ Big design ideas.
 - since nav targets have collision areas, should you be able to drag from those and redraw paths for existing fleets?
 - should all the line drawing features be available during game pause, so players can treat it more like a turn-based game?
 	- if you have that, you could add timed pauses so players can redraw without having to worry about pausing. 
+- cursor should scale like a brush in photoshop, changing the influence area.
+	- with a big influence area, player could send fleets from multiple planets on one path.
+	- path arrows could be sized based on the cursor size at the time.
 
 Important Engineering Decisions:
 	- Who's responsible for evaluating and announcing win/loss conditions?
 	- Right now: when a planet switches sides, it notifies faction.
 	- if faction is out of planets, then out of ships, it notifies level
 	- level counts remaining factions and triggers the celebration
+
+
+Long Term: 'Maybe Someday' Stuff
+- Will you provide multiplayer support? 
+	- If so, all the global.PlayerFactionObj references might fail.
+- Do you want it to be modable? 
+	- If so, sprites need to be loaded dynamically from a folder and properties need to come from json files.
+	- https://docs.godotengine.org/en/stable/getting_started/workflow/export/exporting_pcks.html#overview-of-pck-files
+	
 
 
 
