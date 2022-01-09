@@ -3,6 +3,7 @@ extends Control
 signal opened()
 signal closed()
 signal quit_pressed()
+signal restart_button_pressed()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -48,7 +49,11 @@ func _on_QuitButton_pressed():
 
 
 func _on_RestartButton_pressed():
-	if global.Main.has_method("restart"):
+	if global.Main.has_method("_on_restart_button_pressed"):
+		
+		connect( "restart_button_pressed", global.Main, "_on_restart_button_pressed")
+		emit_signal("restart_button_pressed")
+		disconnect( "restart_button_pressed", global.Main, "_on_restart_button_pressed")
 		
 		global.Main.restart()
 		hide_pause_menu()

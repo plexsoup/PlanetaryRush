@@ -19,6 +19,8 @@ export var ShipToGround : bool = false
 enum Status {READY, FIRING, RELOADING, SWAPPING_MAGAZINE}
 var WeaponStatus = Status.READY
 
+signal weapons_ready()
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	MyShip = get_parent().get_parent() # all weapons are in a Weapons container
@@ -52,6 +54,17 @@ func CommenceFiring():
 	WeaponStatus = Status.FIRING
 	
 
+###############################################################################
+# Outgoing Signals
+
+func notifyShipWeaponsReady():
+	connect("weapons_ready", MyShip, "_on_weapons_reported_ready")
+	emit_signal("weapons_ready")
+	disconnect("weapons_ready", MyShip, "_on_weapons_reported_ready")
+
+###############################################################################
+# Incoming Signals
+
 func _on_ReloadTimer_timeout():
 	if MyShip.State != MyShip.States.DEAD:
 		if TimesFired <= MagazineSize:
@@ -73,5 +86,6 @@ func _on_ReloadTimer_timeout():
 # the SwapMagazineTimer sends a signal to the Weapons and to the Ship itself.
 func _on_SwapMagazineTimer_timeout():
 	WeaponStatus = Status.READY
+	notifyShipWeaponsReady()
 	
 	

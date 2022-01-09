@@ -53,3 +53,5 @@ func GetRandElement(array):
 		return(array[randi()%array.size()])
 	else:
 		return
+
+		

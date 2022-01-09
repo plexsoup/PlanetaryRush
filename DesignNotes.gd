@@ -43,6 +43,8 @@ Current Work Effort:
 
 
 Bugs
+- The game options screen displayed values should reflect global.. 
+	- change them on start, not just on on-click
 
 - every other hard pause, the camera zoom fails to work.
 
@@ -59,6 +61,10 @@ Bugs
 - faction list on title screen is wrong / makes no sense
 
 Refactoring Required
+- Maybe each weapon should have it's own firing collision area node, then it can manage firing itself.
+	- would allow you to have more than one kind of weapon
+	- which means you can have a shop with upgrades.
+
 - Pause menu notifies player's cursor about pause/unpause.
 	- instead, it should notify Main or Level then let them worry about it.
 	- pausemenu.gd shouldn't have to be aware of cursors or players

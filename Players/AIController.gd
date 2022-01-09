@@ -147,7 +147,10 @@ func plot_new_course():
 	CurrentAttackStrategy = randi()%AttackStrategies.size()
 
 	if CurrentAttackStrategy == AttackStrategies.ATTACK_PLAYER:
-		destinationPlanet = planetContainer.get_random_planet(global.PlayerFactionObj)
+		if is_instance_valid(global.PlayerFactionObj) and global.PlayerFactionObj.IsAlive():
+			destinationPlanet = planetContainer.get_random_planet(global.PlayerFactionObj)
+		else:
+			destinationPlanet = planetContainer.get_nearest_enemy_planet(FactionObj, originPlanet.get_global_position())
 	elif CurrentAttackStrategy == AttackStrategies.LOWEST_POPULATION:
 		destinationPlanet = planetContainer.get_lowest_population_adversary(FactionObj)
 	elif CurrentAttackStrategy == AttackStrategies.NEAREST_PLANET:

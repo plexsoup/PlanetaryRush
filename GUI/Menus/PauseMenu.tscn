@@ -55,81 +55,50 @@ margin_bottom = -10.0
 [node name="Panel" type="Panel" parent="MarginContainer/TabContainer/Start"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/TabContainer/Start"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-custom_constants/margin_right = 30
-custom_constants/margin_top = 10
-custom_constants/margin_left = 30
-custom_constants/margin_bottom = 10
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="MarginContainer" type="CenterContainer" parent="MarginContainer/TabContainer/Start"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 50.0
+margin_top = 50.0
+margin_right = -50.0
+margin_bottom = -50.0
+
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TabContainer/Start/MarginContainer"]
-margin_left = 30.0
-margin_top = 10.0
-margin_right = 874.0
-margin_bottom = 425.0
+margin_left = 252.0
+margin_top = 64.0
+margin_right = 552.0
+margin_bottom = 270.0
+size_flags_horizontal = 4
+custom_constants/separation = 30
 
-[node name="OptionsDetails" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer" instance=ExtResource( 3 )]
-anchor_right = 0.0
-anchor_bottom = 0.0
-margin_left = 0.0
-margin_top = 0.0
-margin_right = 844.0
-margin_bottom = 308.0
-
-[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer"]
-margin_top = 312.0
-margin_right = 844.0
-margin_bottom = 381.0
-dragger_visibility = 1
-
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/HSplitContainer"]
-margin_right = 416.0
-margin_bottom = 69.0
-size_flags_horizontal = 3
-custom_constants/margin_right = 20
-custom_constants/margin_top = 20
-custom_constants/margin_left = 20
-custom_constants/margin_bottom = 20
-
-[node name="LeftSide" type="VBoxContainer" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/HSplitContainer/MarginContainer"]
-margin_left = 20.0
-margin_top = 20.0
-margin_right = 396.0
-margin_bottom = 49.0
-size_flags_horizontal = 3
-
-[node name="RestartButton" type="Button" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/HSplitContainer/MarginContainer/LeftSide"]
-margin_right = 376.0
+[node name="RestartButton" type="Button" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer"]
+margin_right = 300.0
 margin_bottom = 29.0
-text = "New Game"
+rect_min_size = Vector2( 300, 0 )
+text = "Quick Play"
 
-[node name="MarginContainer2" type="MarginContainer" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/HSplitContainer"]
-margin_left = 428.0
-margin_right = 844.0
-margin_bottom = 69.0
-size_flags_horizontal = 3
-custom_constants/margin_right = 20
-custom_constants/margin_top = 20
-custom_constants/margin_left = 20
-custom_constants/margin_bottom = 20
+[node name="Tutorial" type="Button" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer"]
+margin_top = 59.0
+margin_right = 300.0
+margin_bottom = 88.0
+disabled = true
+text = "Tutorial (TBD)"
 
-[node name="RightSide" type="VBoxContainer" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/HSplitContainer/MarginContainer2"]
-margin_left = 20.0
-margin_top = 20.0
-margin_right = 396.0
-margin_bottom = 49.0
-size_flags_horizontal = 3
+[node name="Campaign" type="Button" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer"]
+margin_top = 118.0
+margin_right = 300.0
+margin_bottom = 147.0
+disabled = true
+text = "Campaign (TBD)"
 
-[node name="QuitButton" type="Button" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/HSplitContainer/MarginContainer2"]
-margin_left = 20.0
-margin_top = 20.0
-margin_right = 396.0
-margin_bottom = 49.0
+[node name="QuitButton" type="Button" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer"]
+margin_top = 177.0
+margin_right = 300.0
+margin_bottom = 206.0
 text = "Quit"
 
 [node name="Instructions" parent="MarginContainer/TabContainer" instance=ExtResource( 4 )]
@@ -266,108 +235,86 @@ margin_bottom = -10.0
 [node name="Panel3" type="Panel" parent="MarginContainer/TabContainer/More Options"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/TabContainer/More Options"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-custom_constants/margin_right = 30
-custom_constants/margin_top = 15
-custom_constants/margin_left = 30
-custom_constants/margin_bottom = 15
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/Panel3"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 894.0
+margin_bottom = 425.0
 
-[node name="VSplitContainer" type="VSplitContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer"]
-margin_left = 30.0
-margin_top = 15.0
-margin_right = 874.0
-margin_bottom = 420.0
+[node name="OptionsDetails" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 0.0
+margin_top = 0.0
+margin_right = 884.0
+margin_bottom = 308.0
+
+[node name="HSplitContainer2" type="HSplitContainer" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2"]
+margin_top = 312.0
+margin_right = 884.0
+margin_bottom = 381.0
 dragger_visibility = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="Disclaimer" type="Label" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer"]
-margin_right = 844.0
-margin_bottom = 81.0
-text = "In Development: 
-   These options aren't implemented yet.
-Stay Tuned to future updates!"
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2"]
+margin_right = 436.0
+margin_bottom = 69.0
+size_flags_horizontal = 3
+custom_constants/margin_right = 20
+custom_constants/margin_top = 20
+custom_constants/margin_left = 20
+custom_constants/margin_bottom = 20
 
-[node name="Body" type="HSplitContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer"]
-margin_top = 93.0
-margin_right = 844.0
-margin_bottom = 405.0
-dragger_visibility = 1
-
-[node name="LeftSide" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body"]
+[node name="LeftSide" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer"]
+margin_left = 20.0
+margin_top = 20.0
 margin_right = 416.0
-margin_bottom = 312.0
+margin_bottom = 49.0
 size_flags_horizontal = 3
 
-[node name="Threats" type="HSplitContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide"]
-margin_right = 416.0
-margin_bottom = 279.0
-size_flags_vertical = 3
-dragger_visibility = 1
-
-[node name="Label" type="Label" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/Threats"]
-margin_right = 91.0
-margin_bottom = 279.0
-size_flags_vertical = 1
-text = "Threats"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/Threats"]
-margin_left = 103.0
-margin_right = 416.0
-margin_bottom = 279.0
-
-[node name="Pirates" type="CheckBox" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/Threats/VBoxContainer"]
-margin_right = 313.0
+[node name="RestartButton" type="Button" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer/LeftSide"]
+margin_right = 396.0
 margin_bottom = 29.0
-text = "Pirates"
+text = "New Game"
 
-[node name="BlackHoles" type="CheckBox" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/Threats/VBoxContainer"]
-margin_top = 33.0
-margin_right = 313.0
-margin_bottom = 62.0
-text = "Black Holes"
-
-[node name="Nebulae" type="CheckBox" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/Threats/VBoxContainer"]
-margin_top = 66.0
-margin_right = 313.0
-margin_bottom = 95.0
-text = "Nebulae"
-
-[node name="ShipCombat" type="HSplitContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide"]
-margin_top = 283.0
-margin_right = 416.0
-margin_bottom = 312.0
-dragger_visibility = 1
-
-[node name="Label" type="Label" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/ShipCombat"]
-margin_top = 2.0
-margin_right = 150.0
-margin_bottom = 27.0
-text = "Ship Combat"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/ShipCombat"]
-margin_left = 162.0
-margin_right = 416.0
-margin_bottom = 29.0
-
-[node name="Bullets" type="OptionButton" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body/LeftSide/ShipCombat/VBoxContainer"]
-margin_right = 254.0
-margin_bottom = 29.0
-text = "Bullets"
-items = [ "Bullets", null, false, 0, null, "Rays", null, false, 1, null ]
-selected = 0
-
-[node name="RightSide" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/MarginContainer/VSplitContainer/Body"]
-margin_left = 428.0
-margin_right = 844.0
-margin_bottom = 312.0
+[node name="MarginContainer2" type="MarginContainer" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2"]
+margin_left = 448.0
+margin_right = 884.0
+margin_bottom = 69.0
 size_flags_horizontal = 3
+custom_constants/margin_right = 20
+custom_constants/margin_top = 20
+custom_constants/margin_left = 20
+custom_constants/margin_bottom = 20
+
+[node name="RightSide" type="VBoxContainer" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer2"]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 416.0
+margin_bottom = 49.0
+size_flags_horizontal = 3
+
+[node name="QuitButton" type="Button" parent="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer2"]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 416.0
+margin_bottom = 49.0
+text = "Quit"
 
 [node name="ColorRect" type="ColorRect" parent="MarginContainer/TabContainer/More Options"]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color( 0.501961, 0.501961, 0.501961, 0.501961 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="SlideNoise" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 10 )
@@ -378,6 +325,8 @@ stream = ExtResource( 11 )
 volume_db = -29.823
 
 [connection signal="tab_changed" from="MarginContainer/TabContainer" to="." method="_on_TabContainer_tab_changed"]
-[connection signal="pressed" from="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/HSplitContainer/MarginContainer/LeftSide/RestartButton" to="." method="_on_RestartButton_pressed"]
-[connection signal="pressed" from="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/HSplitContainer/MarginContainer2/QuitButton" to="." method="_on_QuitButton_pressed"]
+[connection signal="pressed" from="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/RestartButton" to="." method="_on_RestartButton_pressed"]
+[connection signal="pressed" from="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
 [connection signal="meta_clicked" from="MarginContainer/TabContainer/Licenses/MarginContainer/VBoxContainer/Authoring" to="." method="_on_RichText_meta_clicked"]
+[connection signal="pressed" from="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer/LeftSide/RestartButton" to="." method="_on_RestartButton_pressed"]
+[connection signal="pressed" from="MarginContainer/TabContainer/More Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer2/QuitButton" to="." method="_on_QuitButton_pressed"]

@@ -189,23 +189,17 @@ func collectVelocityVectors():
 	VelocityVectors = []
 	VelocityVectors.push_back(get_peer_avoidance_vector()) # seems to generate noise if you watch the debug lines
 	if State == States.ADVANCING:
-		var planetAvoidVec = get_planet_avoidance_vector(DestinationPlanet)
-		if planetAvoidVec.length_squared() > 0.0 and global.Ticks % 25 == 0:
-			$gimbal/DebugInfoSprite.set_visible(true)
-			
-		else:
-			$gimbal/DebugInfoSprite.set_visible(false)
-		VelocityVectors.push_back(get_planet_avoidance_vector(DestinationPlanet)*2) # seems to generate noise if you watch the debug lines
+		VelocityVectors.push_back(get_planet_avoidance_vector([OriginPlanet, DestinationPlanet]))
 		VelocityVectors.push_back(get_fleet_path_vector())
 	elif State == States.ENGAGING_ENEMY:
-		VelocityVectors.push_back(get_planet_avoidance_vector(DestinationPlanet))
+		VelocityVectors.push_back(get_planet_avoidance_vector([OriginPlanet, DestinationPlanet]))
 		VelocityVectors.push_back(get_dogfighting_vector())
 		VelocityVectors.push_back(get_fleet_path_vector())
 	elif State == States.RETURNING:
-		VelocityVectors.push_back(get_planet_avoidance_vector(DestinationPlanet))
+		VelocityVectors.push_back(get_planet_avoidance_vector([OriginPlanet, DestinationPlanet]))
 		VelocityVectors.push_back(get_vector_toward_planet(DestinationPlanet))
 	elif State == States.BOMBARDING:
-		VelocityVectors.push_back(get_planet_avoidance_vector(DestinationPlanet))
+		VelocityVectors.push_back(get_planet_avoidance_vector([OriginPlanet]))
 		VelocityVectors.push_back(get_vector_toward_planet(DestinationPlanet))
 
 
@@ -264,8 +258,16 @@ func get_vector_toward_planet(planetObj):
 	return returnVec
 	
 
-func get_planet_avoidance_vector(destinationPlanet):
+func get_planet_avoidance_vector(listOfPlanetsToIgnore):
 	# find the nearest planet, and add a vector away from it if it's too close
+
+	var planetsToIgnore : Array = []
+	if typeof(listOfPlanetsToIgnore) == TYPE_OBJECT:
+		printerr("someone passed an object to planets to ignore instead of an array")
+		planetsToIgnore.push_back(listOfPlanetsToIgnore)
+	else:
+		planetsToIgnore = listOfPlanetsToIgnore
+
 	var level = global.Main.CurrentLevel
 	
 	var returnVec = Vector2(0,0)
@@ -275,17 +277,13 @@ func get_planet_avoidance_vector(destinationPlanet):
 	var nearestPlanet = level.PlanetContainer.get_nearest_planet(myPos)
 	if is_instance_valid(nearestPlanet):
 		
-		if nearestPlanet != destinationPlanet and nearestPlanet != OriginPlanet: # you're allowed to land on the destination
+		if not planetsToIgnore.has(nearestPlanet):
 			var planetPos = nearestPlanet.get_global_position()
 			
 #			if myPos.distance_squared_to(planetPos) < avoidDistance * avoidDistance:
 #				returnVec += Vector2(myPos - planetPos).normalized()
 			if utils.WithinFuzzyProximity(self, nearestPlanet, avoidDistance, 0.05):
 				returnVec += (myPos - planetPos).normalized()
-	else:
-		# It's ok, there's no planets to worry about within minimum distance_squared.
-		# but it might mean a ship is flying off into the sunset (they're not supposed to do that).
-		pass
 	return returnVec
 	
 func get_peer_avoidance_vector():
@@ -344,7 +342,7 @@ func _draw():
 
 		# purple = planet avoidance vector
 		var vectorsToDraw = {
-			"avoid_planet" : [get_planet_avoidance_vector(DestinationPlanet), Color.orangered],
+			"avoid_planet" : [get_planet_avoidance_vector([OriginPlanet, DestinationPlanet]), Color.orangered],
 			"vector2_right" : [Vector2.RIGHT, Color.green],
 			"Vector_to_goal" : [VectorToGoal, Color.white]
 		}
@@ -432,6 +430,8 @@ func _on_FiringArc_body_entered(body):
 	if body.is_in_group("planets"):
 		fireOnPlanet(body)
 
+func _on_weapons_reported_ready():
+		enable_firingArc()
 
 func _on_hit(damage, factionObj): # is factionObj the attacker or defender?
 	Health -= damage

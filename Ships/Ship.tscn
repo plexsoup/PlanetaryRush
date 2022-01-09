@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Ships/Ship.gd" type="Script" id=1]
 [ext_resource path="res://Weapons/laser.tscn" type="PackedScene" id=2]
@@ -6,7 +6,6 @@
 [ext_resource path="res://Weapons/ShipToShipLasers.tscn" type="PackedScene" id=4]
 [ext_resource path="res://effects/explosion1.png" type="Texture" id=5]
 [ext_resource path="res://effects/explosion.wav" type="AudioStream" id=6]
-[ext_resource path="res://GUI/Icons/godotIcon.png" type="Texture" id=7]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 34.8188, 35.9784 )
@@ -139,11 +138,6 @@ text = "Status Label"
 __meta__ = {
 "_edit_use_anchors_": false
 }
-
-[node name="DebugInfoSprite" type="Sprite" parent="gimbal"]
-position = Vector2( -6.10352e-05, 0 )
-scale = Vector2( 0.308814, 0.308814 )
-texture = ExtResource( 7 )
 
 [node name="pilot" type="Node2D" parent="."]
 

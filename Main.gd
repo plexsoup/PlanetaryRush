@@ -9,6 +9,7 @@ extends Node2D
 
 var CurrentLevel : Node2D
 var levels: Array = ["res://Levels/Level.tscn"]
+onready var ForegroundLayer = $Foreground
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -18,14 +19,15 @@ func _ready():
 	hide_end_screen()
 
 func hide_end_screen():
-	get_node("CanvasLayer/EndScreen").hide()
+	ForegroundLayer.get_node("EndScreen").hide()
 
 func load_level(level_path):
 	var level_scene = load(level_path)
 	var newLevel = level_scene.instance()
-	add_child(newLevel)
+	$Scenes/QuickPlay.add_child(newLevel)
 	#newLevel.start()
 	CurrentLevel = newLevel
+	
 	
 func remove_level():
 	if CurrentLevel and CurrentLevel != null:
@@ -50,8 +52,19 @@ func updateInGameTimers(speed):
 
 	
 func restart():
+
+	var scenes = $Scenes.get_children()
+	for scene in scenes:
+		scene.hide()
+	
+	var overlays = $Foreground.get_children()
+	for overlay in overlays:
+		overlay.hide()
+	
 	remove_level()
 	load_level(levels[0])
+	$Scenes/QuickPlay.set_visible(true)
+	
 	#global.State = global.States.FIGHTING
 
 func _on_faction_lost(factionObj):
@@ -75,7 +88,7 @@ func _on_faction_won(factionObj):
 		printerr("A faction queued free before it won?")
 		return
 	else: # factionObj is valid
-		var endScreen = get_node("CanvasLayer/EndScreen")
+		var endScreen = ForegroundLayer.get_node("EndScreen")
 		endScreen.show()
 		#global.toggle_hard_pause() # the pause menu does this
 		
@@ -88,17 +101,16 @@ func _on_faction_won(factionObj):
 func _on_Quit_pressed():
 	$AudioStreamPlayer.stop()
 	remove_level()
-	$CanvasLayer/PauseMenu.hide()
-	$CanvasLayer/EndScreen.hide()
+	ForegroundLayer.get_node("PauseMenu").hide()
+	ForegroundLayer.get_node("EndScreen").hide()
 	get_tree().quit()
 
-
+func _on_restart_button_pressed():
+	restart()
+	
 func _on_Restart_pressed():
-	if global.Main.has_method("restart"):
-		global.Main.restart()
-		$CanvasLayer/EndScreen.hide()
-		#global.toggle_hard_pause() # the pause menu does this currently
 		
+	restart()
 
 
 func _on_DebugTimer_timeout():

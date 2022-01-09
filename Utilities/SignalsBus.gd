@@ -38,6 +38,16 @@ func broadcastEvent(eventName, parametersArr):
 	if BroadcastEvents.has(eventName):
 		BroadcastEvents[eventName].broadcast()
 
+func QuickSignal(signalName, targetObject, targetFunction):
+	if is_instance_valid(targetObject) and targetObject.has_method(targetFunction):
+		connect( signalName, targetObject, targetFunction)
+		emit_signal(signalName)
+		disconnect( signalName, targetObject, targetFunction)
+	else:
+		printerr("SignalsBus.gd : invalid targetObject or targetFunction")
+
+
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass

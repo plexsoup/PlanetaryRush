@@ -43,7 +43,7 @@ func start():
 		disconnect("gameplay_started", factionObj, "_on_gameplay_started")
 			
 	print("Level.gd starting gameplay")
-	$CanvasLayer/InLevelGUI.start(getRemainingFactions())
+	$Foreground/InLevelGUI.start(getRemainingFactions())
 	State = States.PLAYING
 	
 	

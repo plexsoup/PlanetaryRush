@@ -7,23 +7,28 @@ extends MarginContainer
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	set_faction_colors()
+	initializePrompts()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
+
+func initializePrompts():
+	var numFactionsButton = $VBoxContainer/FactionsSection/NumFactionsContainer/NumFactionsButton
+	numFactionsButton.selected = global.NumFactions
 	
-	
-	
+	var difficultyButton = $VBoxContainer/HSplitContainer/LSide/Options/Difficulty/DifficultyButton
+	difficultyButton.selected = global.options["difficulty"]
+
+	var gameSpeedSlider = $VBoxContainer/HSplitContainer/LSide/Options/GameSpeed/SpeedSlider
+	gameSpeedSlider.set_value(global.game_speed)
 
 func _on_UI_element_clicked(button_pressed):
 	$Sounds/ClickNoise.play()
 
 
-
-
 func _on_UI_slide_element_selected():
 	$Sounds/SlideNoise.play()
-	
 
 
 func _on_SpeedSlider_mouse_entered():
@@ -38,14 +43,6 @@ func _on_NumFactionsButton_item_selected(index):
 	$Sounds/ClickNoise.play()
 	global.NumFactions = index + 1
 	print("OptionDetails.gd: index == " + str(index) + " therefore NumFactions = " + str(global.NumFactions) )
-
-#	var factionSelector : ItemList = get_node("VBoxContainer/FactionsSection/FactionSelectHSplit/FactionSelect")
-#	for i in range(5):
-#		if i >= global.NumFactions: # neutral faction is disabled here
-#			factionSelector.set_item_disabled(i, true)
-#		else:
-#			factionSelector.set_item_disabled(i, false)
-
 
 
 func set_faction_colors():

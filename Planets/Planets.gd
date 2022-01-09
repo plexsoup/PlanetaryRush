@@ -148,7 +148,7 @@ func get_nearest_faction_planet(factionObj, pos):
 	var planets = get_faction_planets(factionObj)
 	if planets.size() == 0:
 		printerr("someone requested a planet for a faction with none.")
-		return false
+		return null
 	for planet in planets:
 		var planetPos = planet.get_global_position()
 		var dist_sq_to_planet = pos.distance_squared_to(planetPos)
