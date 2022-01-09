@@ -30,11 +30,13 @@ func load_level(level_path):
 	
 	
 func remove_level():
-	if CurrentLevel and CurrentLevel != null:
+	if is_instance_valid(CurrentLevel):
 		if CurrentLevel.has_method("end"):
 			CurrentLevel.end()
 		else:
 			CurrentLevel.queue_free()
+	else:
+		printerr("Main.gd: someone is calling remove_level, but it seems like level is already gone.")
 
 func print_debug_info():
 	if global.Debug:
@@ -107,6 +109,11 @@ func _on_Quit_pressed():
 
 func _on_restart_button_pressed():
 	restart()
+
+func _on_main_menu_requested():
+	remove_level()
+	ForegroundLayer.get_node("PauseMenu").show()
+	ForegroundLayer.get_node("EndScreen").hide()
 	
 func _on_Restart_pressed():
 		
