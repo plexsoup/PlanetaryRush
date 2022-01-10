@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://DesignNotes.gd" type="Script" id=2]
@@ -10,6 +10,11 @@
 [ext_resource path="res://Ships/textures/ship4.png" type="Texture" id=8]
 [ext_resource path="res://Ships/textures/ship3.png" type="Texture" id=9]
 [ext_resource path="res://Scenery/stars.png" type="Texture" id=10]
+[ext_resource path="res://Planets/Planet.tscn" type="PackedScene" id=11]
+[ext_resource path="res://Players/Faction.tscn" type="PackedScene" id=12]
+[ext_resource path="res://Tutorial/Stage 1.gd" type="Script" id=13]
+[ext_resource path="res://Levels/Level.tscn" type="PackedScene" id=14]
+[ext_resource path="res://Levels/QuickPlay.gd" type="Script" id=15]
 
 [node name="Main" type="Node2D"]
 script = ExtResource( 1 )
@@ -103,10 +108,34 @@ texture = ExtResource( 10 )
 [node name="TitleScreenUI" parent="Scenes/TitleScreen" instance=ExtResource( 3 )]
 
 [node name="Tutorial" type="Node2D" parent="Scenes"]
-visible = false
+
+[node name="Stage 1" parent="Scenes/Tutorial" instance=ExtResource( 14 )]
+
+[node name="Faction" parent="Scenes/Tutorial/Stage 1/Factions" index="0" instance=ExtResource( 12 )]
+IsLocalHumanPlayer = true
+
+[node name="Faction2" parent="Scenes/Tutorial/Stage 1/Factions" index="1" instance=ExtResource( 12 )]
+IsNeutralFaction = true
+
+[node name="Planet" parent="Scenes/Tutorial/Stage 1/Planets" index="0" instance=ExtResource( 11 )]
+position = Vector2( 326, 302 )
+
+[node name="Planet2" parent="Scenes/Tutorial/Stage 1/Planets" index="1" instance=ExtResource( 11 )]
+position = Vector2( 706, 307 )
+
+[node name="Stage 1 beta" type="Node2D" parent="Scenes/Tutorial"]
+script = ExtResource( 13 )
+
+[node name="Stage 2" type="Node2D" parent="Scenes/Tutorial"]
+
+[node name="Stage 3" type="Node2D" parent="Scenes/Tutorial"]
 
 [node name="QuickPlay" type="Node2D" parent="Scenes"]
-visible = false
+script = ExtResource( 15 )
+
+[node name="Level" parent="Scenes/QuickPlay" instance=ExtResource( 14 )]
+DesiredNumPlanets = 15
+DesiredNumFactions = 4
 
 [node name="Campaign" type="Node2D" parent="Scenes"]
 visible = false
@@ -197,3 +226,5 @@ texture = ExtResource( 10 )
 position = Vector2( 512, 303 )
 
 [connection signal="timeout" from="DebugPrintTimer" to="." method="_on_DebugTimer_timeout"]
+
+[editable path="Scenes/Tutorial/Stage 1"]

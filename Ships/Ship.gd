@@ -55,8 +55,8 @@ func _ready():
 
 
 # Called by fleet
-func start(factionObj, navTarget, originPlanet, destinationPlanet):
-	Level = global.Main.CurrentLevel
+func start(factionObj, navTarget, originPlanet, destinationPlanet, levelObj):
+	Level = levelObj
 	FactionObj = factionObj
 	MyFleet = get_parent().get_parent() # each fleet has a ShipsContainer node
 	registerShipWithFleet()
@@ -111,6 +111,7 @@ func set_color(factionObj):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	
 	if State == States.DEAD or Level.State != Level.States.PLAYING:
 		return
 	else:
@@ -268,13 +269,11 @@ func get_planet_avoidance_vector(listOfPlanetsToIgnore):
 	else:
 		planetsToIgnore = listOfPlanetsToIgnore
 
-	var level = global.Main.CurrentLevel
-	
 	var returnVec = Vector2(0,0)
 	var myPos = get_global_position()
 	var avoidDistance = 135.0
 	
-	var nearestPlanet = level.PlanetContainer.get_nearest_planet(myPos)
+	var nearestPlanet = Level.PlanetContainer.get_nearest_planet(myPos)
 	if is_instance_valid(nearestPlanet):
 		
 		if not planetsToIgnore.has(nearestPlanet):

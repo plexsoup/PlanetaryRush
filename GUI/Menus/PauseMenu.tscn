@@ -82,14 +82,13 @@ rect_min_size = Vector2( 300, 0 )
 action_mode = 0
 text = "Quick Play"
 
-[node name="Tutorial" type="Button" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer"]
+[node name="TutorialButton" type="Button" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer"]
 margin_top = 59.0
 margin_right = 300.0
 margin_bottom = 88.0
-disabled = true
-text = "Tutorial (TBD)"
+text = "Tutorial"
 
-[node name="Campaign" type="Button" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer"]
+[node name="CampaignButton" type="Button" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer"]
 margin_top = 118.0
 margin_right = 300.0
 margin_bottom = 147.0
@@ -327,6 +326,7 @@ volume_db = -29.823
 
 [connection signal="tab_changed" from="MarginContainer/TabContainer" to="." method="_on_TabContainer_tab_changed"]
 [connection signal="pressed" from="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/RestartButton" to="." method="_on_RestartButton_pressed"]
+[connection signal="pressed" from="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/TutorialButton" to="." method="_on_TutorialButton_pressed"]
 [connection signal="pressed" from="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
 [connection signal="meta_clicked" from="MarginContainer/TabContainer/Licenses/MarginContainer/VBoxContainer/Authoring" to="." method="_on_RichText_meta_clicked"]
 [connection signal="pressed" from="MarginContainer/TabContainer/Options/Panel3/VBoxContainer2/HSplitContainer2/MarginContainer/LeftSide/RestartButton" to="." method="_on_RestartButton_pressed"]

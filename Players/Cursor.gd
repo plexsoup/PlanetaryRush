@@ -18,8 +18,8 @@ signal new_path_requested(planet)
 func _ready():
 	pass
 
-func start(factionObj, isLocalHumanPlayer):
-	Level = global.Main.CurrentLevel
+func start(factionObj, isLocalHumanPlayer, levelObj):
+	Level = levelObj
 	
 	check_requirements()
 	
@@ -45,7 +45,7 @@ func spawn_player_controller(factionObj, isLocalHumanPlayer):
 	else:
 		var newAIController = AIControllerScene.instance()
 		self.add_child(newAIController)
-		newAIController.start(factionObj)
+		newAIController.start(factionObj, Level)
 		ControllerObj = newAIController
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

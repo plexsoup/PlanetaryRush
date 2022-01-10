@@ -18,26 +18,49 @@ func _ready():
 	global.Main = self
 	show_single_scene("TitleScreen")
 
+#func show_single_scene(desiredSceneNodeName):
+#	print("showing scene now: " + desiredSceneNodeName)
+#	if desiredSceneNodeName == "QuickPlay":
+#		$MainCamera._set_current(false)
+#		load_level(levels[0])
+#
+#	else:
+#		$MainCamera._set_current(true)
+#		global.camera = $MainCamera # do we actually really need this?
+#		$MainCamera.set_zoom(Vector2(1,1))
+#		remove_level()
+#
+#	for sceneNode in $Scenes.get_children():
+#		if sceneNode.name == desiredSceneNodeName:
+#			sceneNode.show()
+#		else:
+#			sceneNode.hide()
+		
 func show_single_scene(desiredSceneNodeName):
 	print("showing scene now: " + desiredSceneNodeName)
-	if desiredSceneNodeName == "QuickPlay":
-		$MainCamera._set_current(false)
-		load_level(levels[0])
-
-	else:
-		$MainCamera._set_current(true)
-		global.camera = $MainCamera # do we actually really need this?
-		$MainCamera.set_zoom(Vector2(1,1))
-		remove_level()
+#	if desiredSceneNodeName == "QuickPlay":
+#		$MainCamera._set_current(false)
+#		load_level(levels[0])
+#
+#	else:
+#		global.camera = $MainCamera # do we actually really need this?
+	$MainCamera._set_current(true)
+	$MainCamera.set_zoom(Vector2(1,1))
+#		remove_level()
 
 	for sceneNode in $Scenes.get_children():
 		if sceneNode.name == desiredSceneNodeName:
 			sceneNode.show()
+			if sceneNode.has_method("activate"):
+				print(str(sceneNode.get_children()))
+				sceneNode.activate()
 		else:
+			if sceneNode.has_method("deactivate"):
+				sceneNode.deactivate()
 			sceneNode.hide()
-		
-	
-	
+
+
+
 func show_end_screen(playerWon):
 	if playerWon:
 		$Scenes/EndCredits/EndScreen.win()
@@ -89,6 +112,7 @@ func updateInGameTimers(speed):
 
 	
 func restart():
+	print("Main.gd restart() called")
 	show_single_scene("QuickPlay")
 
 
@@ -151,3 +175,6 @@ func _on_Restart_pressed():
 
 func _on_DebugTimer_timeout():
 	print_debug_info()
+
+func _on_tutorial_requested():
+	show_single_scene("Tutorial")

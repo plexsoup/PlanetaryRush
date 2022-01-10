@@ -9,6 +9,7 @@ var FactionObj : Node2D
 var OriginPlanet
 var DestinationPlanet
 var Name : String
+var Level : Node2D
 
 var CurrentlyEngagedEnemyFleet = null
 
@@ -26,6 +27,19 @@ signal fleet_released()
 func _ready():
 	State = States.DEPLOYING
 	Name = self.name
+
+# called from Planet
+func start(fleetPath, factionObj, numShips, shipScene, originPlanet, destinationPlanet, levelObj):
+	Level = levelObj
+	FactionObj = factionObj
+	FleetPath = fleetPath
+	FleetPathFollowNode = fleetPath.get_node("PathFollow2D") # this is fragile
+	NavTarget = FleetPathFollowNode.get_node("FleetTarget")
+	OriginPlanet = originPlanet
+	DestinationPlanet = destinationPlanet
+	State = States.MOVING
+	spawnShips(factionObj, numShips, shipScene, destinationPlanet)
+
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -61,16 +75,6 @@ func battleIsOver(enemyFleet):
 	
 	return battleOver
 
-# called from Planet
-func start(fleetPath, factionObj, numShips, shipScene, originPlanet, destinationPlanet):
-	FactionObj = factionObj
-	FleetPath = fleetPath
-	FleetPathFollowNode = fleetPath.get_node("PathFollow2D") # this is fragile
-	NavTarget = FleetPathFollowNode.get_node("FleetTarget")
-	OriginPlanet = originPlanet
-	DestinationPlanet = destinationPlanet
-	State = States.MOVING
-	spawnShips(factionObj, numShips, shipScene, destinationPlanet)
 
 func die():
 	notifyPathFleetDestroyed()
@@ -171,7 +175,7 @@ func spawnShips(factionObj, numShips, shipScene, destinationPlanet):
 	for i in range(numShips):
 		var shipNode = shipScene.instance()
 		$ShipsContainer.add_child(shipNode)
-		shipNode.start(factionObj, NavTarget, OriginPlanet, destinationPlanet)
+		shipNode.start(factionObj, NavTarget, OriginPlanet, destinationPlanet, Level)
 		# stick to local coords for this
 		shipNode.set_position(Vector2(rand_range(-50, 50), rand_range(-50, 50)))
 

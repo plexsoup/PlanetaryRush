@@ -1,7 +1,11 @@
 """
 Current Work Effort:
-- refactoring title screen and pause screen, etc.
-	- when player loses, game freezes. No end screen shows.
+- Make objects work independently from parents and grandparents
+	- To craft a tutorial, you have to be able to place planets and factions, etc.
+
+- Level.gd assumes all kinds of folder structure.. planets in planets, etc.
+	- figure out how to make level script coexist with hand-crafted levels
+	
 
 
 - when we have campaigns, it won't make sense for level to signal main that the player won or lost..
@@ -51,6 +55,9 @@ Current Work Effort:
 
 
 Bugs
+- restarting the game doesn't remove the previous game instance.
+	- need a routine in level.end() to empty the planets, factions, etc.
+
 - pauses no longer work. After moving title card scenes around.
 	- pause/unpause is probably due for a refactor
 - after restarting the game, the planet fonts are really small.
@@ -73,6 +80,10 @@ Bugs
 - faction list on title screen is wrong / makes no sense
 
 Refactoring Required
+- Right now a lot of objects rely on Level (eg: to ask planetcontainer for nearest planet)
+	- We pass levelObj to any objects that need it, but that means objects won't work if they aren't instantiated by code.
+	- figure out if we can move currentlevel back to global, so we can get handcrafted levels to work.
+
 - Maybe each weapon should have it's own firing collision area node, then it can manage firing itself.
 	- would allow you to have more than one kind of weapon
 	- which means you can have a shop with upgrades.

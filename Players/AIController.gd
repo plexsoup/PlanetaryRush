@@ -10,6 +10,7 @@
 
 extends Node2D
 
+var Level
 var FactionObj : Node2D
 var Difficulty : float
 var win : bool = false
@@ -42,17 +43,17 @@ func _ready():
 	Difficulty = float(1.0 + global.options["difficulty"]) # 1, 2, 3
 	randomize()
 	
-func start(factionObj):
+func start(factionObj, levelObj):
 	# set up a delay interval so the AI can't make too many Actions per minute.
 	restart_timer()
+	Level = levelObj
 	FactionObj = factionObj
 	CurrentSourcePlanet = FactionObj.CurrentPlanetList[0]
 	
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	var level = global.Main.CurrentLevel
-	if level.State == level.States.PLAYING and State != States.DEAD:
+	if Level.State == Level.States.PLAYING and State != States.DEAD:
 		if not is_instance_valid(FactionObj) or FactionObj.getRemainingPlanetCount() == 0:
 			return
 		
@@ -114,9 +115,9 @@ func execute_click_events(objectivePos):
 
 func getSuitableOriginPlanet():
 	# consider these biases: planet with largest population, planets currently in danger, planets with an opportunity for victory
-	var level = global.Main.CurrentLevel
+	
 	var bestOrigin
-	var planetList = level.PlanetContainer.get_faction_planets(FactionObj)
+	var planetList = Level.PlanetContainer.get_faction_planets(FactionObj)
 	var highestPopulation = 0
 	var highestPopPlanet
 	for planet in planetList: # ties go to the first one discovered
@@ -130,8 +131,8 @@ func getSuitableOriginPlanet():
 
 func plot_new_course():
 	randomize()
-	var level = global.Main.CurrentLevel
-	var planetContainer = level.PlanetContainer
+	
+	var planetContainer = Level.PlanetContainer
 	
 	var factionToAttack : Node2D
 	var originPlanet : StaticBody2D

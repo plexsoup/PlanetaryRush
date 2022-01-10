@@ -4,6 +4,8 @@ signal opened()
 signal closed()
 signal quit_pressed()
 signal restart_button_pressed()
+signal tutorial_requested()
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -61,6 +63,7 @@ func _on_RestartButton_pressed():
 		$ClickNoise.play()
 
 
+
 func _on_RichText_meta_clicked(meta):
 	OS.shell_open(meta)
 
@@ -68,3 +71,7 @@ func _on_RichText_meta_clicked(meta):
 func _on_TabContainer_tab_changed(tab):
 	$SlideNoise.play()
 	
+
+
+func _on_TutorialButton_pressed():
+	SignalsBus.QuickSignal(self, "tutorial_requested", global.Main, "_on_tutorial_requested")

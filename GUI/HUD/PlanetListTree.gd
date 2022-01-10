@@ -13,10 +13,15 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if global.Ticks % 200 == 0:
-		populateTree()
+	pass
+	
+#	if global.Ticks % 200 == 0:
+#		populateTree()
 
 func populateTree():
+	printerr("PlanetListTree.gd populateTree is no longer required.")
+	return
+	
 	var level = global.Main.CurrentLevel
 	var tree = self
 	tree.clear()

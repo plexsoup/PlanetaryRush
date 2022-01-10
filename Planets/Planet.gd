@@ -3,6 +3,8 @@ extends StaticBody2D
 	# godot likes to share a collision shape across instanced clones. So you can't easily adjust the size on the fly. Better to generate new shape for each object.
 
 # Declare member variables here. Examples:
+var Level : Node2D
+
 var Size : float = 1.0
 var units_present : float = 1.0 # billions of people
 var original_scale: Vector2
@@ -34,7 +36,8 @@ func _ready():
 	add_to_group("planets")
 	State = States.READY
 	
-func start(factionObj, size):
+func start(factionObj, size, levelObj):
+	Level = levelObj
 	Size = size
 	var myName = generateName()
 	self.name = myName
@@ -167,14 +170,16 @@ func remove_units(number):
 
 
 func take_focus(): # called by Cursor
-	if self.FactionObj.IsLocalHumanPlayer:
-		popUp(original_scale, original_scale * juicy_bounce_factor)
-		focused = true
+	if is_instance_valid(FactionObj):
+		if self.FactionObj.IsLocalHumanPlayer:
+			popUp(original_scale, original_scale * juicy_bounce_factor)
+			focused = true
 
 func lose_focus(): # called by Cursor
-	if self.FactionObj.IsLocalHumanPlayer:
-		popUp(original_scale * juicy_bounce_factor, original_scale)
-		focused = false
+	if is_instance_valid(FactionObj):
+		if self.FactionObj.IsLocalHumanPlayer:
+			popUp(original_scale * juicy_bounce_factor, original_scale)
+			focused = false
 
 func popUp(initial_scale, final_scale):
 	if State == States.INITIALIZING:
@@ -201,7 +206,7 @@ func spawn_fleet(numShips, path, destinationPlanet): # coming from Planet
 	var fleet = fleetScene.instance()
 	global.level.FleetContainer.add_child(fleet)
 	fleet.set_global_position(get_global_position())
-	fleet.start(path, FactionObj, numShips, shipScene, originPlanet, destinationPlanet)
+	fleet.start(path, FactionObj, numShips, shipScene, originPlanet, destinationPlanet, Level)
 
 	connect( "assigned_fleet", path, "_on_planet_assigned_fleet")
 	emit_signal("assigned_fleet", fleet)
@@ -247,8 +252,9 @@ func notifyPath_PlanetCannotSendShips(path):
 # Incoming Signals
 
 func _on_ProductionTimer_timeout():
-	if not FactionObj.IsNeutralFaction: # grey planets don't produce
-		increase_units_from_timed_production()
+	if is_instance_valid(FactionObj):
+		if not FactionObj.IsNeutralFaction: # grey planets don't produce
+			increase_units_from_timed_production()
 
 # signal coming from cursor via global.level
 func _on_ShipPath_finished_drawing(path, destinationPlanet):

@@ -21,7 +21,7 @@ func _ready():
 func start(factionObj):
 	pass # have to wait for factions to be ready first.
 
-func spawnPlanets(factionObj, totalNumPlanets):
+func spawnPlanets(factionObj, totalNumPlanets, levelObj):
 	randomize()
 	var startingPlanetSize : float = 1.5
 	
@@ -34,7 +34,7 @@ func spawnPlanets(factionObj, totalNumPlanets):
 		var randScale : float = rand_range(0.75, 1.5)
 		var targetPos : Vector2 = get_target_pos(pattern, planetNum, totalNumPlanets)
 		
-		spawnPlanet(factionObj, startingPlanetSize * randScale, targetPos)
+		spawnPlanet(factionObj, startingPlanetSize * randScale, targetPos, levelObj)
 
 
 func get_target_pos(pattern, planetNum, totalNumPlanets):
@@ -94,7 +94,7 @@ func get_target_pos(pattern, planetNum, totalNumPlanets):
 #func _process(delta):
 #	pass
 
-func spawnPlanet(factionObj, planetSize, targetPos):
+func spawnPlanet(factionObj, planetSize, targetPos, levelObj):
 	var planetScene = load("res://Planets/Planet.tscn")
 	var newPlanet = planetScene.instance()
 	add_child(newPlanet)
@@ -118,7 +118,7 @@ func spawnPlanet(factionObj, planetSize, targetPos):
 		# kill it. If you can't find a non-colliding space after 200 attempts, just die.
 		newPlanet.queue_free()
 	else:
-		newPlanet.start(factionObj, planetSize) # has to happen right away to build the factions' planet lists	
+		newPlanet.start(factionObj, planetSize, levelObj) # has to happen right away to build the factions' planet lists	
 
 func isColliding(new_planet):	
 	var myPos = new_planet.get_global_position()

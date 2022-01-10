@@ -1,5 +1,14 @@
 extends Node2D
 
+export var NextScene : PackedScene
+export var PreviousScene : PackedScene
+
+export var IsCurrent : bool = false
+
+export var DesiredNumPlanets : int
+export var DesiredNumFactions : int
+
+
 onready var FleetContainer : Node2D = $Fleets
 onready var BulletContainer : Node2D = $Bullets
 onready var PlanetContainer : Node2D = $Planets
@@ -11,7 +20,7 @@ var Winning_faction
 enum States { INITIALIZING, PLAYING, PAUSED, CELEBRATING, LAMENTING }
 var State = States.INITIALIZING
 
-export var NumPlanets = 15
+var NumPlanets = 15
 
 signal faction_won(factionObj)
 signal player_lost()
@@ -21,29 +30,27 @@ signal gameplay_started()
 var PathFollowScene = preload("res://Paths/ShipPath.tscn")
 
 func _ready():
-	global.level = self
-	global.BulletContainer = $Bullets
-	call_deferred("start")
+	#call_deferred("start")
 	# this is causing a problem. The AI starts before the player has clicked out of the menu
+	print("Hi, I'm level.gd, inside: " + get_parent().name)
 	
 
 func start():
+	global.level = self
+	global.BulletContainer = $Bullets
+
 	# spawn a bunch of neutral planets, then change NumFactions to their unique faction.
 	spawn_factions(global.NumFactions + 1)  # produces factionObj's in FactionContainer
 	spawn_planets(global.NeutralFactionObj, NumPlanets)
-	
-	for factionObj in FactionContainer.get_children():
-		if factionObj.IsNeutralFaction == false:
-			init_starting_planet(factionObj)
-			spawn_cursor(factionObj)
-		
-		connect("gameplay_started", factionObj, "_on_gameplay_started")
-		emit_signal("gameplay_started")
-		disconnect("gameplay_started", factionObj, "_on_gameplay_started")
+	spawn_cursors()
 			
 	print("Level.gd starting gameplay")
-	$Foreground/InLevelGUI.start(getRemainingFactions())
+	
+	# unfortunately, the in-level gui has to be in a CanvasLayer, but they can't be hidden, so you have to hide the gui in the inspector
+	$Foreground/InLevelGUI.show()
+	$Foreground/InLevelGUI.start(getRemainingFactions(), self)
 	State = States.PLAYING
+	
 	
 	
 
@@ -57,7 +64,7 @@ func init_starting_planet(factionObj):
 
 
 func spawn_planets(factionObj, totalNumber):
-	PlanetContainer.spawnPlanets(factionObj, totalNumber) # make sure this happens after factions are created
+	PlanetContainer.spawnPlanets(factionObj, totalNumber, self) # make sure this happens after factions are created
 
 func spawn_factions(numFactions):
 	print("Level.gd: spawning " + str(numFactions) + " Factions")
@@ -84,9 +91,19 @@ func spawn_faction(factionNum, color, isHuman, isNeutralFaction):
 		global.NeutralFactionObj = factionNode
 	else:
 		factionName = "Faction " + str(factionNum)
-	factionNode.start(factionNum, factionName, color, isHuman, isNeutralFaction)
+	factionNode.start(factionNum, factionName, color, isHuman, isNeutralFaction, self)
 
+func spawn_cursors():
+	for factionObj in FactionContainer.get_children():
+		if factionObj.IsNeutralFaction == false:
+			init_starting_planet(factionObj)
+			spawn_cursor(factionObj)
+		
+		connect("gameplay_started", factionObj, "_on_gameplay_started")
+		emit_signal("gameplay_started")
+		disconnect("gameplay_started", factionObj, "_on_gameplay_started")
 
+	
 func spawn_cursor(factionObj): # this could probably be moved into Faction
 	
 	# each cursor acts as a player controller, to receive input and draw paths
@@ -94,7 +111,7 @@ func spawn_cursor(factionObj): # this could probably be moved into Faction
 	var cursorNode = cursorScene.instance()
 	#cursorNode.set_global_position(Vector2(1,1))
 	$Cursors.add_child(cursorNode)
-	cursorNode.start(factionObj, factionObj.IsLocalHumanPlayer)
+	cursorNode.start(factionObj, factionObj.IsLocalHumanPlayer, self)
 	factionObj.CursorObj = cursorNode
 
 func spawn_path(planet, factionObj, cursorObj):
@@ -102,13 +119,15 @@ func spawn_path(planet, factionObj, cursorObj):
 	var pathFollowNode = PathFollowScene.instance()
 	pathFollowNode.set_global_position(planet.get_global_position())
 	PathContainer.add_child(pathFollowNode)
-	pathFollowNode.start(planet, factionObj, cursorObj)
+	pathFollowNode.start(planet, factionObj, cursorObj, self)
 
 
 
 func end():
-	call_deferred("queue_free")
-
+	print("Level is ending. Hiding the gui (GUI has to be in a canvas layer, but they can't be hidden, so you have to hide the stuff inside.)")
+	pass # I don't know why this isn't working
+	#call_deferred("queue_free")
+	$Foreground/InLevelGUI.hide()
 
 func count_player_planets():
 	var count = 0

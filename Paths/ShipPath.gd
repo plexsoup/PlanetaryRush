@@ -10,6 +10,7 @@ var FactionObj : Node2D
 var CursorObj : Node2D
 var AssignedFleet : Node2D # will this ever be an array instead of a single object?
 
+var Level
 
 signal finished_drawing(path)
 signal encountered_enemy(fleetObj)
@@ -21,7 +22,8 @@ func _ready():
 	initialize_path()
 
 
-func start(planet, factionObj, cursorObj):
+func start(planet, factionObj, cursorObj, levelObj):
+	Level = levelObj
 	MyPlanet = planet
 	CursorObj = cursorObj
 	FactionObj = factionObj
@@ -97,8 +99,7 @@ func _on_MousePolling_timeout():
 	if CursorObj.isStillDrawing():
 		add_point()
 	else:
-		var level = global.Main.CurrentLevel
-		var nearestDestinationPlanet = level.PlanetContainer.get_nearest_planet(CursorObj.get_global_position())
+		var nearestDestinationPlanet = Level.PlanetContainer.get_nearest_planet(CursorObj.get_global_position())
 		finish_path(nearestDestinationPlanet)
 		
 		

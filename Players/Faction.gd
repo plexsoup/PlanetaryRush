@@ -3,8 +3,8 @@ extends Node2D
 
 # Declare member variables here. Examples:
 var Number : int
-var IsLocalHumanPlayer : bool = false
-var IsNeutralFaction : bool = false
+export var IsLocalHumanPlayer : bool = false
+export var IsNeutralFaction : bool = false
 var fColor : Color
 var CursorObj : Node2D
 
@@ -16,7 +16,7 @@ var CurrentFleetList = [] # keep track so we can stay alive until the last fleet
 enum States { PAUSED, PLAYING, DEAD} # not really using PAUSED yet
 var State = States.PAUSED
 
-onready var Level = global.Main.CurrentLevel
+var Level : Node2D
 
 signal faction_won(factionObj)
 signal faction_lost(factionObj)
@@ -25,7 +25,9 @@ signal faction_lost(factionObj)
 func _ready():
 	pass # Replace with function body.
 
-func start(number, myName, myColor, isLocalHuman, isNeutralFaction):
+func start(number, myName, myColor, isLocalHuman, isNeutralFaction, levelObj):
+	printerr("Faction.gd needs to get a reference to it's level object, so it knows who to signal")
+	Level = levelObj
 	Number = number
 	name = myName
 	fColor = myColor
