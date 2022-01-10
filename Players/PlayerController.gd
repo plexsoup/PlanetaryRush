@@ -30,11 +30,12 @@ func _process(delta):
 	
 
 func _input(event):
-	if Input.is_action_just_pressed("left_click") and FactionObj.IsLocalHumanPlayer:
-		#signal the parent that we clicked.
-		connect("click_mouse", get_parent(), "_on_PlayerController_Clicked")
-		emit_signal("click_mouse")
-		disconnect("click_mouse", get_parent(), "_on_PlayerController_Clicked")
+	if Input.is_action_just_pressed("left_click") and is_instance_valid(FactionObj):
+		if FactionObj.IsLocalHumanPlayer:
+			#signal the parent that we clicked.
+			connect("click_mouse", get_parent(), "_on_PlayerController_Clicked")
+			emit_signal("click_mouse")
+			disconnect("click_mouse", get_parent(), "_on_PlayerController_Clicked")
 
 func isStillDrawing():
 	if Input.is_action_pressed("left_click"):

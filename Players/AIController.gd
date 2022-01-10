@@ -24,7 +24,7 @@ var CurrentSourcePlanet = null # planet from which to grab ships
 enum RouteTypes { STRAIGHT, CURVED, SINE }
 var CurrentRouteType = RouteTypes.STRAIGHT
 
-enum AttackStrategies { ATTACK_PLAYER, LOWEST_POPULATION, NEAREST_PLANET }
+enum AttackStrategies { ATTACK_PLAYER, LOWEST_POPULATION, NEAREST_PLANET, LARGEST_PLANET }
 var CurrentAttackStrategy
 
 var PseudoMouseSpeed : float = 16.0 # just a guess
@@ -149,7 +149,8 @@ func plot_new_course():
 			return
 
 	CurrentAttackStrategy = randi()%AttackStrategies.size()
-
+	# this seems overly punishing when the player has 1 planet remaining.
+	
 	if CurrentAttackStrategy == AttackStrategies.ATTACK_PLAYER:
 		if is_instance_valid(global.PlayerFactionObj) and global.PlayerFactionObj.IsAlive():
 			destinationPlanet = planetContainer.get_random_planet(global.PlayerFactionObj)
@@ -159,6 +160,8 @@ func plot_new_course():
 		destinationPlanet = planetContainer.get_lowest_population_adversary(FactionObj)
 	elif CurrentAttackStrategy == AttackStrategies.NEAREST_PLANET:
 		destinationPlanet = planetContainer.get_nearest_enemy_planet(FactionObj, originPlanet.get_global_position())
+	elif CurrentAttackStrategy == AttackStrategies.LARGEST_PLANET:
+		destinationPlanet = planetContainer.get_largest_enemy_planet(FactionObj)
 
 	if is_instance_valid(originPlanet) and is_instance_valid(destinationPlanet):
 		if originPlanet != destinationPlanet:
@@ -205,7 +208,10 @@ func die():
 	call_deferred("queue_free") # this is probably safe. no one should expect AI Controller to be around after death.
 	# could probably even queue_free my parent. (Cursor), or send a signal to kill itself
 	
-	
+func end():
+	die()
+
+
 func _on_DecisionTimer_timeout():
 	if global.State != global.States.FIGHTING:
 		restart_timer()
@@ -214,7 +220,7 @@ func _on_DecisionTimer_timeout():
 		# we might need a mechanism to recover from pause..
 		pass
 	
-	if FactionObj.IsAlive():
+	if is_instance_valid(FactionObj) and FactionObj.IsAlive():
 		plot_new_course()
 	else:
 		die()

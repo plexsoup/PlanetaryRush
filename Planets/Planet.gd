@@ -10,7 +10,7 @@ var units_present : float = 1.0 # billions of people
 var original_scale: Vector2
 var scale_factor: float = 70.0
 var base_production: float = 1.0 # based on planet size
-var production_factor: float = 1.02
+#var production_factor: float = 1.02
 var max_population : int = 40
 var difficulty_factor : float # 1, 2, 3.5
 enum States { INITIALIZING, READY }
@@ -53,6 +53,9 @@ func start(factionObj, size, levelObj):
 
 	else:
 		$PlanetNameLabel.set_visible(false)
+
+func end():
+	call_deferred("queue_free") # shouldn't need to notify anyone
 	
 func generateName():
 	var newName = ""
@@ -85,8 +88,9 @@ func set_random_properties():
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func _process(delta):
+	if global.Ticks % 50 == 0:
+		update_unit_label()
 
 func set_random_size():
 	set_planet_size(rand_range(0.5, 2.5))
@@ -108,9 +112,18 @@ func set_initial_population(size):
 	
 func update_unit_label():
 	$Production/ProductionLabel.set_text(str(floor(units_present)))
-	if global.camera != null:
-		$Production.set_scale(lerp($Production.get_scale(), global.camera.get_zoom() / 5.0, 0.8))
+	# var cam = get_viewport().get_camera() # only works for 3D cameras
 	
+	var cam 
+	for camera in get_tree().get_nodes_in_group("cameras"):
+		if camera.is_current():
+			cam = camera
+	if is_instance_valid(cam):
+		var zoom = cam.get_zoom()
+		$Production.set_scale(lerp($Production.get_scale(), zoom / 5.0, 0.8))
+	else:
+		printerr("Planet.gd can't get current camera")
+
 func set_random_texture():
 	$Sprite.set_frame(randi()%9)
 
@@ -149,10 +162,11 @@ func switch_faction(newFaction):
 
 
 func increase_units_from_timed_production():
-	
+	# game_feel opportunity: difficulty factor should only affect AI planets
 	var baseProd = base_production * difficulty_factor * global.game_speed
-	var popGrowth = ((units_present * production_factor) - units_present) * global.game_speed
-	units_present = clamp( units_present + baseProd + popGrowth, 1, max_population)
+#	var popGrowth = ((units_present * production_factor) - units_present) * global.game_speed
+	var popGrowth = base_production * (1 + Size/2) # size spread seems too high so we fudge it a bit here.
+	units_present = clamp( units_present + popGrowth, 1, max_population)
 	update_unit_label()
 
 

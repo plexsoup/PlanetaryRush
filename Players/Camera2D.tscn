@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Camera2D.gd" type="Script" id=1]
 
-[node name="Camera2D" type="Camera2D"]
+[node name="Camera2D" type="Camera2D" groups=["cameras"]]
 current = true
 zoom = Vector2( 3, 3 )
 smoothing_enabled = true

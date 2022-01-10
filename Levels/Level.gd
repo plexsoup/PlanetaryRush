@@ -14,6 +14,7 @@ onready var BulletContainer : Node2D = $Bullets
 onready var PlanetContainer : Node2D = $Planets
 onready var FactionContainer : Node2D = $Factions
 onready var PathContainer : Node2D = $Paths
+onready var CursorsContainer : Node2D = $Cursors
 
 var Winning_faction
 
@@ -121,13 +122,23 @@ func spawn_path(planet, factionObj, cursorObj):
 	PathContainer.add_child(pathFollowNode)
 	pathFollowNode.start(planet, factionObj, cursorObj, self)
 
-
+func remove_entities():
+	
+	var containers = [PlanetContainer, FleetContainer, PathContainer, FactionContainer, CursorsContainer]
+	for container in containers:
+		for entity in container.get_children():
+			if entity.has_method("end"):
+				entity.end()
+			else:
+				entity.call_deferred("queue_free")
+	
 
 func end():
 	print("Level is ending. Hiding the gui (GUI has to be in a canvas layer, but they can't be hidden, so you have to hide the stuff inside.)")
 	pass # I don't know why this isn't working
 	#call_deferred("queue_free")
 	$Foreground/InLevelGUI.hide()
+	remove_entities()
 
 func count_player_planets():
 	var count = 0

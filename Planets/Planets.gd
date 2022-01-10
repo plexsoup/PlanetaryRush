@@ -190,6 +190,8 @@ func get_enemy_planets(enemyFactionObj):
 	return enemyFactionPlanets
 	
 
+
+
 func get_random_planet(factionObj):
 	var returnPlanet : StaticBody2D
 	var factionPlanets = get_faction_planets(factionObj)
@@ -217,6 +219,17 @@ func get_lowest_population_adversary(factionObj):
 				lowestPopulation = planet.get_population()
 	return lowestPopPlanet
 	
-	
+func get_largest_enemy_planet(factionObj):
+	var largestSize = 0.0
+	var largestPlanet = null
+	for planet in get_enemy_planets(factionObj):
+		if planet.Size > largestSize:
+			largestSize = planet.Size
+			largestPlanet = planet
+		if planet.Size == largestSize:
+			if randf() < 0.5:
+				largestPlanet = planet
+	if largestPlanet != null:
+		return largestPlanet
 
 

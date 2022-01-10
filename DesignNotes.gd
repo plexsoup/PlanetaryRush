@@ -80,6 +80,10 @@ Bugs
 - faction list on title screen is wrong / makes no sense
 
 Refactoring Required
+- consider adding setget to the State variables everywhere.
+	- when state changes, maybe someone should be notified.
+	https://docs.godotengine.org/en/3.0/getting_started/scripting/gdscript/gdscript_basics.html?highlight=setget#setters-getters
+	
 - Right now a lot of objects rely on Level (eg: to ask planetcontainer for nearest planet)
 	- We pass levelObj to any objects that need it, but that means objects won't work if they aren't instantiated by code.
 	- figure out if we can move currentlevel back to global, so we can get handcrafted levels to work.
