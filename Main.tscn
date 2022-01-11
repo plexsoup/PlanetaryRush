@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://DesignNotes.gd" type="Script" id=2]
@@ -15,6 +15,7 @@
 [ext_resource path="res://Tutorial/Stage 1.gd" type="Script" id=13]
 [ext_resource path="res://Levels/Level.tscn" type="PackedScene" id=14]
 [ext_resource path="res://Levels/QuickPlay.gd" type="Script" id=15]
+[ext_resource path="res://Tutorial/Tutorial.gd" type="Script" id=16]
 
 [node name="Main" type="Node2D"]
 script = ExtResource( 1 )
@@ -108,8 +109,10 @@ texture = ExtResource( 10 )
 [node name="TitleScreenUI" parent="Scenes/TitleScreen" instance=ExtResource( 3 )]
 
 [node name="Tutorial" type="Node2D" parent="Scenes"]
+script = ExtResource( 16 )
 
 [node name="Stage 1" parent="Scenes/Tutorial" instance=ExtResource( 14 )]
+Bespoke = true
 
 [node name="Faction" parent="Scenes/Tutorial/Stage 1/Factions" index="0" instance=ExtResource( 12 )]
 IsLocalHumanPlayer = true
@@ -122,6 +125,12 @@ position = Vector2( 326, 302 )
 
 [node name="Planet2" parent="Scenes/Tutorial/Stage 1/Planets" index="1" instance=ExtResource( 11 )]
 position = Vector2( 706, 307 )
+
+[node name="Background" parent="Scenes/Tutorial/Stage 1" index="7"]
+visible = false
+
+[node name="bgSprite" parent="Scenes/Tutorial/Stage 1/Background" index="0"]
+visible = false
 
 [node name="Stage 1 beta" type="Node2D" parent="Scenes/Tutorial"]
 script = ExtResource( 13 )

@@ -4,6 +4,7 @@ export var NextScene : PackedScene
 export var PreviousScene : PackedScene
 
 export var IsCurrent : bool = false
+export var Bespoke : bool = false # bespoke levels are handcrafted in the Godot 2D editor. Useful for campaign
 
 export var DesiredNumPlanets : int
 export var DesiredNumFactions : int
@@ -21,7 +22,7 @@ var Winning_faction
 enum States { INITIALIZING, PLAYING, PAUSED, CELEBRATING, LAMENTING }
 var State = States.INITIALIZING
 
-var NumPlanets = 15
+var NumPlanets : int = 0
 
 signal faction_won(factionObj)
 signal player_lost()
@@ -40,11 +41,16 @@ func start():
 	global.level = self
 	global.BulletContainer = $Bullets
 
+	NumPlanets = DesiredNumPlanets
+	
 	# spawn a bunch of neutral planets, then change NumFactions to their unique faction.
-	spawn_factions(global.NumFactions + 1)  # produces factionObj's in FactionContainer
-	spawn_planets(global.NeutralFactionObj, NumPlanets)
-	spawn_cursors()
-			
+	if not Bespoke:
+		spawn_factions(global.NumFactions + 1)  # produces factionObj's in FactionContainer
+		spawn_planets(global.NeutralFactionObj, NumPlanets)
+		spawn_cursors()
+	else:
+		intake_bespoke_elements()
+
 	print("Level.gd starting gameplay")
 	
 	# unfortunately, the in-level gui has to be in a CanvasLayer, but they can't be hidden, so you have to hide the gui in the inspector
@@ -121,6 +127,19 @@ func spawn_path(planet, factionObj, cursorObj):
 	pathFollowNode.set_global_position(planet.get_global_position())
 	PathContainer.add_child(pathFollowNode)
 	pathFollowNode.start(planet, factionObj, cursorObj, self)
+
+func intake_bespoke_elements():
+	# look at the level and identify existing planets, factions, etc.
+	# make sure they get catalogues and initialized correctly
+	
+	var containers = [PlanetContainer, FleetContainer, PathContainer, FactionContainer, CursorsContainer]
+	for container in containers:
+		if container.get_child_count() > 0:
+			for entity in container.get_children():
+				if entity.has_method("start"):
+					printerr("Level.gd. intake_bespoke_elements. Don't we need to know what parameters to pass to each entity?")
+					entity.start()
+			
 
 func remove_entities():
 	

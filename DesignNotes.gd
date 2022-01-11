@@ -1,5 +1,19 @@
 """
 Current Work Effort:
+
+modify factions a bit.
+- neutral is faction == null
+- planets with no faction are neutral
+- revise the faction object, now all factions will have cursors.
+	- each cursor gets a controller.
+	- you can save one as a player, and another as AI
+	- then you don't have to spawn the controller in code.
+	- can use a bespoke flag if you want
+
+
+- figure out how to start the tutorial with 2 planets
+
+	
 - Make objects work independently from parents and grandparents
 	- To craft a tutorial, you have to be able to place planets and factions, etc.
 

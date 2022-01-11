@@ -94,6 +94,14 @@ func get_target_pos(pattern, planetNum, totalNumPlanets):
 #func _process(delta):
 #	pass
 
+func importPlanets():
+	# if the level designer handcrafted a level, it'll have planets already in place (from the inspector / 2D editor)
+	# we need to absorb / intake those planets so the game knows about them.
+	if get_child_count() > 0:
+		for bespokePlanet in get_children():
+		#	bespokePlanet.start(factionObj, planetSize, levelObj)
+			printerr("Planets.gd: importPlanets. Needs development. Or can this be handled by Level.gd?")
+			
 func spawnPlanet(factionObj, planetSize, targetPos, levelObj):
 	var planetScene = load("res://Planets/Planet.tscn")
 	var newPlanet = planetScene.instance()

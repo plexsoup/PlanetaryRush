@@ -48,8 +48,11 @@ func start(factionObj, levelObj):
 	restart_timer()
 	Level = levelObj
 	FactionObj = factionObj
-	CurrentSourcePlanet = FactionObj.CurrentPlanetList[0]
 	
+	if FactionObj.CurrentPlanetList.size() > 0:
+		CurrentSourcePlanet = FactionObj.CurrentPlanetList[0]
+	else:
+		printerr("problem in AIController. It's expecting the Faction object to have a planet")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -97,8 +100,8 @@ func execute_click_events(objectivePos):
 	if distSqToObj < acceptableDistanceSquared:
 		if State == States.SEEKING:
 			#Verify that the planet still belongs to you before you click.
-			var planet = global.planet_container.get_nearest_planet(myPos)
-			if planet.FactionObj == FactionObj:
+			var planet = Level.PlanetContainer.get_nearest_planet(myPos)
+			if is_instance_valid(planet) and planet.FactionObj == FactionObj:
 			# change the state and execute a click
 				start_path()
 			else:
