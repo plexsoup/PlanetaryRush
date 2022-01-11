@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://DesignNotes.gd" type="Script" id=2]
@@ -16,6 +16,42 @@
 [ext_resource path="res://Levels/Level.tscn" type="PackedScene" id=14]
 [ext_resource path="res://Levels/QuickPlay.gd" type="Script" id=15]
 [ext_resource path="res://Tutorial/Tutorial.gd" type="Script" id=16]
+[ext_resource path="res://GUI/Icons/PlexSoup.png" type="Texture" id=17]
+[ext_resource path="res://GUI/Menus/SplashScreen.gd" type="Script" id=18]
+[ext_resource path="res://effects/536104__eminyildirim__sword-hit-heavy.wav" type="AudioStream" id=19]
+
+[sub_resource type="Animation" id=1]
+resource_name = "DropLogo"
+tracks/0/type = "value"
+tracks/0/path = NodePath("PlexSoupLogo:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.8, 0.9, 1 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 512, -272 ), Vector2( 512, 300 ), Vector2( 512, 290 ), Vector2( 512, 300 ) ]
+}
+tracks/1/type = "audio"
+tracks/1/path = NodePath("AudioStreamPlayer2D")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"clips": [ {
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": null
+}, {
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource( 19 )
+} ],
+"times": PoolRealArray( 0, 0.7 )
+}
 
 [node name="Main" type="Node2D"]
 script = ExtResource( 1 )
@@ -37,78 +73,97 @@ autostart = true
 
 [node name="Scenes" type="Node2D" parent="."]
 
-[node name="TitleScreen" type="Node2D" parent="Scenes"]
+[node name="SplashScreen" type="Node2D" parent="Scenes"]
+script = ExtResource( 18 )
+
+[node name="PlexSoupLogo" type="Sprite" parent="Scenes/SplashScreen"]
+position = Vector2( 512, 300 )
+texture = ExtResource( 17 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Scenes/SplashScreen"]
+anims/DropLogo = SubResource( 1 )
+
+[node name="Timer" type="Timer" parent="Scenes/SplashScreen"]
+wait_time = 3.0
+one_shot = true
+autostart = true
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="Scenes/SplashScreen"]
+stream = ExtResource( 19 )
+
+[node name="MainMenu" type="Node2D" parent="Scenes"]
 visible = false
 position = Vector2( 530, 288 )
 
-[node name="ParallaxBackground" type="Node2D" parent="Scenes/TitleScreen"]
+[node name="TitleScreenUI" parent="Scenes/MainMenu" instance=ExtResource( 3 )]
+
+[node name="ParallaxBackground" type="Node2D" parent="Scenes/MainMenu"]
 position = Vector2( -512, -264 )
 
-[node name="ParallaxLayer" type="Node2D" parent="Scenes/TitleScreen/ParallaxBackground"]
+[node name="ParallaxLayer" type="Node2D" parent="Scenes/MainMenu/ParallaxBackground"]
 
-[node name="Sprite" type="Sprite" parent="Scenes/TitleScreen/ParallaxBackground/ParallaxLayer"]
+[node name="Sprite" type="Sprite" parent="Scenes/MainMenu/ParallaxBackground/ParallaxLayer"]
 position = Vector2( 1214.5, 177.5 )
 rotation = -3.14159
 scale = Vector2( 1, -1 )
 texture = ExtResource( 8 )
 script = ExtResource( 6 )
 
-[node name="Sprite2" type="Sprite" parent="Scenes/TitleScreen/ParallaxBackground/ParallaxLayer"]
+[node name="Sprite2" type="Sprite" parent="Scenes/MainMenu/ParallaxBackground/ParallaxLayer"]
 position = Vector2( 1095, 84 )
 rotation = -3.14159
 scale = Vector2( 1, -1 )
 texture = ExtResource( 8 )
 script = ExtResource( 6 )
 
-[node name="ParallaxLayer2" type="Node2D" parent="Scenes/TitleScreen/ParallaxBackground"]
+[node name="ParallaxLayer2" type="Node2D" parent="Scenes/MainMenu/ParallaxBackground"]
 modulate = Color( 0.658824, 0.658824, 0.658824, 1 )
 scale = Vector2( 0.66, 0.66 )
 z_index = -1
 
-[node name="Sprite" type="Sprite" parent="Scenes/TitleScreen/ParallaxBackground/ParallaxLayer2"]
+[node name="Sprite" type="Sprite" parent="Scenes/MainMenu/ParallaxBackground/ParallaxLayer2"]
 position = Vector2( 1387.88, 72.7273 )
 rotation = -3.14159
 scale = Vector2( 1, -1 )
 texture = ExtResource( 7 )
 script = ExtResource( 6 )
 
-[node name="Sprite2" type="Sprite" parent="Scenes/TitleScreen/ParallaxBackground/ParallaxLayer2"]
+[node name="Sprite2" type="Sprite" parent="Scenes/MainMenu/ParallaxBackground/ParallaxLayer2"]
 position = Vector2( 1580.3, 169.697 )
 rotation = -3.14159
 scale = Vector2( 1, -1 )
 texture = ExtResource( 7 )
 script = ExtResource( 6 )
 
-[node name="ParallaxLayer3" type="Node2D" parent="Scenes/TitleScreen/ParallaxBackground"]
+[node name="ParallaxLayer3" type="Node2D" parent="Scenes/MainMenu/ParallaxBackground"]
 modulate = Color( 0.360784, 0.360784, 0.360784, 1 )
 scale = Vector2( 0.5, 0.5 )
 z_index = -2
 
-[node name="Sprite" type="Sprite" parent="Scenes/TitleScreen/ParallaxBackground/ParallaxLayer3"]
+[node name="Sprite" type="Sprite" parent="Scenes/MainMenu/ParallaxBackground/ParallaxLayer3"]
 position = Vector2( 1738, 126 )
 rotation = -3.14159
 scale = Vector2( 1, -1 )
 texture = ExtResource( 9 )
 script = ExtResource( 6 )
 
-[node name="Sprite2" type="Sprite" parent="Scenes/TitleScreen/ParallaxBackground/ParallaxLayer3"]
+[node name="Sprite2" type="Sprite" parent="Scenes/MainMenu/ParallaxBackground/ParallaxLayer3"]
 position = Vector2( 1476, 110 )
 rotation = -3.14159
 scale = Vector2( 1, -1 )
 texture = ExtResource( 9 )
 script = ExtResource( 6 )
 
-[node name="FinalBackground" type="Node2D" parent="Scenes/TitleScreen/ParallaxBackground"]
+[node name="FinalBackground" type="Node2D" parent="Scenes/MainMenu/ParallaxBackground"]
 z_index = -10
 
-[node name="Sprite" type="Sprite" parent="Scenes/TitleScreen/ParallaxBackground/FinalBackground"]
+[node name="Sprite" type="Sprite" parent="Scenes/MainMenu/ParallaxBackground/FinalBackground"]
 position = Vector2( 509, 283 )
 scale = Vector2( 0.6, 0.6 )
 texture = ExtResource( 10 )
 
-[node name="TitleScreenUI" parent="Scenes/TitleScreen" instance=ExtResource( 3 )]
-
 [node name="Tutorial" type="Node2D" parent="Scenes"]
+visible = false
 script = ExtResource( 16 )
 
 [node name="Stage 1" parent="Scenes/Tutorial" instance=ExtResource( 14 )]
@@ -140,11 +195,19 @@ script = ExtResource( 13 )
 [node name="Stage 3" type="Node2D" parent="Scenes/Tutorial"]
 
 [node name="QuickPlay" type="Node2D" parent="Scenes"]
+visible = false
 script = ExtResource( 15 )
 
 [node name="Level" parent="Scenes/QuickPlay" instance=ExtResource( 14 )]
 DesiredNumPlanets = 15
 DesiredNumFactions = 4
+
+[node name="EndScreen" parent="Scenes/QuickPlay" instance=ExtResource( 4 )]
+visible = false
+margin_left = 3.0
+margin_top = 3.0
+margin_right = 1023.0
+margin_bottom = 596.0
 
 [node name="Campaign" type="Node2D" parent="Scenes"]
 visible = false
@@ -159,12 +222,6 @@ visible = false
 
 [node name="EndCredits" type="Node2D" parent="Scenes"]
 visible = false
-
-[node name="EndScreen" parent="Scenes/EndCredits" instance=ExtResource( 4 )]
-margin_left = 3.0
-margin_top = 3.0
-margin_right = 1023.0
-margin_bottom = 596.0
 
 [node name="ParallaxBackground2" type="Node2D" parent="Scenes/EndCredits"]
 position = Vector2( 18, 24 )
@@ -235,5 +292,6 @@ texture = ExtResource( 10 )
 position = Vector2( 512, 303 )
 
 [connection signal="timeout" from="DebugPrintTimer" to="." method="_on_DebugTimer_timeout"]
+[connection signal="timeout" from="Scenes/SplashScreen/Timer" to="Scenes/SplashScreen" method="_on_Timer_timeout"]
 
 [editable path="Scenes/Tutorial/Stage 1"]

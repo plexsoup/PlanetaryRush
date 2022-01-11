@@ -3,7 +3,7 @@ extends Control
 signal opened()
 signal closed()
 signal quit_pressed()
-signal restart_button_pressed()
+signal quickplay_button_pressed()
 signal tutorial_requested()
 
 
@@ -50,12 +50,12 @@ func _on_QuitButton_pressed():
 	
 
 
-func _on_RestartButton_pressed():
-	if global.Main.has_method("_on_restart_button_pressed"):
+func _on_QuickPlayButton_pressed():
+	if global.Main.has_method("_on_quickplay_button_pressed"):
 		
-		connect( "restart_button_pressed", global.Main, "_on_restart_button_pressed")
-		emit_signal("restart_button_pressed")
-		disconnect( "restart_button_pressed", global.Main, "_on_restart_button_pressed")
+		connect( "quickplay_button_pressed", global.Main, "_on_quickplay_button_pressed")
+		emit_signal("quickplay_button_pressed")
+		disconnect( "quickplay_button_pressed", global.Main, "_on_quickplay_button_pressed")
 		
 #		global.Main.restart()
 #		hide_pause_menu()

@@ -7,16 +7,17 @@ Show an option screen
 
 extends Node2D
 
-var CurrentLevel : Node2D
+#var CurrentLevel : Node2D
 var levels: Array = ["res://Levels/Level.tscn"]
-
+var CurrentScene : Node2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# load_level(levels[0]) # this happens when start button is pushed
 	randomize()
 	global.Main = self
-	show_single_scene("TitleScreen")
+	hide_all_scenes()
+	show_single_scene("SplashScreen")
 
 #func show_single_scene(desiredSceneNodeName):
 #	print("showing scene now: " + desiredSceneNodeName)
@@ -48,17 +49,27 @@ func show_single_scene(desiredSceneNodeName):
 	$MainCamera.set_zoom(Vector2(1,1))
 #		remove_level()
 
+	var currentSceneCache = CurrentScene
 	for sceneNode in $Scenes.get_children():
+		
 		if sceneNode.name == desiredSceneNodeName:
 			sceneNode.show()
 			if sceneNode.has_method("activate"):
 				print(str(sceneNode.get_children()))
 				sceneNode.activate()
-		else:
+				CurrentScene = sceneNode
+		elif sceneNode == currentSceneCache:
 			if sceneNode.has_method("deactivate"):
 				sceneNode.deactivate()
 			sceneNode.hide()
+		else:
+			pass
 
+func hide_all_scenes():
+	for sceneNode in $Scenes.get_children():
+		if sceneNode.has_method("deactivate"):
+			sceneNode.deactivate()
+		sceneNode.hide()
 
 
 func show_end_screen(playerWon):
@@ -79,22 +90,26 @@ func show_end_screen(playerWon):
 
 
 func load_level(level_path):
-	$MainCamera._set_current(false)
-	var level_scene = load(level_path)
-	var newLevel = level_scene.instance()
-	$Scenes/QuickPlay.add_child(newLevel)
-	#newLevel.start()
-	CurrentLevel = newLevel
+	printerr("Maind.gd load_level should be deprecated. Not our job anymore")
+	return
+#	$MainCamera._set_current(false)
+#	var level_scene = load(level_path)
+#	var newLevel = level_scene.instance()
+#	$Scenes/QuickPlay.add_child(newLevel)
+#	newLevel.start()
+#	CurrentLevel = newLevel
 	
 	
 func remove_level():
-	if is_instance_valid(CurrentLevel):
-		if CurrentLevel.has_method("end"):
-			CurrentLevel.end()
-		else:
-			CurrentLevel.queue_free()
-	else:
-		printerr("Main.gd: someone is calling remove_level, but it seems like level is already gone.")
+	printerr("Main.gd remove_level should be deprecated. Not our job anymore")
+	return
+#	if is_instance_valid(CurrentLevel):
+#		if CurrentLevel.has_method("end"):
+#			CurrentLevel.end()
+#		else:
+#			CurrentLevel.queue_free()
+#	else:
+#		printerr("Main.gd: someone is calling remove_level, but it seems like level is already gone.")
 
 func print_debug_info():
 	if global.Debug:
@@ -113,6 +128,7 @@ func updateInGameTimers(speed):
 	
 func restart():
 	print("Main.gd restart() called")
+	hide_all_scenes()
 	show_single_scene("QuickPlay")
 
 
@@ -125,48 +141,53 @@ func restart():
 
 # HMM.. Why does main ever care when a single faction lost?
 # They should only care that the player lost.
-func _on_faction_lost(factionObj):
-	printerr("Main.gd _on_faction_lost. Consider deprecating in favour of _on_player_lost")
-	if factionObj.IsLocalHumanPlayer:
-		var playerWon = false
-		show_end_screen(playerWon)
-	else:
-		pass # cause, who cares?
+#func _on_faction_lost(factionObj):
+#	printerr("Main.gd _on_faction_lost. Consider deprecating in favour of _on_player_lost")
+#	if factionObj.IsLocalHumanPlayer:
+#		var playerWon = false
+#		show_end_screen(playerWon)
+#	else:
+#		pass # cause, who cares?
 
 
-func _on_player_lost(): # coming from Level
-	print("Main.gd got notified that player lost. _on_player_lost()")
-	# should we just trust that Level got it right?
-	var playerWon = false
-	show_end_screen(playerWon)
+#func _on_player_lost(): # coming from Level
+#	print("Main.gd got notified that player lost. _on_player_lost()")
+#	# should we just trust that Level got it right?
+#	var playerWon = false
+#	show_end_screen(playerWon)
 
-func _on_faction_won(factionObj):
-	# This should come after the planets all celebrate.
-	# verify a faction won and the celebration is over,
-	# then show the end-screen
-	
-	if is_instance_valid(factionObj) == false:
-		printerr("A faction queued free before it won?")
-		return
-	else: # factionObj is valid
-		if factionObj.IsLocalHumanPlayer:
-			show_end_screen(true)
-		else:
-			if CurrentLevel.FactionContainer.get_child_count() <= 1:
-				show_end_screen(false)
+#func _on_faction_won(factionObj):
+#	# This should come after the planets all celebrate.
+#	# verify a faction won and the celebration is over,
+#	# then show the end-screen
+#	printerr("Main.gd _on_faction_won shouldn't have to know anything about faction. Just show the end screen")
+#
+#	if is_instance_valid(factionObj) == false:
+#		printerr("A faction queued free before it won?")
+#		return
+#	else: # factionObj is valid
+#		printerr("Main.gd: _on_faction_won logic: move this to level.gd")
+#		if factionObj.IsLocalHumanPlayer:
+#			show_end_screen(true)
+#		else:
+#			if CurrentLevel.FactionContainer.get_child_count() <= 1:
+#				show_end_screen(false)
 
 func _on_Quit_pressed():
 	$AudioStreamPlayer.stop()
-	remove_level()
-	$Scenes/TitleScreen.hide()
-	$Scenes/EndCredits.hide()
+	hide_all_scenes()
 	get_tree().quit()
 
+
+func _on_quickplay_button_pressed():
+	restart()
+
+	
 func _on_restart_button_pressed():
 	restart()
 
 func _on_main_menu_requested():
-	show_single_scene("TitleScreen")
+	show_single_scene("MainMenu")
 	
 func _on_Restart_pressed():
 		
@@ -178,3 +199,8 @@ func _on_DebugTimer_timeout():
 
 func _on_tutorial_requested():
 	show_single_scene("Tutorial")
+
+func _on_level_completed(sceneObj):
+	if sceneObj.name == "SplashScreen":
+		show_single_scene("MainMenu")
+	

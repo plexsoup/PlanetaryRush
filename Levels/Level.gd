@@ -24,8 +24,8 @@ var State = States.INITIALIZING
 
 var NumPlanets : int = 0
 
-signal faction_won(factionObj)
-signal player_lost()
+signal level_completed(factionObj)
+#signal player_lost()
 signal set_initial_faction(factionObj)
 signal gameplay_started()
 
@@ -153,7 +153,7 @@ func remove_entities():
 	
 
 func end():
-	print("Level is ending. Hiding the gui (GUI has to be in a canvas layer, but they can't be hidden, so you have to hide the stuff inside.)")
+	print("Level " + self.name + " is ending. Hiding the gui (GUI has to be in a canvas layer, but they can't be hidden, so you have to hide the stuff inside.)")
 	pass # I don't know why this isn't working
 	#call_deferred("queue_free")
 	$Foreground/InLevelGUI.hide()
@@ -208,7 +208,22 @@ func countRemainingFactions():
 
 ###############################################################################
 # Outbound Signals
+func _on_CelebrationDuration_timeout():
+	var playerWon = true
+	
+	# Let main know that the celebration is over. it's ok to show the endscreen
+	if get_parent().has_method("_on_level_completed"):
+		connect("level_completed", get_parent(), "_on_level_completed")
+		emit_signal("level_completed", playerWon)
+		disconnect("level_completed", get_parent(), "_on_level_completed")
+	else:
+		printerr()
 
+func _on_LamentationTimer_timeout():
+	var playerWon = false
+	connect("level_completed", get_parent(), "_on_level_completed")
+	emit_signal("level_completed", playerWon)
+	disconnect("level_completed", get_parent(), "_on_level_completed")
 
 ###############################################################################
 # Incoming Signals
@@ -255,16 +270,5 @@ func _on_faction_lost(factionObj):
 			start_celebration()
 			
 
-func _on_CelebrationDuration_timeout():
-	# Let main know that the celebration is over. it's ok to show the endscreen
-	connect("faction_won", global.Main, "_on_faction_won")
-	emit_signal("faction_won", Winning_faction)
-	disconnect("faction_won", global.Main, "_on_faction_won")
-	
-	
 
 
-func _on_LamentationTimer_timeout():
-	connect("player_lost", global.Main, "_on_player_lost")
-	emit_signal("player_lost")
-	disconnect("player_lost", global.Main, "_on_player_lost")

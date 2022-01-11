@@ -75,7 +75,7 @@ margin_bottom = 270.0
 size_flags_horizontal = 4
 custom_constants/separation = 30
 
-[node name="RestartButton" type="Button" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer"]
+[node name="QuickPlayButton" type="Button" parent="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer"]
 margin_right = 300.0
 margin_bottom = 29.0
 rect_min_size = Vector2( 300, 0 )
@@ -325,7 +325,7 @@ stream = ExtResource( 11 )
 volume_db = -29.823
 
 [connection signal="tab_changed" from="MarginContainer/TabContainer" to="." method="_on_TabContainer_tab_changed"]
-[connection signal="pressed" from="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/RestartButton" to="." method="_on_RestartButton_pressed"]
+[connection signal="pressed" from="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/QuickPlayButton" to="." method="_on_QuickPlayButton_pressed"]
 [connection signal="pressed" from="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/TutorialButton" to="." method="_on_TutorialButton_pressed"]
 [connection signal="pressed" from="MarginContainer/TabContainer/Start/MarginContainer/VBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
 [connection signal="meta_clicked" from="MarginContainer/TabContainer/Licenses/MarginContainer/VBoxContainer/Authoring" to="." method="_on_RichText_meta_clicked"]

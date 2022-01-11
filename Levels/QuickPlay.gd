@@ -18,8 +18,23 @@ func _ready():
 func activate():
 	print(str(get_children()))
 	$Level.start()
+	$EndScreen.hide()
 	
 func deactivate():
 	$Level.end()
-
-
+	
+func _on_level_completed(isPlayerWinner):
+	print("Congratulations. Now we have to connect up some signals and show the win screen.")
+	
+	$Level.end()
+	if isPlayerWinner:
+		$EndScreen.win()
+	else:
+		$EndScreen.lose()
+	$EndScreen.show()
+	
+func _on_Restart_pressed():
+	$EndScreen.hide()
+	$Level.show() # might need to spawn a new level, since we killed the old one already?
+	$Level.start()
+	

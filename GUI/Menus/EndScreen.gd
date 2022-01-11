@@ -13,7 +13,7 @@ func _ready():
 	call_deferred("connect_signals") # wait for Main to be ready
 	
 func connect_signals():
-	connect("Restart_pressed", global.Main, "_on_Restart_pressed")
+	connect("Restart_pressed", get_parent(), "_on_Restart_pressed")
 	connect("Quit_pressed", global.Main, "_on_Quit_pressed")
 
 func win():
