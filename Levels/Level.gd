@@ -51,7 +51,7 @@ func start():
 		for faction in FactionContainer.get_children():
 			var randomPlanet = PlanetContainer.get_random_neutral_planet()
 			randomPlanet.switch_faction(faction)
-			randomPlanet.set_initial_population(2)
+			randomPlanet.set_initial_population(4.0)
 	else:
 		intake_bespoke_elements()
 
@@ -74,7 +74,7 @@ func spawn_in_level_GUI():
 
 
 func spawn_planets(totalNumber):
-	PlanetContainer.spawnPlanets(totalNumber, self) # make sure this happens after factions are created
+	PlanetContainer.spawnPlanets(self, totalNumber) # make sure this happens after factions are created
 
 func spawn_factions(numFactions):
 	print("Level.gd: spawning " + str(numFactions) + " Factions")
@@ -95,7 +95,7 @@ func spawn_faction(factionNum, color, isHuman):
 	if isHuman:
 		factionName = "Player 1"
 	else:
-		factionName = "Faction " + str(factionNum)
+		factionName = "AI " + str(factionNum)
 	
 	factionNode = factionScene.instance()
 	$Factions.add_child(factionNode)
@@ -142,10 +142,9 @@ func intake_bespoke_elements():
 			faction.start(self, i, "Faction " + str(i), global.FactionColors[i], false)
 	
 
-	if PlanetContainer.get_child_count() > 0:
-		for planet in PlanetContainer:
-			planet.start()
-			# planets expect size, factionObj
+	PlanetContainer.importPlanets()
+	
+				# planets expect size, factionObj
 			
 
 func remove_entities():
@@ -163,7 +162,7 @@ func end():
 	print("Level " + self.name + " is ending. Hiding the gui (GUI has to be in a canvas layer, but they can't be hidden, so you have to hide the stuff inside.)")
 	pass # I don't know why this isn't working
 	#call_deferred("queue_free")
-	$Foreground/InLevelGUI.hide()
+	$Foreground/InLevelGUI.end()
 	remove_entities()
 
 func count_player_planets():
@@ -196,7 +195,12 @@ func start_lamentation():
 		State = States.LAMENTING
 		$LamentationTimer.start()
 		
+func LookupFaction(factionNum : int):
+	for faction in FactionContainer.get_children():
+		if faction.Number == factionNum:
+			return faction
 
+	
 func getRemainingFactions():
 	var remainingFactions = []
 	for faction in FactionContainer.get_children():

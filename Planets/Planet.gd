@@ -4,6 +4,7 @@ extends StaticBody2D
 
 # Declare member variables here. Examples:
 var Level : Node2D
+export var FactionNum : int
 
 var Size : float = 1.0
 var units_present : float = 1.0 # billions of people
@@ -30,24 +31,30 @@ signal no_ships_available()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	if FactionObj == null:
-		$Sprite.set_self_modulate(Color.darkcyan)
+
 	initialize_collision_shape()
 	set_random_properties()
 	update_unit_label()
 	add_to_group("planets")
 	State = States.READY
 	
-func start(size : float = 1.0, levelObj = null):
+func start(levelObj = null, size : float = 1.0):
 	Level = levelObj
 	Size = size
 	var myName = generateName()
 	self.name = myName
+	
+	$Sprite.set_self_modulate(Color.darkcyan)
+
 	#switch_faction(factionObj) # note: switch_faction sets units_present == 1
 	set_planet_size(size)
 	set_initial_population(size) # must come after switch_faction
 	#set_difficulty(factionObj)
 	update_unit_label()
+
+	if FactionNum != 0:
+		switch_faction(FactionNum) # means level has to spawn factions before planets
+
 	
 	if global.Debug:
 		$PlanetNameLabel.text = myName
@@ -106,7 +113,7 @@ func set_planet_size(size):
 	base_production = size / 5.0 # units_present and size have to be floats
 	
 func set_initial_population(size):
-	units_present = size * 10.0
+	units_present = size * 5.0
 #	printerr("Planet.gd has a temporary hack to give the player advantage for testing")
 #	if FactionObj == global.PlayerFactionObj:
 #		units_present = 40
@@ -114,17 +121,16 @@ func set_initial_population(size):
 	
 func update_unit_label():
 	$Production/ProductionLabel.set_text(str(floor(units_present)))
-	# var cam = get_viewport().get_camera() # only works for 3D cameras
+	$Production.set_scale(lerp($Production.get_scale(), get_font_scale(), 0.8))
+
+func get_font_scale():
+	var fontScale : Vector2 = Vector2(1.0, 1.0)
+
+	var screen = get_viewport()
+	var zoom = screen.get_canvas_transform().get_scale()
+	fontScale = fontScale * ( 0.25 / zoom.x )
 	
-	var cam 
-	for camera in get_tree().get_nodes_in_group("cameras"):
-		if camera.is_current():
-			cam = camera
-	if is_instance_valid(cam):
-		var zoom = cam.get_zoom()
-		$Production.set_scale(lerp($Production.get_scale(), zoom / 5.0, 0.8))
-	else:
-		printerr("Planet.gd can't get current camera")
+	return fontScale
 
 func set_random_texture():
 	$Sprite.set_frame(randi()%9)
@@ -146,13 +152,15 @@ func set_faction(factionObj):
 	
 func switch_faction(newFaction):
 	if not is_instance_valid(newFaction):
+		if typeof(newFaction) == TYPE_INT:
+			newFaction = Level.LookupFaction(newFaction)
 		printerr("Planet.gd: dead faction trying to claim a planet. Something wrong with logic.")
 		return
 		
 	var oldFaction = FactionObj # may be null for neutral planets
 	if oldFaction != newFaction:
 		set_faction(newFaction)
-		units_present = 1
+		units_present = 1.0
 		update_unit_label()
 		# notify factions about the change in planets
 		for faction in [newFaction, oldFaction]:
@@ -295,11 +303,11 @@ func _on_hit(damage, factionObj, location = get_global_position()):
 func _on_ship_landed(damage, factionObj):
 	
 	if self.FactionObj == null:
-		if units_present <= 0: # empty neutral, claim it
+		if units_present < 1.0: # empty neutral, claim it. #under 1.0 will look like zero in-game
 			switch_faction(factionObj)
 		else: # populated neutral, reduce population
 			remove_units(damage)
-			if units_present <= 0:
+			if units_present < 1.0:
 				switch_faction(factionObj)
 				
 				

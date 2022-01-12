@@ -1,10 +1,10 @@
-extends HBoxContainer
+extends Container
 
 
 # Declare member variables here. Examples:
 onready var FactionProgressBar = $ProgressBar
-onready var FactionNameLabel = $ProgressBar/HBoxContainer/Name
-onready var FactionStatusLabel = $ProgressBar/HBoxContainer/Status
+onready var FactionNameLabel = $Nameplate/HBox/Name
+onready var FactionStatusLabel = $Nameplate/HBox/Status
 var FactionObj : Node2D
 var Level : Node2D
 
@@ -27,7 +27,13 @@ func _process(delta):
 			var factionPlanets = FactionObj.CurrentPlanetList.size()
 			var totalPlanets = Level.PlanetContainer.get_child_count()
 			FactionNameLabel.set_text(FactionObj.name)
-			FactionStatusLabel.set_text(FactionObj.States.keys()[FactionObj.State])
+			
+			var statusStr : String = FactionObj.States.keys()[FactionObj.State]
+			if statusStr == "DEAD":
+				FactionStatusLabel.set_text(statusStr)
+			else: 
+				FactionStatusLabel.set_text("")
+			
 			FactionProgressBar.set_value(float(factionPlanets)/float(totalPlanets)*100)
 			FactionProgressBar.update()
 		

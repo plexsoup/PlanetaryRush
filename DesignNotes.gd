@@ -1,7 +1,11 @@
 """
 Current Work Effort:
+- sometimes (rarely) the player doesn't get a starting planet?
 
-- if you restart the game, you end up with multiple progress bars per faction
+- sometimes it feels like you should acquire a planet, but you don't get it.
+	- 2 ships vs population of 1
+	- it may be the production timer working against you.
+	
 
 - quickplay doesn't end when player loses all planets
 - or when you win all planets

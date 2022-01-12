@@ -2,7 +2,7 @@ extends Control
 
 
 # Declare member variables here. Examples:
-onready var FactionProgressContainer = $TopHUD/HBoxContainer
+onready var FactionProgressContainer = $TopHUD/Panel/HBoxContainer
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -11,6 +11,10 @@ func _ready():
 func start(levelObj, factionsList): # called by Level.gd
 	initializeFactionProgressBars(levelObj, factionsList)
 
+func end():
+	for progressNode in FactionProgressContainer.get_children():
+		progressNode.call_deferred("queue_free")
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass

@@ -235,24 +235,27 @@ scale = Vector2( 0.6, 0.6 )
 texture = ExtResource( 10 )
 
 [node name="Tutorial" type="Node2D" parent="Scenes"]
-visible = false
 script = ExtResource( 16 )
 
 [node name="Stage 1" parent="Scenes/Tutorial" instance=ExtResource( 14 )]
 Bespoke = true
 
 [node name="Faction" parent="Scenes/Tutorial/Stage 1/Factions" index="0" instance=ExtResource( 12 )]
+Number = 1
 IsLocalHumanPlayer = true
 
 [node name="Faction2" parent="Scenes/Tutorial/Stage 1/Factions" index="1" instance=ExtResource( 12 )]
+Number = 2
 
 [node name="Planet" parent="Scenes/Tutorial/Stage 1/Planets" index="0" instance=ExtResource( 11 )]
 position = Vector2( 326, 302 )
+FactionNum = 1
 
 [node name="Planet2" parent="Scenes/Tutorial/Stage 1/Planets" index="1" instance=ExtResource( 11 )]
 position = Vector2( 706, 307 )
+FactionNum = 2
 
-[node name="Background" parent="Scenes/Tutorial/Stage 1" index="7"]
+[node name="Background" parent="Scenes/Tutorial/Stage 1" index="6"]
 visible = false
 
 [node name="bgSprite" parent="Scenes/Tutorial/Stage 1/Background" index="0"]

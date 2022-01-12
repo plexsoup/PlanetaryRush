@@ -2,8 +2,9 @@ extends Node2D
 
 
 # Declare member variables here. Examples:
-var Number : int
+export var Number : int
 export var IsLocalHumanPlayer : bool = false
+
 var fColor : Color
 var CursorObj : Node2D
 
@@ -24,7 +25,7 @@ signal faction_lost(factionObj)
 func _ready():
 	pass # Replace with function body.
 
-func start(levelObj, number : int, myName : String = "Faction", myColor : Color = Color.gray, isLocalHuman : bool = false):
+func start(levelObj, number : int, myName : String = "Faction", myColor : Color = Color.darkcyan, isLocalHuman : bool = false):
 	Level = levelObj
 	Number = number
 	name = myName

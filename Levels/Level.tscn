@@ -14,8 +14,6 @@ layer = 3
 [node name="InLevelGUI" parent="Foreground" instance=ExtResource( 3 )]
 visible = false
 
-[node name="Cursors_DEL" type="Node2D" parent="."]
-
 [node name="Paths" type="Node2D" parent="."]
 
 [node name="Fleets" type="Node2D" parent="."]

@@ -1,5 +1,6 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
+[ext_resource path="res://GUI/Themes/CyberTheme.tres" type="Theme" id=1]
 [ext_resource path="res://GUI/HUD/PlanetListTree.gd" type="Script" id=2]
 [ext_resource path="res://GUI/HUD/InLevelGUI.gd" type="Script" id=3]
 
@@ -15,6 +16,7 @@ margin_right = 202.0
 margin_bottom = 600.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme = ExtResource( 1 )
 script = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -39,14 +41,25 @@ script = ExtResource( 2 )
 [node name="TopHUD" type="CenterContainer" parent="."]
 margin_right = 1024.0
 margin_bottom = 40.0
+size_flags_horizontal = 3
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HBoxContainer" type="HBoxContainer" parent="TopHUD"]
-margin_left = 512.0
-margin_top = 20.0
-margin_right = 512.0
-margin_bottom = 20.0
+[node name="Panel" type="PanelContainer" parent="TopHUD"]
+margin_left = 502.0
+margin_right = 522.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TopHUD/Panel"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 10.0
+margin_bottom = 10.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/separation = 25
+__meta__ = {
+"_edit_use_anchors_": false
+}

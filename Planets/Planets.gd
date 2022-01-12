@@ -3,7 +3,7 @@ extends Node2D
 # Declare member variables here. Examples:
 var min_distance : float = 325
 var DeploymentZone : Rect2
-
+var Level : Node2D
 
 
 enum PlanetaryPatterns { SIN, CIRCLE, ELLIPSE, SPIRAL, GLOBS, RANDOM }
@@ -12,17 +12,18 @@ signal faction_lost(factionObj)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	
 	var AA = Vector2( -1.5 * global.screen_size )
 	var BB = Vector2( 3.0 * global.screen_size )
 	DeploymentZone = Rect2(AA, BB)
-	global.planet_container = self # singleton, but it should be registered in Level, not global.
 	
-func start(factionObj):
-	pass # have to wait for factions to be ready first.
+func start():
+	pass # Level calls spawnPlanets directly (for better or worse)
 
-func spawnPlanets(totalNumPlanets, levelObj):
+
+func spawnPlanets(levelObj, totalNumPlanets):
 	# note: planets always start as neutral (no faction). Use switch_faction to set a faction
+
+	Level = levelObj
 	randomize()
 	var startingPlanetSize : float = 1.5
 	
@@ -35,7 +36,7 @@ func spawnPlanets(totalNumPlanets, levelObj):
 		var randScale : float = rand_range(0.75, 1.5)
 		var targetPos : Vector2 = get_target_pos(pattern, planetNum, totalNumPlanets)
 		
-		spawnPlanet(startingPlanetSize * randScale, targetPos, levelObj)
+		spawnPlanet(levelObj, startingPlanetSize * randScale, targetPos)
 
 
 func get_target_pos(pattern, planetNum, totalNumPlanets):
@@ -103,7 +104,7 @@ func importPlanets():
 		#	bespokePlanet.start(factionObj, planetSize, levelObj)
 			printerr("Planets.gd: importPlanets. Needs development. Or can this be handled by Level.gd?")
 			
-func spawnPlanet(planetSize, targetPos, levelObj):
+func spawnPlanet(levelObj, planetSize, targetPos):
 	# note: planets always start as neutral (no faction). Use switch_faction to set a faction
 	var planetScene = load("res://Planets/Planet.tscn")
 	var newPlanet = planetScene.instance()
@@ -128,7 +129,7 @@ func spawnPlanet(planetSize, targetPos, levelObj):
 		# kill it. If you can't find a non-colliding space after 200 attempts, just die.
 		newPlanet.queue_free()
 	else:
-		newPlanet.start(planetSize, levelObj) # has to happen right away to build the factions' planet lists	
+		newPlanet.start(levelObj, planetSize) # has to happen right away to build the factions' planet lists	
 
 func isColliding(new_planet):	
 	var myPos = new_planet.get_global_position()
