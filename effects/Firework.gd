@@ -13,7 +13,8 @@ func start(pos, rot, vel, factionObj):
 	set_global_position(pos)
 	set_global_rotation(rot)
 	Velocity = vel
-	$projectile.set_self_modulate(factionObj.fColor)
+	if is_instance_valid(factionObj): # neutral planets don't have a faction
+		$projectile.set_self_modulate(factionObj.fColor)
 	shoot()
 	
 func shoot():

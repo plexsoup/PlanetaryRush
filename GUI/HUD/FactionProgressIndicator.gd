@@ -1,10 +1,10 @@
-extends HSplitContainer
+extends HBoxContainer
 
 
 # Declare member variables here. Examples:
 onready var FactionProgressBar = $ProgressBar
-onready var FactionNameLabel = $VBoxContainer/Name
-onready var FactionStatusLabel = $VBoxContainer/Status
+onready var FactionNameLabel = $ProgressBar/HBoxContainer/Name
+onready var FactionStatusLabel = $ProgressBar/HBoxContainer/Status
 var FactionObj : Node2D
 var Level : Node2D
 
@@ -12,7 +12,7 @@ var Level : Node2D
 func _ready():
 	pass # Replace with function body.
 
-func start(factionObj, levelObj):
+func start(levelObj, factionObj):
 	Level = levelObj
 	FactionObj = factionObj
 	FactionNameLabel.set_text(factionObj.name)

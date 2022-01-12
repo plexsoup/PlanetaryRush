@@ -42,6 +42,9 @@ signal release_mouse()
 func _ready():
 	Difficulty = float(1.0 + global.options["difficulty"]) # 1, 2, 3
 	randomize()
+	fuzz_timer()
+		
+
 	
 func start(factionObj, levelObj):
 	# set up a delay interval so the AI can't make too many Actions per minute.
@@ -49,10 +52,10 @@ func start(factionObj, levelObj):
 	Level = levelObj
 	FactionObj = factionObj
 	
-	if FactionObj.CurrentPlanetList.size() > 0:
-		CurrentSourcePlanet = FactionObj.CurrentPlanetList[0]
-	else:
-		printerr("problem in AIController. It's expecting the Faction object to have a planet")
+#	if FactionObj.CurrentPlanetList.size() > 0:
+#		CurrentSourcePlanet = FactionObj.CurrentPlanetList[0]
+#	else:
+#		printerr("problem in AIController. It's expecting the Faction object to have a planet")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -67,8 +70,14 @@ func _process(delta):
 			
 			$StateLabel.text = States.keys()[State]
 		else:
-			printerr("AIController.gd " + self.name + " has no CurrentSourcePlanet")
+			pass
 
+func fuzz_timer():
+	# make each AI faction seem a little different.
+	var currentWaitTime = $DecisionTimer.get_wait_time()
+	var newWaitTime = currentWaitTime * (rand_range(0.9, 1.1))
+	$DecisionTimer.set_wait_time(newWaitTime)
+	
 func getObjectivePos(sourcePlanet):
 	if is_instance_valid(sourcePlanet):
 		var objectivePos:Vector2 = get_global_position()
@@ -133,6 +142,7 @@ func getSuitableOriginPlanet():
 	
 
 func plot_new_course():
+	#print("AI Controller : plotting course")
 	randomize()
 	
 	var planetContainer = Level.PlanetContainer
@@ -142,6 +152,8 @@ func plot_new_course():
 	var destinationPlanet : StaticBody2D
 
 	originPlanet = getSuitableOriginPlanet()
+	if is_instance_valid(originPlanet):
+		CurrentSourcePlanet = originPlanet
 
 	if not is_instance_valid(originPlanet):
 		printerr("AIController, can't get a suitable origin planet.")
@@ -156,20 +168,21 @@ func plot_new_course():
 	
 	if CurrentAttackStrategy == AttackStrategies.ATTACK_PLAYER:
 		if is_instance_valid(global.PlayerFactionObj) and global.PlayerFactionObj.IsAlive():
-			destinationPlanet = planetContainer.get_random_planet(global.PlayerFactionObj)
+			destinationPlanet = planetContainer.get_random_faction_planet(global.PlayerFactionObj)
 		else:
-			destinationPlanet = planetContainer.get_nearest_enemy_planet(FactionObj, originPlanet.get_global_position())
+			if is_instance_valid(originPlanet):
+				destinationPlanet = planetContainer.get_nearest_enemy_planet(FactionObj, originPlanet.get_global_position())
 	elif CurrentAttackStrategy == AttackStrategies.LOWEST_POPULATION:
 		destinationPlanet = planetContainer.get_lowest_population_adversary(FactionObj)
 	elif CurrentAttackStrategy == AttackStrategies.NEAREST_PLANET:
-		destinationPlanet = planetContainer.get_nearest_enemy_planet(FactionObj, originPlanet.get_global_position())
+		if is_instance_valid(originPlanet):
+			destinationPlanet = planetContainer.get_nearest_enemy_planet(FactionObj, originPlanet.get_global_position())
 	elif CurrentAttackStrategy == AttackStrategies.LARGEST_PLANET:
 		destinationPlanet = planetContainer.get_largest_enemy_planet(FactionObj)
 
-	if is_instance_valid(originPlanet) and is_instance_valid(destinationPlanet):
+	if is_instance_valid(destinationPlanet):
 		if originPlanet != destinationPlanet:
 			CurrentTargetPlanet = destinationPlanet
-			CurrentSourcePlanet = originPlanet
 			State = States.SEEKING # start moving the cursor toward the origin planet
 		else: # why should we ever get to this?
 			printerr("AI Controller still has some logic issues near the end of plot_new_course.")

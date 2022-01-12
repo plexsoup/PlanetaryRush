@@ -39,13 +39,26 @@ func broadcastEvent(eventName, parametersArr):
 		BroadcastEvents[eventName].broadcast()
 
 func QuickSignal(requestingObj, signalName, targetObject, targetFunction, parameters : Array = []):
+	# sometimes useful when you just want a quick signal.
+	# takes parameters as an array to get around the variable parameter count.
+
+	# connects a signal, emits the signal, disconnects the signal
+
+	# note: this is an anti-pattern. Use at own risk.
+	# if you always knew the exact object to signal, you might as well just call a function directly.
+	# signals are best used when you don't know who you're talking to.
+	# that way, the game dev can wire up signals manually depending on different situations
+
+	# eg: when a timer completes, the recipient of the signal isn't hard-wired, it's connected.
+	
 	if is_instance_valid(targetObject) and targetObject.has_method(targetFunction):
-		requestingObj.connect( signalName, targetObject, targetFunction)
-		
-		
+		#requestingObj.connect( signalName, targetObject, targetFunction)
+		var argsArray = [signalName, targetObject, targetFunction]
+		if parameters.size() > 0:
+			argsArray.append_array(parameters)
+		requestingObj.callv("connect", argsArray)
 		requestingObj.emit_signal(signalName)
-		
-		requestingObj.disconnect( signalName, targetObject, targetFunction)
+		requestingObj.callv("disconnect", argsArray)
 	else:
 		printerr("SignalsBus.gd : invalid targetObject or targetFunction")
 

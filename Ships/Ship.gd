@@ -150,8 +150,6 @@ func planet_within_distance(planetObj, distance):
 	else:
 		var closeEnough : bool = false
 		var myPos = get_global_position()
-		var targetPos = NavTarget.get_global_position()
-		#if utils.WithinFuzzyProximity(myPos, targetPos, landingDistance, 0.1):
 		if utils.WithinFuzzyProximity(self, planetObj, distance, 0.1):
 			closeEnough = true
 		return closeEnough

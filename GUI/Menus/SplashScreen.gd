@@ -3,7 +3,7 @@ extends Node2D
 
 # Declare member variables here. Examples:
 signal level_completed(sceneObj)
-
+export var AnimationName = "DropLogo"
 
 
 # Called when the node enters the scene tree for the first time.
@@ -16,7 +16,7 @@ func _ready():
 #	pass
 
 func activate():
-	$AnimationPlayer.play("DropLogo")
+	$AnimationPlayer.play(AnimationName)
 
 	
 func deactivate():

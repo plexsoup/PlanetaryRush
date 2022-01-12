@@ -65,11 +65,19 @@ func lock_cursor_on(planet):
 	State = States.LOCKED
 		
 func spawnPath(planet):
-	if planet.FactionObj == self.FactionObj and FactionObj.State == FactionObj.States.PLAYING:
-		askLevelForPath(planet) # cursor doesn't spawn paths, level does.
+		askLevelForPath(planet)
 	
-	elif FactionObj.State == FactionObj.States.PLAYING:
-		printerr("Cursor.gd: " + FactionObj.name + " is trying to draw paths from unowned planets. It happens")
+#	if planet.FactionObj == self.FactionObj and FactionObj.State == FactionObj.States.PLAYING:
+#		askLevelForPath(planet) # cursor doesn't spawn paths, level does.
+#
+#	elif FactionObj.State == FactionObj.States.PLAYING:
+#		printerr("Cursor.gd: " + FactionObj.name + " is trying to draw paths from unowned planets. It happens")
+#	else:
+#		printerr("WTF Cursor. What's happening?")
+#		print(planet.FactionObj.name)
+#		print(self.FactionObj.name)
+#		print(FactionObj.State)
+#		pass
 
 func get_closest_friendly_planet():
 	return Level.PlanetContainer.get_nearest_faction_planet(get_global_position(), FactionObj)
@@ -96,9 +104,9 @@ func isStillDrawing():
 # Outbound Signals
 
 func askLevelForPath(planet):
-	connect("new_path_requested", global.level, "_on_new_path_requested")
+	connect("new_path_requested", Level, "_on_new_path_requested")
 	emit_signal("new_path_requested", planet, FactionObj, self)
-	disconnect("new_path_requested", global.level, "_on_new_path_requested")
+	disconnect("new_path_requested", Level, "_on_new_path_requested")
 
 # the planet decides this and notifies the path directly so we don't have to keep track
 #func notifyLevelPathNoLongerRequired(planet, faction):

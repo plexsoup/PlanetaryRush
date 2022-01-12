@@ -28,7 +28,6 @@ var planet_container : Node2D
 var NumFactions : int = 4 # active factions only.. neutral doesn't count.
 
 var FactionColors : PoolColorArray = [
-		Color.darkcyan,
 		Color.blue, 
 		Color.orangered, 
 		Color.greenyellow, 
@@ -37,17 +36,18 @@ var FactionColors : PoolColorArray = [
 		Color.chocolate,
 		Color.purple,
 		Color.red, 
+
 	]
 
 
 
-var PlayerFactionNum : int = 1
+var PlayerFactionNum : int = 0
 var PlayerFactionObj : Node2D
 
 var camera : Camera2D
 
-var NeutralFactionNum : int = 0
-var NeutralFactionObj : Node2D
+#var NeutralFactionNum : int = 0
+#var NeutralFactionObj : Node2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

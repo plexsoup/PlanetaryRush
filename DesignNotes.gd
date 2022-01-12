@@ -1,6 +1,15 @@
 """
 Current Work Effort:
 
+- if you restart the game, you end up with multiple progress bars per faction
+
+- quickplay doesn't end when player loses all planets
+- or when you win all planets
+
+- it's not obvious what colour you are when you start quickplay.
+
+
+
 modify factions a bit.
 - neutral is faction == null
 - planets with no faction are neutral

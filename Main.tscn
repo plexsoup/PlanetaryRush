@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=25 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://DesignNotes.gd" type="Script" id=2]
@@ -19,6 +19,8 @@
 [ext_resource path="res://GUI/Icons/PlexSoup.png" type="Texture" id=17]
 [ext_resource path="res://GUI/Menus/SplashScreen.gd" type="Script" id=18]
 [ext_resource path="res://effects/536104__eminyildirim__sword-hit-heavy.wav" type="AudioStream" id=19]
+[ext_resource path="res://GUI/Themes/CyberTheme.tres" type="Theme" id=20]
+[ext_resource path="res://GUI/Menus/MainMenu.gd" type="Script" id=21]
 
 [sub_resource type="Animation" id=1]
 resource_name = "DropLogo"
@@ -53,6 +55,68 @@ tracks/1/keys = {
 "times": PoolRealArray( 0, 0.7 )
 }
 
+[sub_resource type="Animation" id=2]
+resource_name = "DropLogo"
+tracks/0/type = "value"
+tracks/0/path = NodePath("PlexSoupLogo:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.8, 0.9, 1 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 512, -272 ), Vector2( 512, 300 ), Vector2( 512, 290 ), Vector2( 512, 300 ) ]
+}
+tracks/1/type = "audio"
+tracks/1/path = NodePath("AudioStreamPlayer2D")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"clips": [ {
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": null
+}, {
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource( 19 )
+} ],
+"times": PoolRealArray( 0, 0.7 )
+}
+
+[sub_resource type="Animation" id=3]
+resource_name = "RaiseLogo"
+tracks/0/type = "value"
+tracks/0/path = NodePath("PlexSoupLogo:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0.1, 0.2, 0.3, 1 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 512, 300 ), Vector2( 512, 326 ), Vector2( 512, 300 ), Vector2( 512, -272 ) ]
+}
+tracks/1/type = "audio"
+tracks/1/path = NodePath("AudioStreamPlayer2D")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"clips": [ {
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource( 19 )
+} ],
+"times": PoolRealArray( 0 )
+}
+
 [node name="Main" type="Node2D"]
 script = ExtResource( 1 )
 
@@ -74,28 +138,36 @@ autostart = true
 [node name="Scenes" type="Node2D" parent="."]
 
 [node name="SplashScreen" type="Node2D" parent="Scenes"]
+visible = false
 script = ExtResource( 18 )
 
 [node name="PlexSoupLogo" type="Sprite" parent="Scenes/SplashScreen"]
-position = Vector2( 512, 300 )
+position = Vector2( 512, -272 )
 texture = ExtResource( 17 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Scenes/SplashScreen"]
 anims/DropLogo = SubResource( 1 )
 
 [node name="Timer" type="Timer" parent="Scenes/SplashScreen"]
-wait_time = 3.0
+wait_time = 1.2
 one_shot = true
 autostart = true
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="Scenes/SplashScreen"]
 stream = ExtResource( 19 )
 
+[node name="background" type="Sprite" parent="Scenes/SplashScreen"]
+position = Vector2( 508, 302 )
+z_index = -1
+texture = ExtResource( 10 )
+
 [node name="MainMenu" type="Node2D" parent="Scenes"]
 visible = false
 position = Vector2( 530, 288 )
+script = ExtResource( 21 )
 
 [node name="TitleScreenUI" parent="Scenes/MainMenu" instance=ExtResource( 3 )]
+visible = false
 
 [node name="ParallaxBackground" type="Node2D" parent="Scenes/MainMenu"]
 position = Vector2( -512, -264 )
@@ -173,7 +245,6 @@ Bespoke = true
 IsLocalHumanPlayer = true
 
 [node name="Faction2" parent="Scenes/Tutorial/Stage 1/Factions" index="1" instance=ExtResource( 12 )]
-IsNeutralFaction = true
 
 [node name="Planet" parent="Scenes/Tutorial/Stage 1/Planets" index="0" instance=ExtResource( 11 )]
 position = Vector2( 326, 302 )
@@ -288,10 +359,64 @@ position = Vector2( 509, 283 )
 scale = Vector2( 0.6, 0.6 )
 texture = ExtResource( 10 )
 
+[node name="GoodByeScreen" type="Node2D" parent="Scenes"]
+visible = false
+script = ExtResource( 18 )
+AnimationName = "RaiseLogo"
+
+[node name="PlexSoupLogo" type="Sprite" parent="Scenes/GoodByeScreen"]
+position = Vector2( 512, 300 )
+z_index = 1
+texture = ExtResource( 17 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Scenes/GoodByeScreen"]
+anims/DropLogo = SubResource( 2 )
+anims/RaiseLogo = SubResource( 3 )
+
+[node name="Timer" type="Timer" parent="Scenes/GoodByeScreen"]
+wait_time = 1.2
+one_shot = true
+autostart = true
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="Scenes/GoodByeScreen"]
+stream = ExtResource( 19 )
+
+[node name="background" type="Sprite" parent="Scenes/GoodByeScreen"]
+position = Vector2( 508, 302 )
+z_index = -1
+texture = ExtResource( 10 )
+
+[node name="Panel" type="Panel" parent="Scenes/GoodByeScreen"]
+margin_left = 376.0
+margin_top = 182.0
+margin_right = 643.0
+margin_bottom = 482.0
+rect_min_size = Vector2( 250, 250 )
+theme = ExtResource( 20 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Scenes/GoodByeScreen/Panel"]
+margin_top = 39.0
+margin_right = 61.0
+margin_bottom = 92.0
+rect_scale = Vector2( 4.28912, 4.28912 )
+size_flags_horizontal = 3
+size_flags_vertical = 6
+theme = ExtResource( 20 )
+text = "Good
+Bye"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="MainCamera" type="Camera2D" parent="." groups=["cameras"]]
 position = Vector2( 512, 303 )
 
 [connection signal="timeout" from="DebugPrintTimer" to="." method="_on_DebugTimer_timeout"]
 [connection signal="timeout" from="Scenes/SplashScreen/Timer" to="Scenes/SplashScreen" method="_on_Timer_timeout"]
+[connection signal="timeout" from="Scenes/GoodByeScreen/Timer" to="Scenes/GoodByeScreen" method="_on_Timer_timeout"]
 
 [editable path="Scenes/Tutorial/Stage 1"]

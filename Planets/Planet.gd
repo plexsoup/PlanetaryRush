@@ -30,21 +30,23 @@ signal no_ships_available()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	if FactionObj == null:
+		$Sprite.set_self_modulate(Color.darkcyan)
 	initialize_collision_shape()
 	set_random_properties()
 	update_unit_label()
 	add_to_group("planets")
 	State = States.READY
 	
-func start(factionObj, size, levelObj):
+func start(size : float = 1.0, levelObj = null):
 	Level = levelObj
 	Size = size
 	var myName = generateName()
 	self.name = myName
-	switch_faction(factionObj) # note: switch_faction sets units_present == 1
+	#switch_faction(factionObj) # note: switch_faction sets units_present == 1
 	set_planet_size(size)
 	set_initial_population(size) # must come after switch_faction
-	set_difficulty(factionObj)
+	#set_difficulty(factionObj)
 	update_unit_label()
 	
 	if global.Debug:
@@ -147,7 +149,7 @@ func switch_faction(newFaction):
 		printerr("Planet.gd: dead faction trying to claim a planet. Something wrong with logic.")
 		return
 		
-	var oldFaction = FactionObj
+	var oldFaction = FactionObj # may be null for neutral planets
 	if oldFaction != newFaction:
 		set_faction(newFaction)
 		units_present = 1
@@ -267,8 +269,7 @@ func notifyPath_PlanetCannotSendShips(path):
 
 func _on_ProductionTimer_timeout():
 	if is_instance_valid(FactionObj):
-		if not FactionObj.IsNeutralFaction: # grey planets don't produce
-			increase_units_from_timed_production()
+		increase_units_from_timed_production()
 
 # signal coming from cursor via global.level
 func _on_ShipPath_finished_drawing(path, destinationPlanet):
@@ -292,9 +293,8 @@ func _on_hit(damage, factionObj, location = get_global_position()):
 		update_unit_label()
 
 func _on_ship_landed(damage, factionObj):
-	# switch to the new faction if you're neutral
 	
-	if self.FactionObj.IsNeutralFaction:
+	if self.FactionObj == null:
 		if units_present <= 0: # empty neutral, claim it
 			switch_faction(factionObj)
 		else: # populated neutral, reduce population
@@ -308,8 +308,7 @@ func _on_ship_landed(damage, factionObj):
 	else: # enemy planet, reduce population
 		remove_units(damage)
 		if units_present <= 0:
-			switch_faction(global.NeutralFactionObj)
-			# not sure if it's necessary to switch to neutral before switching to the new faction?
+			switch_faction(factionObj)
 
 
 func _on_initialize_faction(factionObj):

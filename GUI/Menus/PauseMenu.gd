@@ -3,9 +3,10 @@ extends Control
 signal opened()
 signal closed()
 signal quit_pressed()
-signal quickplay_button_pressed()
-signal tutorial_requested()
+#signal quickplay_button_pressed()
+#signal tutorial_requested()
 
+signal player_requested_scene(sceneName)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -13,6 +14,7 @@ func _ready():
 	call_deferred("start") # wait for Cursor to register itself
 	
 func start():
+	connect("player_requested_scene", global.Main, "_on_player_requested_scene")
 	yield(get_tree().create_timer(0.2), "timeout")
 	show_pause_menu()
 	
@@ -51,20 +53,14 @@ func _on_QuitButton_pressed():
 
 
 func _on_QuickPlayButton_pressed():
-	if global.Main.has_method("_on_quickplay_button_pressed"):
-		
-		connect( "quickplay_button_pressed", global.Main, "_on_quickplay_button_pressed")
-		emit_signal("quickplay_button_pressed")
-		disconnect( "quickplay_button_pressed", global.Main, "_on_quickplay_button_pressed")
-		
-#		global.Main.restart()
-#		hide_pause_menu()
-#		global.toggle_hard_pause()
-		$ClickNoise.play()
+	emit_signal("player_requested_scene", "QuickPlay")
+	$ClickNoise.play()
 
 
 
 func _on_RichText_meta_clicked(meta):
+	# this is to open webpages for the links in the licenses panel.
+	# might not be a good idea.
 	OS.shell_open(meta)
 
 
@@ -74,4 +70,10 @@ func _on_TabContainer_tab_changed(tab):
 
 
 func _on_TutorialButton_pressed():
-	SignalsBus.QuickSignal(self, "tutorial_requested", global.Main, "_on_tutorial_requested")
+	$ClickNoise.play()
+	emit_signal("player_requested_scene", "Tutorial")
+
+
+func _on_CreditsButton_pressed():
+	$ClickNoise.play()
+	emit_signal("player_requested_scene", "Credits")

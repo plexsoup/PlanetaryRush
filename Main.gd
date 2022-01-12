@@ -55,7 +55,7 @@ func show_single_scene(desiredSceneNodeName):
 		if sceneNode.name == desiredSceneNodeName:
 			sceneNode.show()
 			if sceneNode.has_method("activate"):
-				print(str(sceneNode.get_children()))
+				print("Main.gd show_single_scene: "+str(sceneNode.get_children()))
 				sceneNode.activate()
 				CurrentScene = sceneNode
 		elif sceneNode == currentSceneCache:
@@ -176,29 +176,39 @@ func restart():
 func _on_Quit_pressed():
 	$AudioStreamPlayer.stop()
 	hide_all_scenes()
+	show_single_scene("GoodByeScreen")
+	
+
+	yield(get_tree().create_timer(1.5),"timeout")
+
 	get_tree().quit()
 
-
-func _on_quickplay_button_pressed():
-	restart()
+func _on_player_requested_scene(sceneName):
+	if $Scenes.find_node(sceneName):
+		show_single_scene(sceneName)
+	
+	
+#func _on_quickplay_button_pressed():
+#	restart()
 
 	
 func _on_restart_button_pressed():
 	restart()
 
-func _on_main_menu_requested():
-	show_single_scene("MainMenu")
+#func _on_main_menu_requested():
+#	show_single_scene("MainMenu")
 	
-func _on_Restart_pressed():
-		
-	restart()
+#func _on_Restart_pressed():
+#
+#	restart()
 
 
 func _on_DebugTimer_timeout():
 	print_debug_info()
 
-func _on_tutorial_requested():
-	show_single_scene("Tutorial")
+#func _on_tutorial_requested():
+#	hide_all_scenes()
+#	show_single_scene("Tutorial")
 
 func _on_level_completed(sceneObj):
 	if sceneObj.name == "SplashScreen":

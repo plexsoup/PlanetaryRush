@@ -143,8 +143,7 @@ func get_closest_friendly_planet(pos):
 	var nearestNeutral
 	if is_instance_valid(FactionObj):
 		nearestFriendly = FactionObj.get_nearest_planet(pos)
-	if is_instance_valid(global.NeutralFactionObj):
-		nearestNeutral = global.NeutralFactionObj.get_nearest_planet(pos)
+		nearestNeutral = Level.PlanetContainer.get_nearest_faction_planet(null, pos)
 
 	# might want to change this 
 	# to search for the nearest 'dead' neutral planet

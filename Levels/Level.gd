@@ -1,7 +1,8 @@
 extends Node2D
 
-export var NextScene : PackedScene
-export var PreviousScene : PackedScene
+# might not need these. but they could help with scene navigation
+export var NextSceneName : String
+export var PreviousSceneName : String
 
 export var IsCurrent : bool = false
 export var Bespoke : bool = false # bespoke levels are handcrafted in the Godot 2D editor. Useful for campaign
@@ -15,7 +16,7 @@ onready var BulletContainer : Node2D = $Bullets
 onready var PlanetContainer : Node2D = $Planets
 onready var FactionContainer : Node2D = $Factions
 onready var PathContainer : Node2D = $Paths
-onready var CursorsContainer : Node2D = $Cursors
+#onready var CursorsContainer : Node2D = $Cursors
 
 var Winning_faction
 
@@ -45,70 +46,70 @@ func start():
 	
 	# spawn a bunch of neutral planets, then change NumFactions to their unique faction.
 	if not Bespoke:
-		spawn_factions(global.NumFactions + 1)  # produces factionObj's in FactionContainer
-		spawn_planets(global.NeutralFactionObj, NumPlanets)
-		spawn_cursors()
+		spawn_factions(global.NumFactions)  # produces factionObj's in FactionContainer
+		spawn_planets(NumPlanets)
+		for faction in FactionContainer.get_children():
+			var randomPlanet = PlanetContainer.get_random_neutral_planet()
+			randomPlanet.switch_faction(faction)
+			randomPlanet.set_initial_population(2)
 	else:
 		intake_bespoke_elements()
 
 	print("Level.gd starting gameplay")
-	
-	# unfortunately, the in-level gui has to be in a CanvasLayer, but they can't be hidden, so you have to hide the gui in the inspector
-	$Foreground/InLevelGUI.show()
-	$Foreground/InLevelGUI.start(getRemainingFactions(), self)
+
+	spawn_in_level_GUI()
 	State = States.PLAYING
 	
 	
 	
+func spawn_in_level_GUI():
+	print("Level.gd spawn_in_level_GUI called")
+	# unfortunately, the in-level gui has to be in a CanvasLayer, but they can't be hidden, so you have to hide the gui in the inspector
+	var numFactions = global.NumFactions # refactor: this shouldn't be in Global anymore.
+	var factions = getRemainingFactions()
+	
+	$Foreground/InLevelGUI.show()
+	$Foreground/InLevelGUI.start(self, factions)
+	
 
-func init_starting_planet(factionObj):
-	var neutralPlanets = global.NeutralFactionObj.CurrentPlanetList
-	var planetObj = utils.GetRandElement(neutralPlanets)
-	connect("set_initial_faction", planetObj, "_on_initialize_faction")
-	emit_signal("set_initial_faction", factionObj)
-	disconnect("set_initial_faction", planetObj, "_on_initialize_faction")
 
-
-
-func spawn_planets(factionObj, totalNumber):
-	PlanetContainer.spawnPlanets(factionObj, totalNumber, self) # make sure this happens after factions are created
+func spawn_planets(totalNumber):
+	PlanetContainer.spawnPlanets(totalNumber, self) # make sure this happens after factions are created
 
 func spawn_factions(numFactions):
 	print("Level.gd: spawning " + str(numFactions) + " Factions")
 	
 	for factionNum in range(numFactions):
 		var isHuman = false
-		var isNeutralFaction = false
+		
 		if factionNum == global.PlayerFactionNum:
 			isHuman = true
-		elif factionNum == global.NeutralFactionNum:
-			isNeutralFaction = true
-		spawn_faction(factionNum, global.FactionColors[factionNum], isHuman, isNeutralFaction)
+		spawn_faction(factionNum, global.FactionColors[factionNum], isHuman)
 		print("spawning faction: " + str(factionNum))
 
-func spawn_faction(factionNum, color, isHuman, isNeutralFaction):
+func spawn_faction(factionNum, color, isHuman):
 	var factionScene = load("res://Players/Faction.tscn")
-	var factionNode = factionScene.instance()
-	var factionName : String = ""
-	$Factions.add_child(factionNode)
+	var factionNode : Node2D
+	var factionName : String
+	
 	if isHuman:
 		factionName = "Player 1"
-	elif isNeutralFaction:
-		factionName = "Neutral"
-		global.NeutralFactionObj = factionNode
 	else:
 		factionName = "Faction " + str(factionNum)
-	factionNode.start(factionNum, factionName, color, isHuman, isNeutralFaction, self)
+	
+	factionNode = factionScene.instance()
+	$Factions.add_child(factionNode)
+	factionNode.start(self, factionNum, factionName, color, isHuman)
 
-func spawn_cursors():
-	for factionObj in FactionContainer.get_children():
-		if factionObj.IsNeutralFaction == false:
-			init_starting_planet(factionObj)
-			spawn_cursor(factionObj)
-		
-		connect("gameplay_started", factionObj, "_on_gameplay_started")
-		emit_signal("gameplay_started")
-		disconnect("gameplay_started", factionObj, "_on_gameplay_started")
+#func spawn_cursors(): # move this into faction (isHuman can decide what type of cursor to use)
+#	for factionObj in FactionContainer.get_children():
+#		if factionObj.IsNeutralFaction == false:
+#			init_starting_planet(factionObj)
+#			spawn_cursor(factionObj)
+#
+#		connect("gameplay_started", factionObj, "_on_gameplay_started")
+#		emit_signal("gameplay_started")
+#		disconnect("gameplay_started", factionObj, "_on_gameplay_started")
 
 	
 func spawn_cursor(factionObj): # this could probably be moved into Faction
@@ -131,19 +132,25 @@ func spawn_path(planet, factionObj, cursorObj):
 func intake_bespoke_elements():
 	# look at the level and identify existing planets, factions, etc.
 	# make sure they get catalogues and initialized correctly
+	print("Level.gd is identifying objects placed manually in the level designer.")
+	var containers = [PlanetContainer, FactionContainer]
+
+	var i = 0
+	if FactionContainer.get_child_count() > 0:
+		for faction in FactionContainer.get_children():
+			# factions expect: number, myName, myColor, isLocalHuman, levelObj
+			faction.start(self, i, "Faction " + str(i), global.FactionColors[i], false)
 	
-	var containers = [PlanetContainer, FleetContainer, PathContainer, FactionContainer, CursorsContainer]
-	for container in containers:
-		if container.get_child_count() > 0:
-			for entity in container.get_children():
-				if entity.has_method("start"):
-					printerr("Level.gd. intake_bespoke_elements. Don't we need to know what parameters to pass to each entity?")
-					entity.start()
+
+	if PlanetContainer.get_child_count() > 0:
+		for planet in PlanetContainer:
+			planet.start()
+			# planets expect size, factionObj
 			
 
 func remove_entities():
 	
-	var containers = [PlanetContainer, FleetContainer, PathContainer, FactionContainer, CursorsContainer]
+	var containers = [PlanetContainer, FleetContainer, PathContainer, FactionContainer]
 	for container in containers:
 		for entity in container.get_children():
 			if entity.has_method("end"):
@@ -193,7 +200,7 @@ func start_lamentation():
 func getRemainingFactions():
 	var remainingFactions = []
 	for faction in FactionContainer.get_children():
-		if faction.State == faction.States.PLAYING:
+		if faction.State != faction.States.DEAD:
 			remainingFactions.push_back(faction)
 	return remainingFactions
 	
@@ -202,7 +209,7 @@ func countRemainingFactions():
 	printerr("Level.gd deprecated function countRemainingFactions")
 	var remainingAliveFactions = []
 	for faction in FactionContainer.get_children():
-		if faction.State == faction.States.PLAYING:
+		if faction.State != faction.States.DEAD:
 			remainingAliveFactions.push_back(faction)
 	return remainingAliveFactions.size()
 
@@ -257,7 +264,6 @@ func _on_faction_lost(factionObj):
 		Winning_faction = remainingFactions[0]
 	else:
 		remainingFactions.erase(global.PlayerFactionObj)
-		remainingFactions.erase(global.NeutralFactionObj)
 		if remainingFactions.size() == 0: # all enemy factions gone
 				victory = true
 				Winning_faction = global.PlayerFactionObj

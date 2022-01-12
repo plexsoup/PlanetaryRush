@@ -21,7 +21,8 @@ func _ready():
 func start(factionObj):
 	pass # have to wait for factions to be ready first.
 
-func spawnPlanets(factionObj, totalNumPlanets, levelObj):
+func spawnPlanets(totalNumPlanets, levelObj):
+	# note: planets always start as neutral (no faction). Use switch_faction to set a faction
 	randomize()
 	var startingPlanetSize : float = 1.5
 	
@@ -34,7 +35,7 @@ func spawnPlanets(factionObj, totalNumPlanets, levelObj):
 		var randScale : float = rand_range(0.75, 1.5)
 		var targetPos : Vector2 = get_target_pos(pattern, planetNum, totalNumPlanets)
 		
-		spawnPlanet(factionObj, startingPlanetSize * randScale, targetPos, levelObj)
+		spawnPlanet(startingPlanetSize * randScale, targetPos, levelObj)
 
 
 func get_target_pos(pattern, planetNum, totalNumPlanets):
@@ -102,7 +103,8 @@ func importPlanets():
 		#	bespokePlanet.start(factionObj, planetSize, levelObj)
 			printerr("Planets.gd: importPlanets. Needs development. Or can this be handled by Level.gd?")
 			
-func spawnPlanet(factionObj, planetSize, targetPos, levelObj):
+func spawnPlanet(planetSize, targetPos, levelObj):
+	# note: planets always start as neutral (no faction). Use switch_faction to set a faction
 	var planetScene = load("res://Planets/Planet.tscn")
 	var newPlanet = planetScene.instance()
 	add_child(newPlanet)
@@ -126,7 +128,7 @@ func spawnPlanet(factionObj, planetSize, targetPos, levelObj):
 		# kill it. If you can't find a non-colliding space after 200 attempts, just die.
 		newPlanet.queue_free()
 	else:
-		newPlanet.start(factionObj, planetSize, levelObj) # has to happen right away to build the factions' planet lists	
+		newPlanet.start(planetSize, levelObj) # has to happen right away to build the factions' planet lists	
 
 func isColliding(new_planet):	
 	var myPos = new_planet.get_global_position()
@@ -182,8 +184,9 @@ func get_nearest_enemy_planet(factionObj, pos):
 
 
 
-# refactor: should move this into FactionObj
 func get_faction_planets(factionObj):
+	# null object gets neutral planets
+	
 	var factionPlanets :Array = []
 	for planet in get_children():
 		if planet.FactionObj == factionObj:
@@ -198,9 +201,11 @@ func get_enemy_planets(enemyFactionObj):
 	return enemyFactionPlanets
 	
 
+func get_random_neutral_planet():
+	var neutralPlanets = get_faction_planets(null)
+	return neutralPlanets[randi()%neutralPlanets.size()]
 
-
-func get_random_planet(factionObj):
+func get_random_faction_planet(factionObj):
 	var returnPlanet : StaticBody2D
 	var factionPlanets = get_faction_planets(factionObj)
 	var allPlanets = get_children()
@@ -214,6 +219,10 @@ func get_random_planet(factionObj):
 		returnPlanet = allPlanets[randi()%allPlanets.size()]
 	
 	return returnPlanet
+
+func get_random_planet():
+	var allPlanets = get_children()
+	return allPlanets[randi()%allPlanets.size()]
 
 func get_lowest_population_adversary(factionObj):
 	var planets = get_children()

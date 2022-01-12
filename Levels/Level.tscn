@@ -9,11 +9,12 @@
 script = ExtResource( 1 )
 
 [node name="Foreground" type="CanvasLayer" parent="."]
+layer = 3
 
 [node name="InLevelGUI" parent="Foreground" instance=ExtResource( 3 )]
 visible = false
 
-[node name="Cursors" type="Node2D" parent="."]
+[node name="Cursors_DEL" type="Node2D" parent="."]
 
 [node name="Paths" type="Node2D" parent="."]
 

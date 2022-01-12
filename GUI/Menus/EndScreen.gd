@@ -6,7 +6,7 @@ onready var LoseBox = $MarginContainer/MarginContainer/VBoxContainer/WinLose/Los
 
 signal Restart_pressed
 signal Quit_pressed
-signal BackToMain_pressed
+signal player_requested_scene
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -15,6 +15,7 @@ func _ready():
 func connect_signals():
 	connect("Restart_pressed", get_parent(), "_on_Restart_pressed")
 	connect("Quit_pressed", global.Main, "_on_Quit_pressed")
+	connect("player_requested_scene", global.Main, "_on_player_requested_scene")
 
 func win():
 	print("endscreen received call to: win()")
@@ -77,4 +78,5 @@ func _on_Quit_pressed():
 
 
 func _on_BackToMainMenu_pressed():
-	SignalsBus.QuickSignal(self, "BackToMain_pressed", global.Main, "_on_main_menu_requested")
+	emit_signal("player_requested_scene", "MainMenu")
+	$ClickNoise.play()

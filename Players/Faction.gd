@@ -4,7 +4,6 @@ extends Node2D
 # Declare member variables here. Examples:
 var Number : int
 export var IsLocalHumanPlayer : bool = false
-export var IsNeutralFaction : bool = false
 var fColor : Color
 var CursorObj : Node2D
 
@@ -25,8 +24,7 @@ signal faction_lost(factionObj)
 func _ready():
 	pass # Replace with function body.
 
-func start(number, myName, myColor, isLocalHuman, isNeutralFaction, levelObj):
-	printerr("Faction.gd needs to get a reference to it's level object, so it knows who to signal")
+func start(levelObj, number : int, myName : String = "Faction", myColor : Color = Color.gray, isLocalHuman : bool = false):
 	Level = levelObj
 	Number = number
 	name = myName
@@ -34,22 +32,24 @@ func start(number, myName, myColor, isLocalHuman, isNeutralFaction, levelObj):
 	if isLocalHuman:
 		IsLocalHumanPlayer = true
 		global.PlayerFactionObj = self
-			
-	IsNeutralFaction = isNeutralFaction
+	
 	set_modulate(myColor)
+	spawnCursor(isLocalHuman)
+	setState(States.PLAYING)
 
-
+func spawnCursor(isLocalHumanPlayer):
+	var cursorScene = load("res://Players/Cursor.tscn")
+	var cursorNode = cursorScene.instance()
+	#cursorNode.set_global_position(Vector2(1,1))
+	add_child(cursorNode)
+	cursorNode.start(self, isLocalHumanPlayer, Level)
+	CursorObj = cursorNode
+	
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
 
-#func registerShip(shipObj):
-#	CurrentShipList.push_back(shipObj)
-#
-#func deregisterShip(shipObj):
-#	CurrentShipList.erase(shipObj)
-#	if lose_conditions_met():
-#		lose()
 
 func registerFleet(fleetObj):
 	CurrentFleetList.push_back(fleetObj)
@@ -78,20 +78,22 @@ func get_nearest_planet(pos):
 
 func die():
 	print("Faction " + self.name + " is dead now.")
-	State = States.DEAD
+	setState(States.DEAD)
 	#call_deferred("queue_free")
 
+func setState(state):
+	if States.values().has(state):
+		State = state
 
-
-func countNeutralPlanets():
-	if is_instance_valid(global.NeutralFactionObj):
-		var neutralPlanets = 0
-		for planet in global.planet_container.get_children():
-			if planet.FactionObj == global.NeutralFactionObj:
-				neutralPlanets += 1
-		return neutralPlanets
-	else:
-		return 0
+#func countNeutralPlanets():
+#	if is_instance_valid(global.NeutralFactionObj):
+#		var neutralPlanets = 0
+#		for planet in global.planet_container.get_children():
+#			if planet.FactionObj == global.NeutralFactionObj:
+#				neutralPlanets += 1
+#		return neutralPlanets
+#	else:
+#		return 0
 
 
 func win_conditions_met():
