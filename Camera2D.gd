@@ -10,24 +10,54 @@ var Ticks :int = 0
 var MinZoom = 0.3
 var MaxZoom = 15.0
 
-onready var Cursor = get_node("../..") # parent of playercontroller
 
 func _ready():
 	DesiredZoom = zoom
 	
-	self.drag_margin_h_enabled = true
-	self.drag_margin_v_enabled = true
+	self.drag_margin_h_enabled = false
+	self.drag_margin_v_enabled = false
 	
-	#Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
 	
+
+func start(levelObj, planetsObj):
+	printerr("Camera2D.gd start() doesn't seem right.")
+	# zoom extents to capture all the planets.
+	
+	var planets = planetsObj.get_all_planets()
+	var AA = Vector2(1000000,1000000)
+	var BB = Vector2(0, 0)
+	for planet in planets:
+		
+		var planetPos = planet.get_global_position()
+		if planetPos.x < AA.x:
+			AA.x = planetPos.x
+		if planetPos.y < AA.y:
+			AA.y = planetPos.y
+		if planetPos.x > BB.x:
+			BB.x = planetPos.x
+		if planetPos.y > BB.y:
+			BB.y = BB.y
+
+	var extents : Rect2 = Rect2(AA, BB-AA)
+	print("Camera2D.gd " + str(extents))
+	# ok, the rectangle should now include everything.
+	# how do we turn that into camera scale?
+
+	self.set_offset(extents.position + (extents.size / 2.0))
+	self.zoom = Vector2(1.0, 1.0) # ??? Guess? some relationship to viewport size and extents size
+	
+	
+	
+	
+	# get the AABB rect2 which includes all the planets.
+	# move the camera origin to the center of mass
+	# set the camera scale to include every planet in the viewport
+	
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	Ticks += 1
-	
-#	update()
 	
 	zoom = lerp(zoom, DesiredZoom, 0.2 * delta * 60)
-	#print("zoom: ", str(zoom))
 	
 	check_for_keyboard_movement(delta)
 	
@@ -71,8 +101,9 @@ func _input(event):
 func move_toward_mouse(direction):
 	# not the greatest feel, but it works ok for now
 	var myPos = get_global_position()
-	var cursorPos = Cursor.get_global_position()
-	set_global_position(lerp(myPos, cursorPos, 0.8))
+	#var cursorPos = Cursor.get_global_position()
+	var mousePos = get_global_mouse_position()
+	set_global_position(lerp(myPos, mousePos, 0.8))
 
 func set_camera_drag_margins():
 	var drag = lerp(0, 1.0, (zoom.x - MinZoom) / (MaxZoom - MinZoom) )

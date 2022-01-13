@@ -10,6 +10,8 @@ extends Node2D
 func _ready():
 	pass # Replace with function body.
 
+func show_tutorial_stage_selection_menu():
+	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -23,3 +25,8 @@ func deactivate():
 	#$"Stage 1".end()
 	pass
 	#can't be queuing free the hand-placed bespoke assets.
+
+func _on_stage_ended(stage):
+	show_tutorial_stage_selection_menu()
+	# or just: start_next_stage()
+	

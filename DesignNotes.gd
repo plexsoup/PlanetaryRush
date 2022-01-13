@@ -1,11 +1,17 @@
 """
 Current Work Effort:
+- build the referee object
+
+- figure out how to switch tutorial levels
+	
 - build the blueprint import system for level design
 	- clone each planet
 	- identify all the factionNumbers on planets
 	- spawn factions as required
 	- hide the blueprint
 	- launch the level
+
+- figure out how to set the camera zoom so it includes all the planets
 
 - move the pause function from global.gd into Level.gd
 	- game_speed can live there too, cause it's really speed for the current level
@@ -117,6 +123,10 @@ Bugs
 - faction list on title screen is wrong / makes no sense
 
 Refactoring Required
+- make a Factions script, analogous to our Planets script.
+	- it can handle spawning and ending factions, finding, counting, etc.
+	- might be useful to talk to the referee about remaining factions
+
 - consider adding setget to the State variables everywhere.
 	- when state changes, maybe someone should be notified.
 	https://docs.godotengine.org/en/3.0/getting_started/scripting/gdscript/gdscript_basics.html?highlight=setget#setters-getters

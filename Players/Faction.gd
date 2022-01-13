@@ -169,6 +169,8 @@ func _on_planet_switched_faction(planetObj, newFaction):
 	if State == States.PLAYING:
 		if lose_conditions_met():
 			lose()
+#		if win_conditions_met():
+#			win()
 
 func _on_fleet_created(fleetObj):
 	registerFleet(fleetObj)

@@ -6,7 +6,7 @@ extends StaticBody2D
 var Level : Node2D
 export var FactionNum : int
 
-var Size : float = 1.0
+export var Size : float = 1.0
 var units_present : float = 1.0 # billions of people
 var original_scale: Vector2
 var scale_factor: float = 70.0
@@ -151,11 +151,10 @@ func set_faction(factionObj):
 	$Sprite.set_self_modulate(myColor)
 	
 func switch_faction(newFaction):
+	
 	if not is_instance_valid(newFaction):
 		if typeof(newFaction) == TYPE_INT:
 			newFaction = Level.LookupFaction(newFaction)
-		printerr("Planet.gd: dead faction trying to claim a planet. Something wrong with logic.")
-		return
 		
 	var oldFaction = FactionObj # may be null for neutral planets
 	if oldFaction != newFaction:
@@ -165,9 +164,8 @@ func switch_faction(newFaction):
 		# notify factions about the change in planets
 		for faction in [newFaction, oldFaction]:
 			if is_instance_valid(faction):
-				connect("switched_faction", faction, "_on_planet_switched_faction")
-				emit_signal("switched_faction", self, newFaction)
-				disconnect("switched_faction", faction, "_on_planet_switched_faction")
+				notify_faction_planet_switched(faction, newFaction)
+		notify_referee_planet_switched(newFaction, oldFaction)
 
 
 
@@ -271,6 +269,18 @@ func notifyPath_PlanetCannotSendShips(path):
 	emit_signal("no_ships_available")
 	disconnect("no_ships_available", path, "_on_planet_cannot_send_ships")
 
+func notify_faction_planet_switched(faction, newFaction):
+	connect("switched_faction", faction, "_on_planet_switched_faction")
+	emit_signal("switched_faction", self, newFaction)
+	disconnect("switched_faction", faction, "_on_planet_switched_faction")
+
+func notify_referee_planet_switched(newFaction, oldFaction):
+	pass # not yet implemented
+	
+#	var refereeObj = null # ??? who will do this?
+#	connect("switched_faction", refereeObj, "_on_planet_switched_faction")
+#	emit_signal("switched_faction", self, newFaction)
+#	disconnect("switched_faction", refereeObj, "_on_planet_switched_faction")
 
 ##################################################################################
 # Incoming Signals

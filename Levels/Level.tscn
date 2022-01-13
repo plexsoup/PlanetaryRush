@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Levels/Level.gd" type="Script" id=1]
 [ext_resource path="res://Scenery/stars.jpg" type="Texture" id=2]
 [ext_resource path="res://GUI/HUD/InLevelGUI.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Planets/Planets.gd" type="Script" id=4]
 [ext_resource path="res://Players/Camera2D.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Levels/Referee.gd" type="Script" id=6]
 
 [node name="Level" type="Node2D"]
 script = ExtResource( 1 )
@@ -50,7 +51,13 @@ one_shot = true
 one_shot = true
 
 [node name="Camera2D" parent="." instance=ExtResource( 5 )]
-current = false
+zoom = Vector2( 6, 6 )
+
+[node name="Referee" type="Node" parent="."]
+script = ExtResource( 6 )
+
+[node name="InspectionTimer" type="Timer" parent="Referee" groups=["InGameTimers"]]
 
 [connection signal="timeout" from="CelebrationTimer" to="." method="_on_CelebrationDuration_timeout"]
 [connection signal="timeout" from="LamentationTimer" to="." method="_on_LamentationTimer_timeout"]
+[connection signal="timeout" from="Referee/InspectionTimer" to="Referee" method="_on_InspectionTimer_timeout"]

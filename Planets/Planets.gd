@@ -37,7 +37,7 @@ func spawnPlanets(levelObj, totalNumPlanets, pattern):
 		var randScale : float = rand_range(0.75, 1.5)
 		var targetPos : Vector2 = get_target_pos(pattern, planetNum, totalNumPlanets)
 		
-		spawnPlanet(levelObj, startingPlanetSize * randScale, targetPos)
+		var newPlanet = spawnPlanet(levelObj, startingPlanetSize * randScale, targetPos)
 
 
 func get_target_pos(pattern, planetNum, totalNumPlanets):
@@ -132,6 +132,7 @@ func spawnPlanet(levelObj, planetSize, targetPos):
 		newPlanet.queue_free()
 	else:
 		newPlanet.start(levelObj, planetSize) # has to happen right away to build the factions' planet lists	
+		return(newPlanet)
 
 func isColliding(new_planet):	
 	var myPos = new_planet.get_global_position()
@@ -143,6 +144,9 @@ func isColliding(new_planet):
 				return true
 	return false
 
+func get_all_planets():
+	return self.get_children()
+	
 func get_nearest_planet(pos):
 	var closest = null
 	var closest_dist_sq = 10000000

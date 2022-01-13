@@ -6,9 +6,12 @@ export var PreviousSceneName : String
 
 export var IsCurrent : bool = false
 export var Bespoke : bool = false # bespoke levels are handcrafted in the Godot 2D editor. Useful for campaign
+export var RequireNeutralCapture : bool = false
 
 export var DesiredNumPlanets : int
 export var DesiredNumFactions : int
+var NumPlanets : int = 0
+var NumFactions : int = 0
 
 
 onready var FleetContainer : Node2D = $Fleets
@@ -25,10 +28,9 @@ var State = States.INITIALIZING
 
 # Note: this enum exists in two places. Make sure they don't get out of sync.
 # Level and Planets objects both have a list of patterns
-enum PlanetaryPatterns { BESPOKE, SIN, CIRCLE, ELLIPSE, SPIRAL, GLOBS, SCATTER, RANDOM  }
+enum PlanetaryPatterns { RANDOM, SIN, CIRCLE, ELLIPSE, SPIRAL, GLOBS, SCATTER, BESPOKE }
 export (PlanetaryPatterns) var Pattern
 
-var NumPlanets : int = 0
 
 signal level_completed(factionObj)
 #signal player_lost()
@@ -45,14 +47,15 @@ func _ready():
 
 func start(blueprintContainer : Node2D = null):
 	global.level = self
-	global.BulletContainer = $Bullets
+	global.BulletContainer = $Bullets # why? Who uses this?
 
 	NumPlanets = DesiredNumPlanets
+	NumFactions = DesiredNumFactions
 	
 	# spawn a bunch of neutral planets, then change NumFactions to their unique faction.
 	if not Bespoke:
-		spawn_factions(global.NumFactions)  # produces factionObj's in FactionContainer
-		spawn_planets()
+		spawn_factions(DesiredNumFactions)  # produces factionObj's in FactionContainer
+		spawn_planets(NumPlanets)
 		for faction in FactionContainer.get_children():
 			var randomPlanet = PlanetContainer.get_random_neutral_planet()
 			randomPlanet.switch_faction(faction)
@@ -65,12 +68,13 @@ func start(blueprintContainer : Node2D = null):
 	spawn_in_level_GUI()
 	State = States.PLAYING
 	$Camera2D._set_current(true)
+	$Camera2D.start(self, PlanetContainer)
 	
 	
 func spawn_in_level_GUI():
 	print("Level.gd spawn_in_level_GUI called")
 	# unfortunately, the in-level gui has to be in a CanvasLayer, but they can't be hidden, so you have to hide the gui in the inspector
-	var numFactions = global.NumFactions # refactor: this shouldn't be in Global anymore.
+	var numFactions = DesiredNumFactions # refactor: this shouldn't be in Global anymore.
 	var factions = getRemainingFactions()
 	
 	$Foreground/InLevelGUI.show()
@@ -78,14 +82,14 @@ func spawn_in_level_GUI():
 	
 
 
-func spawn_planets():
+func spawn_planets(numPlanets):
 	var p = PlanetaryPatterns
 	if Pattern == null or Pattern == p.RANDOM:
 		# wasn't set by the level designer, so choose one at random
 		var patterns = [p.SIN, p.SCATTER, p.GLOBS]
 		Pattern = patterns[randi()%patterns.size()]
-	if Pattern != p.BESPOKE and NumPlanets == 0:
-		NumPlanets = int(rand_range(10,20))
+	if Pattern != p.BESPOKE and numPlanets == 0:
+		numPlanets = int(rand_range(10,20))
 	PlanetContainer.spawnPlanets(self, NumPlanets, Pattern) # make sure this happens after factions are created
 
 func spawn_factions(numFactions):
@@ -145,20 +149,34 @@ func build_level_from_blueprint(blueprintContainer):
 	# look at the blueprint and identify existing planets, factions, etc.
 	# make sure they get catalogued and initialized correctly
 	print("Level.gd is identifying objects placed manually in the level designer.")
-	var containers = [PlanetContainer, FactionContainer]
-
-
-	var i = 0
-	if FactionContainer.get_child_count() > 0:
-		for faction in FactionContainer.get_children():
-			# factions expect: number, myName, myColor, isLocalHuman, levelObj
-			faction.start(self, i, "Faction " + str(i), global.FactionColors[i], false)
-
-
-	PlanetContainer.importPlanets()
+	# enumerate all the planets in the blueprint node
+	# then spawn factions accordingly
+	# then move the planets into the PlanetContainer
 	
-				# planets expect size, factionObj
-			
+	var factionNums = []
+	var planetsInLevel = blueprintContainer.get_children()
+	for planet in planetsInLevel:
+		if not factionNums.has(planet.FactionNum):
+			factionNums.push_back(planet.FactionNum)
+	
+	factionNums.erase(-1) # get rid of neutral faction
+	for factionNum in factionNums:
+		var isHuman
+		if factionNum == 0:
+			isHuman = true
+		else:
+			isHuman = false
+		spawn_faction(factionNum, global.FactionColors[factionNum], isHuman)
+
+	for templatePlanet in planetsInLevel:
+		var newPlanet = PlanetContainer.spawnPlanet(self, templatePlanet.Size, templatePlanet.get_global_position())
+		newPlanet.start(self, templatePlanet.Size)
+		newPlanet.switch_faction(templatePlanet.FactionNum)
+		newPlanet.set_initial_population(templatePlanet.Size)
+		templatePlanet.hide()
+
+	blueprintContainer.hide() # why isn't this working?
+
 
 func remove_entities():
 	
