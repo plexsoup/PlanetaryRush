@@ -41,7 +41,9 @@ func spawn_player_controller(factionObj, isLocalHumanPlayer):
 	if isLocalHumanPlayer:
 		var newPlayerController = PlayerControllerScene.instance()
 		self.add_child(newPlayerController)
+		newPlayerController.start(Level, factionObj)
 		ControllerObj = newPlayerController
+		
 	else:
 		var newAIController = AIControllerScene.instance()
 		self.add_child(newAIController)

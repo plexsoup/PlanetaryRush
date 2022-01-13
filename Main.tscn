@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://DesignNotes.gd" type="Script" id=2]
-[ext_resource path="res://GUI/Menus/PauseMenu.tscn" type="PackedScene" id=3]
+[ext_resource path="res://GUI/Menus/StartMenu.tscn" type="PackedScene" id=3]
 [ext_resource path="res://GUI/Menus/EndScreen.tscn" type="PackedScene" id=4]
 [ext_resource path="res://BGMusic/hearts-unraveled.ogg" type="AudioStream" id=5]
 [ext_resource path="res://effects/SimpleScroll.gd" type="Script" id=6]
@@ -11,7 +11,7 @@
 [ext_resource path="res://Ships/textures/ship3.png" type="Texture" id=9]
 [ext_resource path="res://Scenery/stars.png" type="Texture" id=10]
 [ext_resource path="res://Planets/Planet.tscn" type="PackedScene" id=11]
-[ext_resource path="res://Players/Faction.tscn" type="PackedScene" id=12]
+[ext_resource path="res://Levels/TutorialStage.gd" type="Script" id=12]
 [ext_resource path="res://Tutorial/Stage 1.gd" type="Script" id=13]
 [ext_resource path="res://Levels/Level.tscn" type="PackedScene" id=14]
 [ext_resource path="res://Levels/QuickPlay.gd" type="Script" id=15]
@@ -235,31 +235,8 @@ scale = Vector2( 0.6, 0.6 )
 texture = ExtResource( 10 )
 
 [node name="Tutorial" type="Node2D" parent="Scenes"]
+visible = false
 script = ExtResource( 16 )
-
-[node name="Stage 1" parent="Scenes/Tutorial" instance=ExtResource( 14 )]
-Bespoke = true
-
-[node name="Faction" parent="Scenes/Tutorial/Stage 1/Factions" index="0" instance=ExtResource( 12 )]
-Number = 1
-IsLocalHumanPlayer = true
-
-[node name="Faction2" parent="Scenes/Tutorial/Stage 1/Factions" index="1" instance=ExtResource( 12 )]
-Number = 2
-
-[node name="Planet" parent="Scenes/Tutorial/Stage 1/Planets" index="0" instance=ExtResource( 11 )]
-position = Vector2( 326, 302 )
-FactionNum = 1
-
-[node name="Planet2" parent="Scenes/Tutorial/Stage 1/Planets" index="1" instance=ExtResource( 11 )]
-position = Vector2( 706, 307 )
-FactionNum = 2
-
-[node name="Background" parent="Scenes/Tutorial/Stage 1" index="6"]
-visible = false
-
-[node name="bgSprite" parent="Scenes/Tutorial/Stage 1/Background" index="0"]
-visible = false
 
 [node name="Stage 1 beta" type="Node2D" parent="Scenes/Tutorial"]
 script = ExtResource( 13 )
@@ -268,6 +245,22 @@ script = ExtResource( 13 )
 
 [node name="Stage 3" type="Node2D" parent="Scenes/Tutorial"]
 
+[node name="Stage 1" type="Node2D" parent="Scenes/Tutorial"]
+script = ExtResource( 12 )
+
+[node name="blueprint" type="Node2D" parent="Scenes/Tutorial/Stage 1"]
+
+[node name="Planet" parent="Scenes/Tutorial/Stage 1/blueprint" instance=ExtResource( 11 )]
+position = Vector2( 298, 300 )
+FactionNum = 1
+
+[node name="Planet2" parent="Scenes/Tutorial/Stage 1/blueprint" instance=ExtResource( 11 )]
+position = Vector2( 778, 302 )
+FactionNum = -1
+
+[node name="Level" parent="Scenes/Tutorial/Stage 1" instance=ExtResource( 14 )]
+Bespoke = true
+
 [node name="QuickPlay" type="Node2D" parent="Scenes"]
 visible = false
 script = ExtResource( 15 )
@@ -275,6 +268,7 @@ script = ExtResource( 15 )
 [node name="Level" parent="Scenes/QuickPlay" instance=ExtResource( 14 )]
 DesiredNumPlanets = 15
 DesiredNumFactions = 4
+Pattern = 7
 
 [node name="EndScreen" parent="Scenes/QuickPlay" instance=ExtResource( 4 )]
 visible = false
@@ -421,5 +415,3 @@ position = Vector2( 512, 303 )
 [connection signal="timeout" from="DebugPrintTimer" to="." method="_on_DebugTimer_timeout"]
 [connection signal="timeout" from="Scenes/SplashScreen/Timer" to="Scenes/SplashScreen" method="_on_Timer_timeout"]
 [connection signal="timeout" from="Scenes/GoodByeScreen/Timer" to="Scenes/GoodByeScreen" method="_on_Timer_timeout"]
-
-[editable path="Scenes/Tutorial/Stage 1"]

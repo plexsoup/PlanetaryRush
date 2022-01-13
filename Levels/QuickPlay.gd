@@ -22,11 +22,13 @@ func activate():
 	
 func deactivate():
 	$Level.end()
+
 	
 func _on_level_completed(isPlayerWinner):
 	print("Congratulations. Now we have to connect up some signals and show the win screen.")
 	
 	$Level.end()
+	global.Main.show_main_camera()
 	if isPlayerWinner:
 		$EndScreen.win()
 	else:

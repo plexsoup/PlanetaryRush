@@ -45,7 +45,7 @@ var FactionColors : PoolColorArray = [
 var PlayerFactionNum : int = 0
 var PlayerFactionObj : Node2D
 
-var camera : Camera2D
+
 
 #var NeutralFactionNum : int = 0
 #var NeutralFactionObj : Node2D

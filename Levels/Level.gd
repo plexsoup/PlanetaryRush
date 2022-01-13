@@ -23,6 +23,11 @@ var Winning_faction
 enum States { INITIALIZING, PLAYING, PAUSED, CELEBRATING, LAMENTING }
 var State = States.INITIALIZING
 
+# Note: this enum exists in two places. Make sure they don't get out of sync.
+# Level and Planets objects both have a list of patterns
+enum PlanetaryPatterns { BESPOKE, SIN, CIRCLE, ELLIPSE, SPIRAL, GLOBS, SCATTER, RANDOM  }
+export (PlanetaryPatterns) var Pattern
+
 var NumPlanets : int = 0
 
 signal level_completed(factionObj)
@@ -38,7 +43,7 @@ func _ready():
 	print("Hi, I'm level.gd, inside: " + get_parent().name)
 	
 
-func start():
+func start(blueprintContainer : Node2D = null):
 	global.level = self
 	global.BulletContainer = $Bullets
 
@@ -47,19 +52,19 @@ func start():
 	# spawn a bunch of neutral planets, then change NumFactions to their unique faction.
 	if not Bespoke:
 		spawn_factions(global.NumFactions)  # produces factionObj's in FactionContainer
-		spawn_planets(NumPlanets)
+		spawn_planets()
 		for faction in FactionContainer.get_children():
 			var randomPlanet = PlanetContainer.get_random_neutral_planet()
 			randomPlanet.switch_faction(faction)
 			randomPlanet.set_initial_population(4.0)
-	else:
-		intake_bespoke_elements()
+	elif is_instance_valid(blueprintContainer):
+		build_level_from_blueprint(blueprintContainer)
 
 	print("Level.gd starting gameplay")
 
 	spawn_in_level_GUI()
 	State = States.PLAYING
-	
+	$Camera2D._set_current(true)
 	
 	
 func spawn_in_level_GUI():
@@ -73,8 +78,15 @@ func spawn_in_level_GUI():
 	
 
 
-func spawn_planets(totalNumber):
-	PlanetContainer.spawnPlanets(self, totalNumber) # make sure this happens after factions are created
+func spawn_planets():
+	var p = PlanetaryPatterns
+	if Pattern == null or Pattern == p.RANDOM:
+		# wasn't set by the level designer, so choose one at random
+		var patterns = [p.SIN, p.SCATTER, p.GLOBS]
+		Pattern = patterns[randi()%patterns.size()]
+	if Pattern != p.BESPOKE and NumPlanets == 0:
+		NumPlanets = int(rand_range(10,20))
+	PlanetContainer.spawnPlanets(self, NumPlanets, Pattern) # make sure this happens after factions are created
 
 func spawn_factions(numFactions):
 	print("Level.gd: spawning " + str(numFactions) + " Factions")
@@ -129,18 +141,19 @@ func spawn_path(planet, factionObj, cursorObj):
 	PathContainer.add_child(pathFollowNode)
 	pathFollowNode.start(planet, factionObj, cursorObj, self)
 
-func intake_bespoke_elements():
-	# look at the level and identify existing planets, factions, etc.
-	# make sure they get catalogues and initialized correctly
+func build_level_from_blueprint(blueprintContainer):
+	# look at the blueprint and identify existing planets, factions, etc.
+	# make sure they get catalogued and initialized correctly
 	print("Level.gd is identifying objects placed manually in the level designer.")
 	var containers = [PlanetContainer, FactionContainer]
+
 
 	var i = 0
 	if FactionContainer.get_child_count() > 0:
 		for faction in FactionContainer.get_children():
 			# factions expect: number, myName, myColor, isLocalHuman, levelObj
 			faction.start(self, i, "Faction " + str(i), global.FactionColors[i], false)
-	
+
 
 	PlanetContainer.importPlanets()
 	
@@ -157,8 +170,12 @@ func remove_entities():
 			else:
 				entity.call_deferred("queue_free")
 	
-
+func toggle_soft_pause():
+	# refactor: this is temporary. The functionality should live here, not in global.
+	global.toggle_soft_pause()
+	
 func end():
+	$Camera2D._set_current(false)
 	print("Level " + self.name + " is ending. Hiding the gui (GUI has to be in a canvas layer, but they can't be hidden, so you have to hide the stuff inside.)")
 	pass # I don't know why this isn't working
 	#call_deferred("queue_free")

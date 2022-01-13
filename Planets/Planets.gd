@@ -6,7 +6,8 @@ var DeploymentZone : Rect2
 var Level : Node2D
 
 
-enum PlanetaryPatterns { SIN, CIRCLE, ELLIPSE, SPIRAL, GLOBS, RANDOM }
+# moved to Level.gd
+#enum PlanetaryPatterns { BESPOKE, SIN, CIRCLE, ELLIPSE, SPIRAL, GLOBS, SCATTER, RANDOM  }
 
 signal faction_lost(factionObj)
 
@@ -20,17 +21,17 @@ func start():
 	pass # Level calls spawnPlanets directly (for better or worse)
 
 
-func spawnPlanets(levelObj, totalNumPlanets):
+func spawnPlanets(levelObj, totalNumPlanets, pattern):
 	# note: planets always start as neutral (no faction). Use switch_faction to set a faction
 
 	Level = levelObj
 	randomize()
 	var startingPlanetSize : float = 1.5
 	
-	var p = PlanetaryPatterns
-	var patterns = [p.SIN, p.RANDOM, p.GLOBS]
-	
-	var pattern = patterns[randi()%patterns.size()]
+	if pattern == null or pattern == Level.PlanetaryPatterns.RANDOM: # assign one at random
+		var p = Level.PlanetaryPatterns
+		var patterns = [p.SIN, p.SCATTER, p.GLOBS]
+		pattern = patterns[randi()%patterns.size()]
 
 	for planetNum in range(totalNumPlanets):
 		var randScale : float = rand_range(0.75, 1.5)
@@ -48,8 +49,9 @@ func get_target_pos(pattern, planetNum, totalNumPlanets):
 	var width = DeploymentZone.size.x
 	var height = DeploymentZone.size.y
 	var deploymentZoneCenter = DeploymentZone.position + (DeploymentZone.size/2)
+	var p = Level.PlanetaryPatterns
 	
-	if pattern == PlanetaryPatterns.SIN:
+	if pattern == p.SIN:
 		targetPos.x += ( float(planetNum) / float(totalNumPlanets) * float(width) )
 		if planetNum % 2 == 0:
 			targetPos.y += ( sin(2.0 * PI * float(planetNum) / float(totalNumPlanets)) * float(height/2.0) + height/2)
@@ -57,20 +59,20 @@ func get_target_pos(pattern, planetNum, totalNumPlanets):
 			targetPos.y -= ( sin(2.0 * PI * float(planetNum) / float(totalNumPlanets)) * float(height/2.0) - height/2)
 			
 			
-	elif pattern == PlanetaryPatterns.ELLIPSE:
+	elif pattern == p.ELLIPSE:
 		pass
-	elif pattern == PlanetaryPatterns.CIRCLE:
+	elif pattern == p.CIRCLE:
 		pass
-	elif pattern == PlanetaryPatterns.SPIRAL:
+	elif pattern == p.SPIRAL:
 		pass
-	elif pattern == PlanetaryPatterns.GLOBS:
+	elif pattern == p.GLOBS:
 		targetPos = deploymentZoneCenter
 		# choose 2 to 5 locations and cluster around them
 		var numFoci = 3 # can't be random, because it has to be consistent for each planet
 		var fociLocations : PoolVector2Array = []
 		for fociNum in range(numFoci):
 			var currentFociLocation = deploymentZoneCenter
-			#var currentFociLocation = global.camera.get_camera_screen_center() # could also work.
+			
 			currentFociLocation += Vector2.RIGHT.rotated(2*PI * fociNum / numFoci) * (DeploymentZone.size.x/3)
 			fociLocations.push_back(currentFociLocation)
 
@@ -82,7 +84,7 @@ func get_target_pos(pattern, planetNum, totalNumPlanets):
 		targetPos.y += rand_range(-spread, spread)
 			
 			
-	elif pattern == PlanetaryPatterns.RANDOM:
+	elif pattern == p.SCATTER:
 		targetPos.x += rand_range(0, width)
 		targetPos.y += rand_range(0, height)
 

@@ -19,32 +19,13 @@ func _ready():
 	hide_all_scenes()
 	show_single_scene("SplashScreen")
 
-#func show_single_scene(desiredSceneNodeName):
-#	print("showing scene now: " + desiredSceneNodeName)
-#	if desiredSceneNodeName == "QuickPlay":
-#		$MainCamera._set_current(false)
-#		load_level(levels[0])
-#
-#	else:
-#		$MainCamera._set_current(true)
-#		global.camera = $MainCamera # do we actually really need this?
-#		$MainCamera.set_zoom(Vector2(1,1))
-#		remove_level()
-#
-#	for sceneNode in $Scenes.get_children():
-#		if sceneNode.name == desiredSceneNodeName:
-#			sceneNode.show()
-#		else:
-#			sceneNode.hide()
-		
+func show_main_camera():
+	$MainCamera._set_current(true)
+	
+	
 func show_single_scene(desiredSceneNodeName):
 	print("showing scene now: " + desiredSceneNodeName)
-#	if desiredSceneNodeName == "QuickPlay":
-#		$MainCamera._set_current(false)
-#		load_level(levels[0])
-#
-#	else:
-#		global.camera = $MainCamera # do we actually really need this?
+
 	$MainCamera._set_current(true)
 	$MainCamera.set_zoom(Vector2(1,1))
 #		remove_level()
@@ -89,27 +70,6 @@ func show_end_screen(playerWon):
 
 
 
-func load_level(level_path):
-	printerr("Maind.gd load_level should be deprecated. Not our job anymore")
-	return
-#	$MainCamera._set_current(false)
-#	var level_scene = load(level_path)
-#	var newLevel = level_scene.instance()
-#	$Scenes/QuickPlay.add_child(newLevel)
-#	newLevel.start()
-#	CurrentLevel = newLevel
-	
-	
-func remove_level():
-	printerr("Main.gd remove_level should be deprecated. Not our job anymore")
-	return
-#	if is_instance_valid(CurrentLevel):
-#		if CurrentLevel.has_method("end"):
-#			CurrentLevel.end()
-#		else:
-#			CurrentLevel.queue_free()
-#	else:
-#		printerr("Main.gd: someone is calling remove_level, but it seems like level is already gone.")
 
 func print_debug_info():
 	if global.Debug:

@@ -35,13 +35,14 @@ func show_pause_menu():
 
 
 func _input(event):
-	if is_visible() == false and Input.is_action_just_pressed("ui_show_options_menu"):
-		show_pause_menu()
-	elif is_visible() == true and Input.is_action_just_pressed("ui_show_options_menu"):
-		hide_pause_menu()
-	elif Input.is_action_just_pressed("ui_pause_action"):
-		print("user requested a soft pause toggle")
-		global.toggle_soft_pause()
+	pass # makes sense to move pause into the Level object instead of global
+#	if is_visible() == false and Input.is_action_just_pressed("ui_show_options_menu"):
+#		show_pause_menu()
+#	elif is_visible() == true and Input.is_action_just_pressed("ui_show_options_menu"):
+#		hide_pause_menu()
+#	elif Input.is_action_just_pressed("ui_pause_action"):
+#		print("user requested a soft pause toggle")
+#		global.toggle_soft_pause()
 	
 
 

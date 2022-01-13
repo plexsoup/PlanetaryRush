@@ -54,15 +54,14 @@ func _input(event):
 		DesiredZoom = zoom * 0.8
 		var direction = -1
 		#move_toward_mouse(direction)
-		#set_camera_drag_margins()
-		
+
+
 	if event is InputEventMouseButton and event.is_action("zoom_out"):
 		DesiredZoom = zoom * 1.25
 		var direction = 1
 		#move_toward_mouse(direction)
-		
-		#set_camera_drag_margins()
-		
+
+
 	if event is InputEventKey and event.is_action("ui_up"):
 		pass # we'll do this in _process instead. if is_action_pressed
 

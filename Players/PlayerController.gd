@@ -3,17 +3,18 @@ extends Node2D
 
 # Declare member variables here. Examples:
 var FactionObj
+var Level
 signal click_mouse(position)
 var lerp_toward_mouse_speed : float = 0.8 # Not higher than 1!
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	check_requirements()
-	FactionObj = get_parent().FactionObj
 	
 
-func start(): # typically called by the parent once the node is in the scene.
-	pass
+func start(levelObj, factionObj): # called by Cursor.gd
+	Level = levelObj
+	FactionObj = factionObj
 
 func check_requirements():
 	if lerp_toward_mouse_speed > 0.9:
@@ -36,6 +37,11 @@ func _input(event):
 			connect("click_mouse", get_parent(), "_on_PlayerController_Clicked")
 			emit_signal("click_mouse")
 			disconnect("click_mouse", get_parent(), "_on_PlayerController_Clicked")
+
+	elif Input.is_action_just_pressed("ui_pause_action"):
+		print("user requested a soft pause toggle")
+		Level.toggle_soft_pause()
+
 
 func isStillDrawing():
 	if Input.is_action_pressed("left_click"):

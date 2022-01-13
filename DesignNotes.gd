@@ -1,5 +1,15 @@
 """
 Current Work Effort:
+- build the blueprint import system for level design
+	- clone each planet
+	- identify all the factionNumbers on planets
+	- spawn factions as required
+	- hide the blueprint
+	- launch the level
+
+- move the pause function from global.gd into Level.gd
+	- game_speed can live there too, cause it's really speed for the current level
+
 - sometimes (rarely) the player doesn't get a starting planet?
 
 - sometimes it feels like you should acquire a planet, but you don't get it.
