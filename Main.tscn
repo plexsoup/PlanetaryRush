@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=2]
+[gd_scene load_steps=22 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://DesignNotes.gd" type="Script" id=2]
@@ -10,12 +10,9 @@
 [ext_resource path="res://Ships/textures/ship4.png" type="Texture" id=8]
 [ext_resource path="res://Ships/textures/ship3.png" type="Texture" id=9]
 [ext_resource path="res://Scenery/stars.png" type="Texture" id=10]
-[ext_resource path="res://Planets/PlanetBlueprint.tscn" type="PackedScene" id=11]
-[ext_resource path="res://Levels/TutorialStage.gd" type="Script" id=12]
-[ext_resource path="res://GUI/CanvasLayerHack.gd" type="Script" id=13]
+[ext_resource path="res://Tutorial/Tutorial.tscn" type="PackedScene" id=11]
 [ext_resource path="res://Levels/Level.tscn" type="PackedScene" id=14]
 [ext_resource path="res://Levels/QuickPlay.gd" type="Script" id=15]
-[ext_resource path="res://Tutorial/Tutorial.gd" type="Script" id=16]
 [ext_resource path="res://GUI/Icons/PlexSoup.png" type="Texture" id=17]
 [ext_resource path="res://GUI/Menus/SplashScreen.gd" type="Script" id=18]
 [ext_resource path="res://effects/536104__eminyildirim__sword-hit-heavy.wav" type="AudioStream" id=19]
@@ -162,12 +159,10 @@ z_index = -1
 texture = ExtResource( 10 )
 
 [node name="MainMenu" type="Node2D" parent="Scenes"]
-visible = false
 position = Vector2( 530, 288 )
 script = ExtResource( 21 )
 
 [node name="TitleScreenUI" parent="Scenes/MainMenu" instance=ExtResource( 3 )]
-visible = false
 
 [node name="ParallaxBackground" type="Node2D" parent="Scenes/MainMenu"]
 position = Vector2( -512, -264 )
@@ -234,90 +229,8 @@ position = Vector2( 509, 283 )
 scale = Vector2( 0.6, 0.6 )
 texture = ExtResource( 10 )
 
-[node name="Tutorial" type="Node2D" parent="Scenes"]
-script = ExtResource( 16 )
-
-[node name="Stage 1" type="Node2D" parent="Scenes/Tutorial"]
-script = ExtResource( 12 )
-
-[node name="blueprint" type="Node2D" parent="Scenes/Tutorial/Stage 1"]
-
-[node name="PlanetBlueprint" parent="Scenes/Tutorial/Stage 1/blueprint" instance=ExtResource( 11 )]
-position = Vector2( 373, 434 )
-Size = 3.0
-
-[node name="PlanetBlueprint2" parent="Scenes/Tutorial/Stage 1/blueprint" instance=ExtResource( 11 )]
-position = Vector2( 674, 426 )
-FactionNum = -1
-
-[node name="Level" parent="Scenes/Tutorial/Stage 1" instance=ExtResource( 14 )]
-Bespoke = true
-RequireNeutralCapture = true
-DesiredNumPlanets = 2
-DesiredNumFactions = 1
-
-[node name="Instructions" type="CanvasLayer" parent="Scenes/Tutorial/Stage 1"]
-script = ExtResource( 13 )
-
-[node name="MarginContainer" type="MarginContainer" parent="Scenes/Tutorial/Stage 1/Instructions"]
-anchor_right = 1.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme = ExtResource( 20 )
-custom_constants/margin_top = 50
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="PanelContainer" type="PanelContainer" parent="Scenes/Tutorial/Stage 1/Instructions/MarginContainer"]
-margin_top = 50.0
-margin_right = 1024.0
-margin_bottom = 153.0
-
-[node name="CenterContainer" type="CenterContainer" parent="Scenes/Tutorial/Stage 1/Instructions/MarginContainer/PanelContainer"]
-margin_left = 10.0
-margin_top = 10.0
-margin_right = 1014.0
-margin_bottom = 93.0
-size_flags_horizontal = 3
-size_flags_vertical = 0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Scenes/Tutorial/Stage 1/Instructions/MarginContainer/PanelContainer/CenterContainer"]
-margin_left = 178.0
-margin_right = 826.0
-margin_bottom = 83.0
-
-[node name="DrawLineLabel" type="Label" parent="Scenes/Tutorial/Stage 1/Instructions/MarginContainer/PanelContainer/CenterContainer/VBoxContainer"]
-margin_right = 648.0
-margin_bottom = 25.0
-text = "Click on your planet and drag a line to the other planet."
-align = 1
-
-[node name="ZoomInstructions" type="Label" parent="Scenes/Tutorial/Stage 1/Instructions/MarginContainer/PanelContainer/CenterContainer/VBoxContainer"]
-margin_top = 29.0
-margin_right = 648.0
-margin_bottom = 54.0
-text = "Zoom the camera with the mouse wheel."
-align = 1
-
-[node name="MoveInstructions" type="Label" parent="Scenes/Tutorial/Stage 1/Instructions/MarginContainer/PanelContainer/CenterContainer/VBoxContainer"]
-margin_top = 58.0
-margin_right = 648.0
-margin_bottom = 83.0
-text = "Move the camera with WASD."
-align = 1
-
-[node name="Stage 2" type="Node2D" parent="Scenes/Tutorial"]
+[node name="Tutorial" parent="Scenes" instance=ExtResource( 11 )]
 visible = false
-script = ExtResource( 12 )
-
-[node name="Level" parent="Scenes/Tutorial/Stage 2" instance=ExtResource( 14 )]
-DesiredNumPlanets = 5
-DesiredNumFactions = 2
-
-[node name="Stage 3" type="Node2D" parent="Scenes/Tutorial"]
-visible = false
-script = ExtResource( 12 )
 
 [node name="QuickPlay" type="Node2D" parent="Scenes"]
 visible = false
@@ -471,5 +384,4 @@ position = Vector2( 512, 303 )
 
 [connection signal="timeout" from="DebugPrintTimer" to="." method="_on_DebugTimer_timeout"]
 [connection signal="timeout" from="Scenes/SplashScreen/Timer" to="Scenes/SplashScreen" method="_on_Timer_timeout"]
-[connection signal="visibility_changed" from="Scenes/Tutorial/Stage 1" to="Scenes/Tutorial/Stage 1/Instructions" method="_on_parent_visibility_changed"]
 [connection signal="timeout" from="Scenes/GoodByeScreen/Timer" to="Scenes/GoodByeScreen" method="_on_Timer_timeout"]

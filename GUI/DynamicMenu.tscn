@@ -1,0 +1,56 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://GUI/Themes/CyberTheme.tres" type="Theme" id=1]
+[ext_resource path="res://Scenery/VQGAN Art/professor.jpg" type="Texture" id=2]
+[ext_resource path="res://GUI/DynamicMenu.gd" type="Script" id=3]
+
+[node name="DynamicMenu" type="Node2D"]
+script = ExtResource( 3 )
+ButtonsContainerPath = "Control/bgImage/CenterContainer/PanelContainer/VBoxContainer"
+
+[node name="Control" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = 1027.0
+margin_bottom = 604.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bgImage" type="TextureRect" parent="Control"]
+margin_right = 1056.0
+margin_bottom = 704.0
+texture = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="Control/bgImage"]
+anchor_right = 0.4
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PanelContainer" type="PanelContainer" parent="Control/bgImage/CenterContainer"]
+margin_left = 114.0
+margin_top = 329.0
+margin_right = 308.0
+margin_bottom = 374.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/bgImage/CenterContainer/PanelContainer"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 184.0
+margin_bottom = 35.0
+custom_constants/separation = 30
+
+[node name="Label" type="Label" parent="Control/bgImage/CenterContainer/PanelContainer/VBoxContainer"]
+margin_right = 174.0
+margin_bottom = 25.0
+text = "Dynamic Menu"

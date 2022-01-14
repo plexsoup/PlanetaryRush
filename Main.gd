@@ -36,7 +36,7 @@ func show_single_scene(desiredSceneNodeName):
 		if sceneNode.name == desiredSceneNodeName:
 			sceneNode.show()
 			if sceneNode.has_method("activate"):
-				print("Main.gd show_single_scene: "+str(sceneNode.get_children()))
+				print("Main.gd show_single_scene: " + sceneNode.name)
 				sceneNode.activate()
 				CurrentScene = sceneNode
 		elif sceneNode == currentSceneCache:

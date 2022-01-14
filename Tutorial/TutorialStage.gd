@@ -10,14 +10,19 @@ signal finished(nodeObj)
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	connect("finished", get_parent(), "_on_stage_finished")
-	hide_children()
+	#hide_children()
 
 func start():
-	if self.has_node("blueprint") and is_instance_valid($blueprint):
+	#show_children()
+
+	# if it's a blueprint level, import the blueprint
+	if self.has_node("blueprint") and self.has_node("Level"):
 		$Level.start($blueprint)
-	else:
-		$Level.start()
-	show_children()
+		$blueprint.hide()
+	elif self.has_node("Level") and is_instance_valid($Level):
+			$Level.start() # no blueprint
+	else: # probably just a regular menu
+		pass
 
 func show_children():
 	# note, CanvasLayers by default have no hide or show methods.

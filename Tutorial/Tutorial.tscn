@@ -1,0 +1,82 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Planets/PlanetBlueprint.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Levels/Level.tscn" type="PackedScene" id=2]
+[ext_resource path="res://GUI/Themes/CyberTheme.tres" type="Theme" id=3]
+[ext_resource path="res://Tutorial/TutorialStage.gd" type="Script" id=4]
+[ext_resource path="res://GUI/DynamicMenu.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Tutorial/Tutorial.gd" type="Script" id=7]
+
+[node name="Tutorial" type="Node2D"]
+script = ExtResource( 7 )
+
+[node name="DynamicMenu" parent="." instance=ExtResource( 5 )]
+ScenesContainerPath = ".."
+
+[node name="Stage 1" type="Node2D" parent="."]
+visible = false
+script = ExtResource( 4 )
+
+[node name="blueprint" type="Node2D" parent="Stage 1"]
+
+[node name="PlanetBlueprint" parent="Stage 1/blueprint" instance=ExtResource( 1 )]
+position = Vector2( 373, 434 )
+Size = 3.0
+
+[node name="PlanetBlueprint2" parent="Stage 1/blueprint" instance=ExtResource( 1 )]
+position = Vector2( 674, 426 )
+FactionNum = -1
+
+[node name="Level" parent="Stage 1" instance=ExtResource( 2 )]
+Bespoke = true
+RequireNeutralCapture = true
+DesiredNumPlanets = 2
+DesiredNumFactions = 1
+
+[node name="PanelContainer" type="PanelContainer" parent="Stage 1"]
+margin_left = 193.0
+margin_top = 246.0
+margin_right = 861.0
+margin_bottom = 349.0
+theme = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Stage 1/PanelContainer"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 658.0
+margin_bottom = 93.0
+
+[node name="DrawLineLabel" type="Label" parent="Stage 1/PanelContainer/VBoxContainer"]
+margin_right = 648.0
+margin_bottom = 25.0
+text = "Click on your planet and drag a line to the other planet."
+align = 1
+
+[node name="ZoomInstructions" type="Label" parent="Stage 1/PanelContainer/VBoxContainer"]
+margin_top = 29.0
+margin_right = 648.0
+margin_bottom = 54.0
+text = "Zoom the camera with the mouse wheel."
+align = 1
+
+[node name="MoveInstructions" type="Label" parent="Stage 1/PanelContainer/VBoxContainer"]
+margin_top = 58.0
+margin_right = 648.0
+margin_bottom = 83.0
+text = "Move the camera with WASD."
+align = 1
+
+[node name="Stage 2" type="Node2D" parent="."]
+visible = false
+script = ExtResource( 4 )
+
+[node name="Level" parent="Stage 2" instance=ExtResource( 2 )]
+DesiredNumPlanets = 5
+DesiredNumFactions = 2
+
+[node name="Stage 3" type="Node2D" parent="."]
+visible = false
+script = ExtResource( 4 )

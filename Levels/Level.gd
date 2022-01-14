@@ -175,7 +175,7 @@ func build_level_from_blueprint(blueprintContainer):
 		newPlanet.set_initial_population(templatePlanet.Size)
 		templatePlanet.hide()
 
-	blueprintContainer.hide() # why isn't this working?
+	#blueprintContainer.hide() # why isn't this working?
 
 
 func remove_entities():

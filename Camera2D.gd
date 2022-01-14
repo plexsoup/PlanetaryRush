@@ -21,6 +21,7 @@ func _ready():
 
 func start(levelObj, planetsObj):
 	printerr("Camera2D.gd start() doesn't seem right.")
+	return
 	# zoom extents to capture all the planets.
 	
 	var planets = planetsObj.get_all_planets()
