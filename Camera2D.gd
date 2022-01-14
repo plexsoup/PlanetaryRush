@@ -4,7 +4,7 @@ extends Camera2D
 
 # Declare member variables here. Examples:
 
-var DesiredZoom = Vector2(1, 1)
+var DesiredZoom : Vector2
 var Ticks :int = 0
 
 var MinZoom = 0.3
@@ -12,7 +12,7 @@ var MaxZoom = 15.0
 
 
 func _ready():
-	DesiredZoom = zoom
+	
 	
 	self.drag_margin_h_enabled = false
 	self.drag_margin_v_enabled = false
@@ -21,32 +21,44 @@ func _ready():
 
 func start(levelObj, planetsObj):
 	printerr("Camera2D.gd start() doesn't seem right.")
-	return
+	#return
 	# zoom extents to capture all the planets.
 	
 	var planets = planetsObj.get_all_planets()
 	var AA = Vector2(1000000,1000000)
 	var BB = Vector2(0, 0)
+
+	var allX = []
+	var allY = []
+	
 	for planet in planets:
-		
-		var planetPos = planet.get_global_position()
-		if planetPos.x < AA.x:
-			AA.x = planetPos.x
-		if planetPos.y < AA.y:
-			AA.y = planetPos.y
-		if planetPos.x > BB.x:
-			BB.x = planetPos.x
-		if planetPos.y > BB.y:
-			BB.y = BB.y
+		allX.push_back(planet.get_global_position().x)
+		allY.push_back(planet.get_global_position().y)
+
+	AA = Vector2(allX.min(),allY.min())
+	BB = Vector2(allX.max(), allY.max())
+	
 
 	var extents : Rect2 = Rect2(AA, BB-AA)
-	print("Camera2D.gd " + str(extents))
+	print("extents position = " + str(extents.position))
+	print("extents size = " + str(extents.size))
+	
+	
+	print("Camera2D.gd extents: " + str(extents))
 	# ok, the rectangle should now include everything.
 	# how do we turn that into camera scale?
 
 	self.set_offset(extents.position + (extents.size / 2.0))
-	self.zoom = Vector2(1.0, 1.0) # ??? Guess? some relationship to viewport size and extents size
+	#self.set_offset(extents.position)
 	
+	# what's the viewport size?
+	# compare that to the required rect2
+	# then set the zoom (bigger numbers zoom out, smaller zoom in)
+	var viewport = get_viewport()
+	var viewportToRectRatio = viewport.size.x * (1/extents.size.x * 2)
+	print("Camera2D.gd" + str(viewportToRectRatio))
+#	DesiredZoom = Vector2(viewportToRectRatio, viewportToRectRatio) # ??? Guess? some relationship to viewport size and extents size
+	DesiredZoom = extents.size / 250
 	
 	
 	

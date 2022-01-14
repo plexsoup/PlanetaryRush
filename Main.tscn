@@ -159,6 +159,7 @@ z_index = -1
 texture = ExtResource( 10 )
 
 [node name="MainMenu" type="Node2D" parent="Scenes"]
+visible = false
 position = Vector2( 530, 288 )
 script = ExtResource( 21 )
 
@@ -230,7 +231,6 @@ scale = Vector2( 0.6, 0.6 )
 texture = ExtResource( 10 )
 
 [node name="Tutorial" parent="Scenes" instance=ExtResource( 11 )]
-visible = false
 
 [node name="QuickPlay" type="Node2D" parent="Scenes"]
 visible = false

@@ -3,6 +3,7 @@ extends Node2D
 
 export var ScenesContainerPath : String = ""
 export var ButtonsContainerPath : String = "Control/bgImage/CenterContainer/PanelContainer/VBoxContainer/Label"
+export var MenuName : String = "Dynamic Menu"
 
 var ScenesContainer : Node
 var ButtonsContainer : Control
@@ -22,12 +23,17 @@ func start(scenesContainer : Node = null):
 			createButtons(scenesContainer, ButtonsContainer)
 		else:
 			printerr("DynamicMenu.gd " + self.name + " problem locating button container")
-	
-	print_tree_pretty()
+	setTitle()
 	
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass
+
+func setTitle():
+	var labelNode = find_node("MenuTitle")
+	if is_instance_valid(labelNode):
+		labelNode.set_text(MenuName)
+		
 
 func createButtons(scenesContainer, buttonsContainer):
 		

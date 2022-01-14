@@ -63,16 +63,17 @@ func start(blueprintContainer : Node2D = null):
 	elif is_instance_valid(blueprintContainer):
 		build_level_from_blueprint(blueprintContainer)
 
-	print("Level.gd starting gameplay")
-
 	spawn_in_level_GUI()
+	initializeCamera()
 	State = States.PLAYING
+
+
+func initializeCamera():
 	$Camera2D._set_current(true)
 	$Camera2D.start(self, PlanetContainer)
 	
 	
 func spawn_in_level_GUI():
-	print("Level.gd spawn_in_level_GUI called")
 	# unfortunately, the in-level gui has to be in a CanvasLayer, but they can't be hidden, so you have to hide the gui in the inspector
 	var numFactions = DesiredNumFactions # refactor: this shouldn't be in Global anymore.
 	var factions = getRemainingFactions()

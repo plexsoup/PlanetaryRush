@@ -50,7 +50,7 @@ margin_right = 184.0
 margin_bottom = 35.0
 custom_constants/separation = 30
 
-[node name="Label" type="Label" parent="Control/bgImage/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="MenuTitle" type="Label" parent="Control/bgImage/CenterContainer/PanelContainer/VBoxContainer"]
 margin_right = 174.0
 margin_bottom = 25.0
 text = "Dynamic Menu"

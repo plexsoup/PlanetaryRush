@@ -25,13 +25,27 @@ func show_tutorial_stage_selection_menu():
 
 func activate():
 	print("Tutorial.gd: activate()")
+	
+	hide_all_stages()
+	
 	$DynamicMenu.show()
 	$DynamicMenu.start() # relying on the path to be set manually in the inspector
+	
+	
 	
 func deactivate():
 	#$"Stage 1".end()
 	pass
 	#can't be queuing free the hand-placed bespoke assets.
+
+func hide_all_stages():
+	for scene in get_children():
+		if scene.has_method("hide"):
+			scene.hide()
+		elif scene.is_class("CanvasLayer"):
+			scene.get_child[0].hide()
+			
+			
 
 func _on_stage_ended(stage):
 	show_tutorial_stage_selection_menu()
@@ -40,12 +54,14 @@ func _on_stage_ended(stage):
 
 
 func _on_Stage_Button_pressed(stageName):
+	
 	if self.has_node(stageName):
 		
-		for stageNode in get_children():
-			if stageNode.has_method("deactivate"):
-				stageNode.deactivate()
-			stageNode.hide()
+#		for stageNode in get_children():
+#			if stageNode.has_method("deactivate"):
+#				stageNode.deactivate()
+#			stageNode.hide()
+		hide_all_stages()
 		var newStageNode = get_node(stageName)
 #		printerr("Tutorial.gd: We need to settle on an init function. Is it activate() or start()?")
 #		if newStageNode.has_method("activate"):
