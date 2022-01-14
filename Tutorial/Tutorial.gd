@@ -16,8 +16,12 @@ func _ready():
 	
 	pass # Replace with function body.
 
+func construct_tutorial_stage_selection_menu():
+	$DynamicMenu.start()
+
 func show_tutorial_stage_selection_menu():
-	pass
+	$DynamicMenu.show()
+	#$DynamicMenu.start()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -51,7 +55,10 @@ func _on_stage_ended(stage):
 	show_tutorial_stage_selection_menu()
 	# or just: start_next_stage()
 	
-
+func _on_stage_finished(stage):
+	
+	show_tutorial_stage_selection_menu()
+	
 
 func _on_Stage_Button_pressed(stageName):
 	

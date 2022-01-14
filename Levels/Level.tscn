@@ -52,7 +52,7 @@ one_shot = true
 [node name="LamentationTimer" type="Timer" parent="."]
 one_shot = true
 
-[node name="Camera2D" parent="." instance=ExtResource( 5 )]
+[node name="ActionCamera" parent="." instance=ExtResource( 5 )]
 zoom = Vector2( 6, 6 )
 
 [node name="Referee" type="Node" parent="."]

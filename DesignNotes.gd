@@ -4,6 +4,9 @@ Current Work Effort:
 
 - figure out how to switch tutorial levels
 	
+- move global.PlayerFaction into Level.gd
+
+
 - build the blueprint import system for level design
 	- clone each planet
 	- identify all the factionNumbers on planets

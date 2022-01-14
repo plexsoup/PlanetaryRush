@@ -21,6 +21,8 @@ onready var FactionContainer : Node2D = $Factions
 onready var PathContainer : Node2D = $Paths
 #onready var CursorsContainer : Node2D = $Cursors
 
+var PlayerFactionObj : Node2D
+
 var Winning_faction
 
 enum States { INITIALIZING, PLAYING, PAUSED, CELEBRATING, LAMENTING }
@@ -46,7 +48,7 @@ func _ready():
 	
 
 func start(blueprintContainer : Node2D = null):
-	global.level = self
+	global.level = self # why? Shouldn't be necessary anymore
 	global.BulletContainer = $Bullets # why? Who uses this?
 
 	NumPlanets = DesiredNumPlanets
@@ -65,13 +67,16 @@ func start(blueprintContainer : Node2D = null):
 
 	spawn_in_level_GUI()
 	initializeCamera()
+	$Referee.start(self, FactionContainer, PlanetContainer, PlayerFactionObj)
 	State = States.PLAYING
 
 
 func initializeCamera():
-	$Camera2D._set_current(true)
-	$Camera2D.start(self, PlanetContainer)
+	$ActionCamera._set_current(true)
+	$ActionCamera.start(self, PlanetContainer)
 	
+func resetCamera():
+	$ActionCamera.resetToOrigin()
 	
 func spawn_in_level_GUI():
 	# unfortunately, the in-level gui has to be in a CanvasLayer, but they can't be hidden, so you have to hide the gui in the inspector
@@ -101,7 +106,10 @@ func spawn_factions(numFactions):
 		
 		if factionNum == global.PlayerFactionNum:
 			isHuman = true
-		spawn_faction(factionNum, global.FactionColors[factionNum], isHuman)
+		var newFaction = spawn_faction(factionNum, global.FactionColors[factionNum], isHuman)
+		if isHuman == true:
+			PlayerFactionObj = newFaction
+
 		print("spawning faction: " + str(factionNum))
 
 func spawn_faction(factionNum, color, isHuman):
@@ -118,15 +126,8 @@ func spawn_faction(factionNum, color, isHuman):
 	$Factions.add_child(factionNode)
 	factionNode.start(self, factionNum, factionName, color, isHuman)
 
-#func spawn_cursors(): # move this into faction (isHuman can decide what type of cursor to use)
-#	for factionObj in FactionContainer.get_children():
-#		if factionObj.IsNeutralFaction == false:
-#			init_starting_planet(factionObj)
-#			spawn_cursor(factionObj)
-#
-#		connect("gameplay_started", factionObj, "_on_gameplay_started")
-#		emit_signal("gameplay_started")
-#		disconnect("gameplay_started", factionObj, "_on_gameplay_started")
+	return factionNode
+
 
 	
 func spawn_cursor(factionObj): # this could probably be moved into Faction
@@ -167,7 +168,9 @@ func build_level_from_blueprint(blueprintContainer):
 			isHuman = true
 		else:
 			isHuman = false
-		spawn_faction(factionNum, global.FactionColors[factionNum], isHuman)
+		var newFaction = spawn_faction(factionNum, global.FactionColors[factionNum], isHuman)
+		if isHuman:
+			PlayerFactionObj = newFaction
 
 	for templatePlanet in planetsInLevel:
 		var newPlanet = PlanetContainer.spawnPlanet(self, templatePlanet.Size, templatePlanet.get_global_position())
@@ -194,7 +197,7 @@ func toggle_soft_pause():
 	global.toggle_soft_pause()
 	
 func end():
-	$Camera2D._set_current(false)
+	$ActionCamera._set_current(false)
 	print("Level " + self.name + " is ending. Hiding the gui (GUI has to be in a canvas layer, but they can't be hidden, so you have to hide the stuff inside.)")
 	pass # I don't know why this isn't working
 	#call_deferred("queue_free")
@@ -208,6 +211,9 @@ func count_player_planets():
 			count += 1
 	return count
 
+func get_referee():
+	return $Referee
+	
 func start_celebration():
 	# lock out player inputs?
 	# show some fireworks or do a little dance
@@ -257,7 +263,7 @@ func countRemainingFactions():
 # Outbound Signals
 func _on_CelebrationDuration_timeout():
 	var playerWon = true
-	
+	resetCamera()
 	# Let main know that the celebration is over. it's ok to show the endscreen
 	if get_parent().has_method("_on_level_completed"):
 		connect("level_completed", get_parent(), "_on_level_completed")
@@ -268,6 +274,7 @@ func _on_CelebrationDuration_timeout():
 
 func _on_LamentationTimer_timeout():
 	var playerWon = false
+	resetCamera()
 	connect("level_completed", get_parent(), "_on_level_completed")
 	emit_signal("level_completed", playerWon)
 	disconnect("level_completed", get_parent(), "_on_level_completed")
@@ -278,43 +285,20 @@ func _on_LamentationTimer_timeout():
 func _on_new_path_requested(planet, factionObj, cursorObj):
 	if State == States.PLAYING:
 		spawn_path(planet, factionObj, cursorObj)
-		
-#func _on_path_no_longer_required(planet, factionObj):
-#	# find a path for faction, from planet, with no fleets.
-#	var paths = PathContainer.get_children()
-#	for path in paths:
-#		if path.FactionObj = factionObj and AssignedFleet == null:
-#			printerr("hmm.. how do we identify paths?")
+
 
 func _on_faction_lost(factionObj):
-	print("Level.gd was notified that " + factionObj.name + " has no planets or ships remaining.")
-	# figure out which factions remain. 
-	# Trigger celebration if it's only player and neutral
-	# Trigger loss if the player isn't in the list
-	if factionObj == global.PlayerFactionObj:
-		# player lost.. show the end screen
-		print("Sorry Player, you lost.") # but we probably don't care, because we want to watch the fireworks
-		start_lamentation()
+	return # moved validation to the referee object
 
-	var victory = false
-	var remainingFactions = getRemainingFactions()
-	if not remainingFactions.has(global.PlayerFactionObj) and remainingFactions.size() == 1:
-		# player lost
-		victory = true # but not the player
-		Winning_faction = remainingFactions[0]
-	else:
-		remainingFactions.erase(global.PlayerFactionObj)
-		if remainingFactions.size() == 0: # all enemy factions gone
-				victory = true
-				Winning_faction = global.PlayerFactionObj
-			
-		
-	if victory:
-		
+
+func _on_faction_won(faction):
+	# should only come from the Referee object, because we trust them.
+	if faction == PlayerFactionObj:
 		print("Level.gd _on_faction_lost claims victory is here! Let the celebrations begin.")
 		if State != States.CELEBRATING:
 			start_celebration()
-			
-
-
+	else:
+		print("Sorry Player, you lost.") # but we probably don't care, because we want to watch the fireworks
+		start_lamentation()
+		
 

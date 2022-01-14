@@ -1,4 +1,13 @@
 extends StaticBody2D
+
+# refactoring opportunity: optimization.
+# it may be costly to connect and discconnect signals all the time
+# instead, you could keep the referee connected all the time,
+# connect a newFaction before the signal
+# disconnect the oldFaction after the signal
+# then send only one signal (to three recipients oldFaction, newFaction, referee)
+
+
 # Note. The inspector complains about a missing collision shape, but we build them dynamically because each planet has a different size
 	# godot likes to share a collision shape across instanced clones. So you can't easily adjust the size on the fly. Better to generate new shape for each object.
 
@@ -275,12 +284,11 @@ func notify_faction_planet_switched(faction, newFaction):
 	disconnect("switched_faction", faction, "_on_planet_switched_faction")
 
 func notify_referee_planet_switched(newFaction, oldFaction):
-	pass # not yet implemented
+	var refereeObj = Level.get_referee()
+	connect("switched_faction", refereeObj, "_on_planet_switched_faction")
+	emit_signal("switched_faction", self, newFaction)
+	disconnect("switched_faction", refereeObj, "_on_planet_switched_faction")
 	
-#	var refereeObj = null # ??? who will do this?
-#	connect("switched_faction", refereeObj, "_on_planet_switched_faction")
-#	emit_signal("switched_faction", self, newFaction)
-#	disconnect("switched_faction", refereeObj, "_on_planet_switched_faction")
 
 ##################################################################################
 # Incoming Signals

@@ -44,6 +44,7 @@ func hide_children():
 		
 	
 func end():
+	global.Main.show_main_camera()
 	hide_children()
 	emit_signal("finished", self)
 	
@@ -51,3 +52,10 @@ func end():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
+
+func _on_level_completed(isPlayerWinner):
+	if isPlayerWinner:
+		end()
+	else:
+		end()
+	

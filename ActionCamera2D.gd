@@ -86,7 +86,9 @@ func check_for_keyboard_movement(delta):
 		offset.y += scrollSpeed
 	
 	
-	
+func resetToOrigin():
+	self.offset = Vector2.ZERO
+	self.zoom = Vector2(1.0, 1.0)
 
 func _draw():
 	#draw_string(global.BaseFont, Vector2(0, 20), "zoom: " + str(zoom), Color.antiquewhite )

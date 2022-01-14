@@ -12,7 +12,6 @@
 script = ExtResource( 7 )
 
 [node name="DynamicMenu" parent="." instance=ExtResource( 5 )]
-visible = false
 ScenesContainerPath = ".."
 MenuName = "Tutorial"
 
@@ -88,7 +87,6 @@ text = "Move the camera with WASD."
 align = 1
 
 [node name="Stage 2" type="Node2D" parent="."]
-visible = false
 script = ExtResource( 4 )
 
 [node name="Level" parent="Stage 2" instance=ExtResource( 2 )]
@@ -96,7 +94,6 @@ DesiredNumPlanets = 5
 DesiredNumFactions = 2
 
 [node name="Stage 3" type="Node2D" parent="."]
-visible = false
 script = ExtResource( 4 )
 
 [node name="Level" parent="Stage 3" instance=ExtResource( 2 )]
