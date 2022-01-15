@@ -11,7 +11,7 @@ func _ready():
 	pass # Replace with function body.
 
 
-func activate():
+func activate(callBackObj):
 	$TitleScreenUI.show()
 	
 func deactivate():

@@ -2,9 +2,9 @@ extends Node2D
 
 
 # Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
+var CallBackObj
 
+signal finished()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -27,8 +27,9 @@ func show_tutorial_stage_selection_menu():
 #func _process(delta):
 #	pass
 
-func activate():
+func activate(callBackObj):
 	print("Tutorial.gd: activate()")
+	CallBackObj = callBackObj # who to tell when we're finished
 	
 	hide_all_stages()
 	
@@ -52,11 +53,12 @@ func hide_all_stages():
 			
 
 func _on_stage_ended(stage):
+	printerr("Tutorial.gd has redundancy: _on_stage_ended and _on_stage_finished do the same thing. Pick one.")
 	show_tutorial_stage_selection_menu()
 	# or just: start_next_stage()
 	
 func _on_stage_finished(stage):
-	
+	printerr("Tutorial.gd has redundancy: _on_stage_ended and _on_stage_finished do the same thing. Pick one.")
 	show_tutorial_stage_selection_menu()
 	
 
@@ -77,4 +79,10 @@ func _on_Stage_Button_pressed(stageName):
 			newStageNode.start()
 			newStageNode.show()
 		
-		
+func _on_menu_finished():
+	# signal main that the tutorial menu is done. User wants to get back to main menu.
+	printerr("Tutorial.gd needs development in _on_menu_finished")
+	connect("finished", CallBackObj, "_on_tutorial_finished")
+	emit_signal("finished")
+	disconnect("finished", CallBackObj, "_on_tutorial_finished")
+	

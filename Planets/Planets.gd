@@ -164,7 +164,7 @@ func get_nearest_faction_planet(factionObj, pos):
 	var closest_dist_sq = 10000000000
 	var planets = get_faction_planets(factionObj)
 	if planets.size() == 0:
-		printerr("someone requested a planet for a faction with none.")
+		printerr(self.name + " : get_nearest_faction_planet: someone requested a planet for a faction with none.")
 		return null
 	for planet in planets:
 		var planetPos = planet.get_global_position()
@@ -179,7 +179,7 @@ func get_nearest_enemy_planet(factionObj, pos):
 	var closest_dist_sq = 10000000000
 	var planets = get_enemy_planets(factionObj)
 	if planets.size() == 0:
-		printerr("someone requested a planet for a faction with none.")
+		printerr(self.name + " : get_nearest_enemy_planet: someone requested a planet for a faction with none.")
 		return null
 	for planet in planets:
 		var planetPos = planet.get_global_position()

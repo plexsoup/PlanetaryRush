@@ -58,8 +58,12 @@ func start(levelObj, planetsObj):
 	var viewportToRectRatio = viewport.size.x * (1/extents.size.x * 2)
 	print("Camera2D.gd" + str(viewportToRectRatio))
 #	DesiredZoom = Vector2(viewportToRectRatio, viewportToRectRatio) # ??? Guess? some relationship to viewport size and extents size
-	DesiredZoom = extents.size / 250
-	
+	DesiredZoom = Vector2(1.0,1.0)
+	DesiredZoom.x = extents.size.x / 250
+	var viewportRect = get_viewport().get_visible_rect()
+	printerr("ActionCamera.gd: start(): not sure the aspectRatio calculation is right.")
+	var aspectRatio = viewportRect.size.x / viewportRect.size.y
+	DesiredZoom.y = DesiredZoom.x * aspectRatio
 	
 	
 	# get the AABB rect2 which includes all the planets.
@@ -69,10 +73,9 @@ func start(levelObj, planetsObj):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	
-	zoom = lerp(zoom, DesiredZoom, 0.2 * delta * 60)
-	
-	check_for_keyboard_movement(delta)
+	if is_current():
+		zoom = lerp(zoom, DesiredZoom, 0.2 * delta * 60)
+		check_for_keyboard_movement(delta)
 	
 func check_for_keyboard_movement(delta):
 	var scrollSpeed = 800.0 * delta

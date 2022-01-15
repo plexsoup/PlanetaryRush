@@ -7,20 +7,29 @@ export var MenuName : String = "Dynamic Menu"
 
 var ScenesContainer : Node
 var ButtonsContainer : Control
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
 
-func start(scenesContainer : Node = null):
+#signal finished()
+
+func start(scenesContainer : Node = null, callBackObj : Node = null):
+	ButtonsContainer = get_node(ButtonsContainerPath)
+	
+	# cleanup first.. cause this was creating endless buttons
+	if ButtonsContainer.get_child_count() > 0:
+		for button in ButtonsContainer.get_children():
+			button.call_deferred("queue_free")
+			
 	if scenesContainer == null:
 		scenesContainer = get_node(ScenesContainerPath)
+	if callBackObj == null:
+		callBackObj = get_parent()
 		
 	if is_instance_valid(scenesContainer):
 		ScenesContainer = scenesContainer
 		
-		ButtonsContainer = get_node(ButtonsContainerPath)
+		
 		if is_instance_valid(ButtonsContainer):
 			createButtons(scenesContainer, ButtonsContainer)
+			createReturnButton(ButtonsContainer, callBackObj)
 		else:
 			printerr("DynamicMenu.gd " + self.name + " problem locating button container")
 	setTitle()
@@ -41,6 +50,18 @@ func createButtons(scenesContainer, buttonsContainer):
 		for scene in scenesContainer.get_children():
 			if scene != self:
 				createButton(scene, buttonsContainer)
+		
+		
+func createReturnButton(buttonsContainer, callBackObj):
+		var newButton = Button.new()
+		newButton.name = "Return" # not sure if we should escape slashes for this or convert to camel case
+		newButton.set_text(newButton.name)
+		buttonsContainer.add_child(newButton)
+		print("DynamicMenu.gd creating new button: " + newButton.name)
+		if callBackObj.has_method("_on_menu_finished"):
+			newButton.connect("pressed", callBackObj, "_on_menu_finished")
+		else:
+			printerr("When adding a dynamic menu, you need an _on_menu_finished function in the callback object to receive it's signal for when a user presses the Back button.")
 
 
 func createButton(scene, buttonsContainer):

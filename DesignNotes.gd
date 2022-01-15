@@ -1,9 +1,15 @@
 """
 Current Work Effort:
-- build the referee object
 
-- figure out how to switch tutorial levels
-	
+- actioncamera gets really squashed/stretched sometimes.
+
+- bug: if you play through the tutorial, there's a nonexistent function "get_referee" in base Nil error after switching stages.
+
+- seems like we need more cleanup after a level has ended.. ships are committing suicide after a time limit because they weren't garbage collected.
+
+- add a button to the tutorial menu to go back to main.
+	- or, add a routine in DynamicMenu to always add an UP button
+
 - move global.PlayerFaction into Level.gd
 
 

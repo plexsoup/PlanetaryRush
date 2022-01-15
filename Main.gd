@@ -37,7 +37,7 @@ func show_single_scene(desiredSceneNodeName):
 			sceneNode.show()
 			if sceneNode.has_method("activate"):
 				print("Main.gd show_single_scene: " + sceneNode.name)
-				sceneNode.activate()
+				sceneNode.activate(self)
 				CurrentScene = sceneNode
 		elif sceneNode == currentSceneCache:
 			if sceneNode.has_method("deactivate"):
@@ -173,4 +173,7 @@ func _on_DebugTimer_timeout():
 func _on_level_completed(sceneObj):
 	if sceneObj.name == "SplashScreen":
 		show_single_scene("MainMenu")
+	
+func _on_tutorial_finished():
+	show_single_scene("MainMenu")
 	
