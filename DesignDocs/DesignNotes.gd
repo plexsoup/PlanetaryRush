@@ -104,6 +104,7 @@ func _on_button_pressed(args):
 
 func Current_Work_Effort():
 	var currentWorkEffort = {
+		"Tutorial Back Button" : "doesn't work",
 		"clean main scene tree" : "figure out which scenes need to be visible/hidden. Ensure that happens in code",
 		"remove level obj" : "instantiate levels in code instead of in the inspector",
 		"fix actioncamera" : "actioncamera gets stretched/squashed and sometimes zooms wrong",

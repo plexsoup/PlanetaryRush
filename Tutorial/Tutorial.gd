@@ -17,7 +17,7 @@ func _ready():
 	#activate(self)
 
 func construct_tutorial_stage_selection_menu():
-	$DynamicMenu.start()
+	$DynamicMenu.start(self, self)
 
 func show_tutorial_stage_selection_menu():
 	$DynamicMenu.show()
@@ -89,4 +89,14 @@ func _on_menu_finished():
 	connect("finished", CallBackObj, "_on_tutorial_finished")
 	emit_signal("finished")
 	disconnect("finished", CallBackObj, "_on_tutorial_finished")
+	
+func _on_level_finished(scene):
+	# can probably just ignore the scene.. you know it's coming from your Level.tscn
+
+	print("Tutorial.gd received _on_level_finished signal")
+
+	if has_signal("finished"):
+		print(get_signal_connection_list("finished"))
+	print("emitting signal finished")
+	emit_signal("finished", self) # tell the dynamic menu we're done.
 	

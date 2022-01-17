@@ -29,7 +29,11 @@ func spawnLevel():
 	var level = levelScene.instance()
 	self.add_child(level)
 	level.name = "Level"
-	level.start($blueprint)
+	if level.has_signal("finished"):
+		level.connect("finished", self, "_on_level_finished")
+	else:
+		printerr("Level requires a finished signal.")
+	level.start($blueprint, self)
 	Level = level
 
 func show_children():
@@ -67,9 +71,7 @@ func end():
 #func _process(delta):
 #	pass
 
-func _on_level_completed(isPlayerWinner):
-	if isPlayerWinner:
-		end()
-	else:
-		end()
+func _on_level_finished(levelObj):
+	print("TutorialStage.gd _on_level_completed() emitting signal finished.")
+	emit_signal("finished", self)
 	
