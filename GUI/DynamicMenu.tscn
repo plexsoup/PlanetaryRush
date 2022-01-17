@@ -55,3 +55,6 @@ custom_constants/separation = 30
 margin_right = 174.0
 margin_bottom = 25.0
 text = "Dynamic Menu"
+
+[node name="Camera2D" type="Camera2D" parent="."]
+anchor_mode = 0

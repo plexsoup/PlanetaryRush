@@ -1,4 +1,11 @@
+"""
+Hack to hide all the children of a Canvas Layer whenever
+	the parent of the CanvasLayer is hidden.
+Useful if you have a lot of canvas layers you want to show/hide,
+ 	since the base CanvasLayer class doesn't have show/hide functions.
+"""
 extends CanvasLayer
+
 
 
 # Declare member variables here. Examples:

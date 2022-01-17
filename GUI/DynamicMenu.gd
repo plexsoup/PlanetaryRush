@@ -4,7 +4,7 @@ extends Node2D
 export var ScenesContainerPath : String = ""
 export var ButtonsContainerPath : String = "Control/bgImage/CenterContainer/PanelContainer/VBoxContainer/Label"
 export var MenuName : String = "Dynamic Menu"
-
+export var BackgroundImage : Texture
 var ScenesContainer : Node
 var ButtonsContainer : Control
 
@@ -41,7 +41,19 @@ func start(scenesContainer : Node = null, callBackObj : Node = null):
 	
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass
+	if BackgroundImage != null:
+		var bgTex
+		if BackgroundImage.is_class("Image"):
+			bgTex = BackgroundImage.ImageTexture.new()
+			bgTex.create_from_image(BackgroundImage)
+		elif BackgroundImage.is_class("StreamTexture"):
+			bgTex = BackgroundImage
+
+		$Control/bgImage.set_texture(bgTex)
+	else:
+		printerr("Dynamic Menu should have an image set in the inspector.")
+
+
 
 func setTitle():
 	var labelNode = find_node("MenuTitle")
@@ -103,15 +115,19 @@ func _on_button_pressed(buttonName):
 		newScene.set_visible(true)
 		self.set_visible(false)
 
+		if newScene.has_signal("finished"):
+			if not newScene.is_connected("finished", self, "_on_scene_finished"):
+				newScene.connect("finished", self, "_on_scene_finished")
+		else:
+			printerr("Dynamic menu expects all scenes to have a finished function")
+
 		if newScene.has_method("start"):
 			newScene.start(CallBackObj)
 		else:
 			printerr("DynamicMenu.gd: newScene, " + newScene.name + ", requires a 'start' function.")
 		
-		if newScene.has_signal("finished"):
-			newScene.connect("finished", self, "_on_scene_finished")
-		else:
-			printerr("DynamicMenu.gd: newScene, " + newScene.name + ", requires a 'finished' signal.")
-	
+
 func _on_scene_finished(scene):
+	print("Dynamic Menu received _on_scene_finished signal")
+	$Camera2D._set_current(true)
 	self.set_visible(true)

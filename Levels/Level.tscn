@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Levels/Level.gd" type="Script" id=1]
 [ext_resource path="res://Scenery/stars.jpg" type="Texture" id=2]
@@ -6,14 +6,15 @@
 [ext_resource path="res://Planets/Planets.gd" type="Script" id=4]
 [ext_resource path="res://Players/Camera2D.tscn" type="PackedScene" id=5]
 [ext_resource path="res://Levels/Referee.gd" type="Script" id=6]
-[ext_resource path="res://GUI/CanvasLayerHack.gd" type="Script" id=7]
+[ext_resource path="res://Scenery/VQGAN Art/failure.jpg" type="Texture" id=7]
+[ext_resource path="res://Scenery/VQGAN Art/fireworks.jpg" type="Texture" id=8]
+[ext_resource path="res://GUI/Themes/CyberTheme.tres" type="Theme" id=9]
 
 [node name="Level" type="Node2D"]
 script = ExtResource( 1 )
 
 [node name="Foreground" type="CanvasLayer" parent="."]
 layer = 3
-script = ExtResource( 7 )
 
 [node name="InLevelGUI" parent="Foreground" instance=ExtResource( 3 )]
 
@@ -23,6 +24,122 @@ margin_bottom = 40.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="WinScreen" type="Control" parent="Foreground"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource( 9 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PanelContainer" type="PanelContainer" parent="Foreground/WinScreen"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="Foreground/WinScreen/PanelContainer"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 1014.0
+margin_bottom = 590.0
+texture = ExtResource( 8 )
+expand = true
+stretch_mode = 5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="Foreground/WinScreen/PanelContainer"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 1014.0
+margin_bottom = 590.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Foreground/WinScreen/PanelContainer/CenterContainer"]
+margin_left = 450.0
+margin_top = 261.0
+margin_right = 553.0
+margin_bottom = 319.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="WinLabel" type="Label" parent="Foreground/WinScreen/PanelContainer/CenterContainer/VBoxContainer"]
+margin_right = 103.0
+margin_bottom = 25.0
+text = "You Win!"
+
+[node name="BackButton" type="Button" parent="Foreground/WinScreen/PanelContainer/CenterContainer/VBoxContainer"]
+margin_top = 29.0
+margin_right = 103.0
+margin_bottom = 58.0
+text = "Back"
+
+[node name="LoseScreen" type="Control" parent="Foreground"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource( 9 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PanelContainer" type="PanelContainer" parent="Foreground/LoseScreen"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="Foreground/LoseScreen/PanelContainer"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 1014.0
+margin_bottom = 590.0
+texture = ExtResource( 7 )
+expand = true
+stretch_mode = 5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="Foreground/LoseScreen/PanelContainer"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 1014.0
+margin_bottom = 590.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Foreground/LoseScreen/PanelContainer/CenterContainer"]
+margin_left = 378.0
+margin_top = 247.0
+margin_right = 626.0
+margin_bottom = 333.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LoseLabel" type="Label" parent="Foreground/LoseScreen/PanelContainer/CenterContainer/VBoxContainer"]
+margin_right = 248.0
+margin_bottom = 53.0
+text = "You Lose.
+Better luck next time."
+align = 1
+
+[node name="BackButton" type="Button" parent="Foreground/LoseScreen/PanelContainer/CenterContainer/VBoxContainer"]
+margin_top = 57.0
+margin_right = 248.0
+margin_bottom = 86.0
+text = "Back"
 
 [node name="Paths" type="Node2D" parent="."]
 
@@ -59,6 +176,8 @@ script = ExtResource( 6 )
 
 [node name="InspectionTimer" type="Timer" parent="Referee" groups=["InGameTimers"]]
 
+[connection signal="pressed" from="Foreground/WinScreen/PanelContainer/CenterContainer/VBoxContainer/BackButton" to="." method="_on_BackButton_pressed"]
+[connection signal="pressed" from="Foreground/LoseScreen/PanelContainer/CenterContainer/VBoxContainer/BackButton" to="." method="_on_BackButton_pressed"]
 [connection signal="timeout" from="CelebrationTimer" to="." method="_on_CelebrationDuration_timeout"]
 [connection signal="timeout" from="LamentationTimer" to="." method="_on_LamentationTimer_timeout"]
 [connection signal="timeout" from="Referee/InspectionTimer" to="Referee" method="_on_InspectionTimer_timeout"]

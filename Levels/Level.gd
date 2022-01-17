@@ -35,6 +35,8 @@ export (PlanetaryPatterns) var Pattern
 
 
 signal level_completed(factionObj)
+signal finished()
+
 #signal player_lost()
 signal set_initial_faction(factionObj)
 signal gameplay_started()
@@ -44,10 +46,10 @@ var PathFollowScene = preload("res://Paths/ShipPath.tscn")
 func _ready():
 	#call_deferred("start")
 	# this is causing a problem. The AI starts before the player has clicked out of the menu
-	print("Hi, I'm level.gd, inside: " + get_parent().name)
+	pass
 	#start()
 
-func start(blueprintContainer : Node2D = null):
+func start(blueprintContainer : Node2D = null, callbackObj = get_parent()):
 	#Note: since we're now spawning levels dynamically, we should add numplanets and numfactions to the start function (pseudo constructor)
 	
 	global.BulletContainer = $Bullets # why? Who uses this? Need to refactor weapons.gd
@@ -69,10 +71,17 @@ func start(blueprintContainer : Node2D = null):
 		build_level_from_blueprint(blueprintContainer)
 
 	spawn_in_level_GUI()
+	hide_end_scenes()
 	initializeCamera()
+	
 	$Referee.start(self, FactionContainer, PlanetContainer, PlayerFactionObj)
 	State = States.PLAYING
 
+func hide_end_scenes():
+	$Foreground/WinScreen.set_visible(false)
+	$Foreground/LoseScreen.set_visible(false)
+	$Foreground/PauseMenu.set_visible(false)
+	
 
 func initializeCamera():
 	$ActionCamera._set_current(true)
@@ -247,7 +256,14 @@ func start_lamentation():
 	else:
 		State = States.LAMENTING
 		$LamentationTimer.start()
-		
+
+func show_win_screen():
+	$Foreground/WinScreen.show()
+	
+	
+func show_lose_screen():
+	$Foreground/LoseScreen.show()
+
 func LookupFaction(factionNum : int):
 	for faction in FactionContainer.get_children():
 		if faction.Number == factionNum:
@@ -273,22 +289,27 @@ func countRemainingFactions():
 ###############################################################################
 # Outbound Signals
 func _on_CelebrationDuration_timeout():
-	var playerWon = true
-	resetCamera()
-	# Let main know that the celebration is over. it's ok to show the endscreen
-	if get_parent().has_method("_on_level_completed"):
-		connect("level_completed", get_parent(), "_on_level_completed")
-		emit_signal("level_completed", playerWon)
-		disconnect("level_completed", get_parent(), "_on_level_completed")
-	else:
-		printerr()
+	show_win_screen()
+	
+#	var playerWon = true
+#	resetCamera()
+#	# Let main know that the celebration is over. it's ok to show the endscreen
+#	if get_parent().has_method("_on_level_completed"):
+#		connect("level_completed", get_parent(), "_on_level_completed")
+#		emit_signal("level_completed", playerWon)
+#		disconnect("level_completed", get_parent(), "_on_level_completed")
+#	else:
+#		printerr()
 
 func _on_LamentationTimer_timeout():
-	var playerWon = false
-	resetCamera()
-	connect("level_completed", get_parent(), "_on_level_completed")
-	emit_signal("level_completed", playerWon)
-	disconnect("level_completed", get_parent(), "_on_level_completed")
+	show_lose_screen()
+
+#	var playerWon = false
+#	resetCamera()
+#
+#	connect("level_completed", get_parent(), "_on_level_completed")
+#	emit_signal("level_completed", playerWon)
+#	disconnect("level_completed", get_parent(), "_on_level_completed")
 
 ###############################################################################
 # Incoming Signals
@@ -313,3 +334,13 @@ func _on_faction_won(faction):
 		start_lamentation()
 		
 
+
+
+func _on_BackButton_pressed():
+	print("Level.gd received _on_BackButton_pressed signal")
+	if self.has_signal("finished"):
+		print("Signalling 'finished' to: "+ str(get_signal_connection_list("finished")))
+	emit_signal("finished", self)
+	print("Level.gd queuing_free now.")
+	call_deferred("queue_free")
+	

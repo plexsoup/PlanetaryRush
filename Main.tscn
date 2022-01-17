@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=2]
+[gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://Scenery/AnimatedSpaceships.tscn" type="PackedScene" id=2]
@@ -11,6 +11,7 @@
 [ext_resource path="res://Ships/textures/ship3.png" type="Texture" id=9]
 [ext_resource path="res://Scenery/stars.png" type="Texture" id=10]
 [ext_resource path="res://Tutorial/Tutorial.tscn" type="PackedScene" id=11]
+[ext_resource path="res://Scenery/VQGAN Art/princess 3.png" type="Texture" id=12]
 [ext_resource path="res://Levels/QuickPlay.gd" type="Script" id=15]
 [ext_resource path="res://GUI/Icons/PlexSoup.png" type="Texture" id=17]
 [ext_resource path="res://GUI/Menus/SplashScreen.gd" type="Script" id=18]
@@ -139,137 +140,134 @@ position = Vector2( 508, 302 )
 z_index = -1
 texture = ExtResource( 10 )
 
-[node name="DynamicMenu" parent="." instance=ExtResource( 3 )]
-visible = false
+[node name="Game" type="Node2D" parent="."]
 
-[node name="AnimatedSpaceships" parent="DynamicMenu" instance=ExtResource( 2 )]
+[node name="DynamicMenu" parent="Game" instance=ExtResource( 3 )]
+BackgroundImage = ExtResource( 12 )
+
+[node name="AnimatedSpaceships" parent="Game/DynamicMenu" instance=ExtResource( 2 )]
 position = Vector2( 18, 24 )
 
-[node name="Scenes" type="Node2D" parent="."]
-
-[node name="Tutorial" parent="Scenes" instance=ExtResource( 11 )]
+[node name="Tutorial" parent="Game" instance=ExtResource( 11 )]
 visible = false
 
-[node name="QuickPlay" type="Node2D" parent="Scenes"]
+[node name="QuickPlay" type="Node2D" parent="Game"]
 visible = false
 script = ExtResource( 15 )
 
-[node name="EndScreen" parent="Scenes/QuickPlay" instance=ExtResource( 4 )]
+[node name="EndScreen" parent="Game/QuickPlay" instance=ExtResource( 4 )]
 margin_left = 3.0
 margin_top = 3.0
 margin_right = 1023.0
 margin_bottom = 596.0
 
-[node name="Campaign" type="Node2D" parent="Scenes"]
+[node name="Campaign" type="Node2D" parent="Game"]
 visible = false
 
-[node name="Shopping" type="Node2D" parent="Scenes/Campaign"]
+[node name="Shopping" type="Node2D" parent="Game/Campaign"]
 
-[node name="Interludes" type="Node2D" parent="Scenes/Campaign"]
+[node name="Interludes" type="Node2D" parent="Game/Campaign"]
 
-[node name="StarMap" type="Node2D" parent="Scenes/Campaign"]
+[node name="StarMap" type="Node2D" parent="Game/Campaign"]
 
-[node name="PlanetMap" type="Node2D" parent="Scenes/Campaign"]
+[node name="PlanetMap" type="Node2D" parent="Game/Campaign"]
 
-[node name="EndCredits" type="Node2D" parent="Scenes"]
+[node name="EndCredits" type="Node2D" parent="Game"]
 visible = false
 
-[node name="ParallaxBackground2" type="Node2D" parent="Scenes/EndCredits"]
+[node name="ParallaxBackground2" type="Node2D" parent="Game/EndCredits"]
 position = Vector2( 18, 24 )
 
-[node name="ParallaxLayer" type="Node2D" parent="Scenes/EndCredits/ParallaxBackground2"]
+[node name="ParallaxLayer" type="Node2D" parent="Game/EndCredits/ParallaxBackground2"]
 
-[node name="Sprite" type="Sprite" parent="Scenes/EndCredits/ParallaxBackground2/ParallaxLayer"]
+[node name="Sprite" type="Sprite" parent="Game/EndCredits/ParallaxBackground2/ParallaxLayer"]
 position = Vector2( 1214.5, 177.5 )
 rotation = -3.14159
 scale = Vector2( 1, -1 )
 texture = ExtResource( 8 )
 script = ExtResource( 6 )
 
-[node name="Sprite2" type="Sprite" parent="Scenes/EndCredits/ParallaxBackground2/ParallaxLayer"]
+[node name="Sprite2" type="Sprite" parent="Game/EndCredits/ParallaxBackground2/ParallaxLayer"]
 position = Vector2( 1095, 84 )
 rotation = -3.14159
 scale = Vector2( 1, -1 )
 texture = ExtResource( 8 )
 script = ExtResource( 6 )
 
-[node name="ParallaxLayer2" type="Node2D" parent="Scenes/EndCredits/ParallaxBackground2"]
+[node name="ParallaxLayer2" type="Node2D" parent="Game/EndCredits/ParallaxBackground2"]
 modulate = Color( 0.658824, 0.658824, 0.658824, 1 )
 scale = Vector2( 0.66, 0.66 )
 z_index = -1
 
-[node name="Sprite" type="Sprite" parent="Scenes/EndCredits/ParallaxBackground2/ParallaxLayer2"]
+[node name="Sprite" type="Sprite" parent="Game/EndCredits/ParallaxBackground2/ParallaxLayer2"]
 position = Vector2( 1387.88, 72.7273 )
 rotation = -3.14159
 scale = Vector2( 1, -1 )
 texture = ExtResource( 7 )
 script = ExtResource( 6 )
 
-[node name="Sprite2" type="Sprite" parent="Scenes/EndCredits/ParallaxBackground2/ParallaxLayer2"]
+[node name="Sprite2" type="Sprite" parent="Game/EndCredits/ParallaxBackground2/ParallaxLayer2"]
 position = Vector2( 1580.3, 169.697 )
 rotation = -3.14159
 scale = Vector2( 1, -1 )
 texture = ExtResource( 7 )
 script = ExtResource( 6 )
 
-[node name="ParallaxLayer3" type="Node2D" parent="Scenes/EndCredits/ParallaxBackground2"]
+[node name="ParallaxLayer3" type="Node2D" parent="Game/EndCredits/ParallaxBackground2"]
 modulate = Color( 0.360784, 0.360784, 0.360784, 1 )
 scale = Vector2( 0.5, 0.5 )
 z_index = -2
 
-[node name="Sprite" type="Sprite" parent="Scenes/EndCredits/ParallaxBackground2/ParallaxLayer3"]
+[node name="Sprite" type="Sprite" parent="Game/EndCredits/ParallaxBackground2/ParallaxLayer3"]
 position = Vector2( 1738, 126 )
 rotation = -3.14159
 scale = Vector2( 1, -1 )
 texture = ExtResource( 9 )
 script = ExtResource( 6 )
 
-[node name="Sprite2" type="Sprite" parent="Scenes/EndCredits/ParallaxBackground2/ParallaxLayer3"]
+[node name="Sprite2" type="Sprite" parent="Game/EndCredits/ParallaxBackground2/ParallaxLayer3"]
 position = Vector2( 1476, 110 )
 rotation = -3.14159
 scale = Vector2( 1, -1 )
 texture = ExtResource( 9 )
 script = ExtResource( 6 )
 
-[node name="FinalBackground" type="Node2D" parent="Scenes/EndCredits/ParallaxBackground2"]
+[node name="FinalBackground" type="Node2D" parent="Game/EndCredits/ParallaxBackground2"]
 z_index = -10
 
-[node name="Sprite" type="Sprite" parent="Scenes/EndCredits/ParallaxBackground2/FinalBackground"]
+[node name="Sprite" type="Sprite" parent="Game/EndCredits/ParallaxBackground2/FinalBackground"]
 position = Vector2( 509, 283 )
 scale = Vector2( 0.6, 0.6 )
 texture = ExtResource( 10 )
 
-[node name="MainCamera" type="Camera2D" parent="." groups=["cameras"]]
-position = Vector2( 512, 303 )
-
-[node name="GoodByeScreen" type="Node2D" parent="."]
+[node name="EndScreen" type="Node2D" parent="."]
 visible = false
 script = ExtResource( 18 )
 AnimationName = "RaiseLogo"
 
-[node name="PlexSoupLogo" type="Sprite" parent="GoodByeScreen"]
+[node name="PlexSoupLogo" type="Sprite" parent="EndScreen"]
 position = Vector2( 512, 300 )
 z_index = 1
 texture = ExtResource( 17 )
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="GoodByeScreen"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="EndScreen"]
 anims/DropLogo = SubResource( 2 )
 anims/RaiseLogo = SubResource( 3 )
 
-[node name="Timer" type="Timer" parent="GoodByeScreen"]
+[node name="Timer" type="Timer" parent="EndScreen"]
 wait_time = 1.2
 one_shot = true
 autostart = true
 
-[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="GoodByeScreen"]
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="EndScreen"]
 stream = ExtResource( 19 )
 
-[node name="background" type="Sprite" parent="GoodByeScreen"]
+[node name="background" type="Sprite" parent="EndScreen"]
 position = Vector2( 508, 302 )
 z_index = -1
 texture = ExtResource( 10 )
 
-[node name="Panel" type="Panel" parent="GoodByeScreen"]
+[node name="Panel" type="Panel" parent="EndScreen"]
 margin_left = 376.0
 margin_top = 182.0
 margin_right = 643.0
@@ -280,7 +278,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="GoodByeScreen/Panel"]
+[node name="Label" type="Label" parent="EndScreen/Panel"]
 margin_top = 39.0
 margin_right = 61.0
 margin_bottom = 92.0
@@ -295,6 +293,9 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="MainCamera" type="Camera2D" parent="." groups=["cameras"]]
+position = Vector2( 512, 303 )
+
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 pause_mode = 2
 stream = ExtResource( 5 )
@@ -308,5 +309,5 @@ one_shot = true
 autostart = true
 
 [connection signal="timeout" from="SplashScreen/Timer" to="SplashScreen" method="_on_Timer_timeout"]
-[connection signal="timeout" from="GoodByeScreen/Timer" to="GoodByeScreen" method="_on_Timer_timeout"]
+[connection signal="timeout" from="EndScreen/Timer" to="EndScreen" method="_on_Timer_timeout"]
 [connection signal="timeout" from="DebugPrintTimer" to="." method="_on_DebugTimer_timeout"]

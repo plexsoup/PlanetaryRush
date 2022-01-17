@@ -20,6 +20,10 @@ func _ready():
 	randomize()
 	global.Main = self
 	#hide_all_scenes()
+	
+	$Game.hide()
+	$EndScreen.hide()
+	
 	$SplashScreen.connect("finished", self, "_on_SplashScreen_finished")
 	$SplashScreen.show()
 	$SplashScreen.start(self)
@@ -35,14 +39,13 @@ func showSplashScreen():
 	
 func show_single_scene(desiredSceneNodeName):
 	print("showing scene now: " + desiredSceneNodeName)
-	$Scenes.show()
 	
 	$MainCamera._set_current(true)
 	$MainCamera.set_zoom(Vector2(1,1))
 #		remove_level()
 
 	var currentSceneCache = CurrentScene
-	for sceneNode in $Scenes.get_children():
+	for sceneNode in get_children():
 		
 		if sceneNode.name == desiredSceneNodeName:
 			sceneNode.show()
@@ -58,10 +61,8 @@ func show_single_scene(desiredSceneNodeName):
 			pass
 
 func hide_all_scenes():
-	$DynamicMenu.hide()
-	$Scenes.hide()
 	
-	for sceneNode in $Scenes.get_children():
+	for sceneNode in get_children():
 		if sceneNode.has_method("deactivate"):
 			sceneNode.deactivate()
 		sceneNode.hide()
@@ -186,16 +187,17 @@ func _on_DebugTimer_timeout():
 
 func _on_level_completed(sceneObj):
 	if sceneObj.name == "SplashScreen":
-		show_single_scene("MainMenu")
+		show_single_scene("Game")
 	
 func _on_tutorial_finished():
-	show_single_scene("MainMenu")
+	show_single_scene("Game")
 	
 func _on_SplashScreen_finished():
 	print("main.gd splashscreen is finished")
 	$SplashScreen.hide()
-	$DynamicMenu.start($Scenes, self)
-	$DynamicMenu.show()
+	$Game.show()
+	$Game/DynamicMenu.start($Game, self)
+	#$Game/DynamicMenu.show()
 	
 func _on_menu_finished():
 	showSplashScreen()

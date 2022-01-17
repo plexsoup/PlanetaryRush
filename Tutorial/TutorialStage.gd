@@ -8,23 +8,21 @@ signal finished(nodeObj)
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# The Dynamic Menu should establish the callback for the finished signal.
-	
-	#hide_children()
+
 	pass
 
 func start(callbackObj):
-	#show_children()
 
 	spawnLevel()
 
 	# if it's a blueprint level, import the blueprint
-	if self.has_node("blueprint") and self.has_node("Level"):
-		$Level.start($blueprint)
-		$blueprint.hide()
-	elif self.has_node("Level") and is_instance_valid($Level):
-			$Level.start() # no blueprint
-	else: # probably just a regular menu
-		pass
+#	if self.has_node("blueprint") and self.has_node("Level"):
+#		$Level.start($blueprint)
+#		$blueprint.hide()
+#	elif self.has_node("Level") and is_instance_valid($Level):
+#			$Level.start() # no blueprint
+#	else: # probably just a regular menu
+#		pass
 
 func spawnLevel():
 	var levelScene = preload("res://Levels/Level.tscn")

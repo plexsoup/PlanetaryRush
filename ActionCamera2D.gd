@@ -24,12 +24,39 @@ func start(levelObj, planetsObj):
 	#return
 	# zoom extents to capture all the planets.
 	
+	var extents = calculatePlanetViewRect(planetsObj)
+	setupCameraViewport(extents)
+
+
+func setupCameraViewport(extents):
+	
+	
+	self.set_offset(extents.position + (extents.size / 2.0))
+	DesiredZoom = Vector2(5.0,5.0)
+	return
+	
+	#self.set_offset(extents.position)
+#
+#	# what's the viewport size?
+#	# compare that to the required rect2
+#	# then set the zoom (bigger numbers zoom out, smaller zoom in)
+#	var viewport = get_viewport()
+#	var viewportToRectRatio = viewport.size.x * (1/extents.size.x * 2)
+#	print("Camera2D.gd" + str(viewportToRectRatio))
+##	DesiredZoom = Vector2(viewportToRectRatio, viewportToRectRatio) # ??? Guess? some relationship to viewport size and extents size
+#	DesiredZoom = Vector2(1.0,1.0)
+#	DesiredZoom.x = extents.size.x / 250
+#	var viewportRect = get_viewport().get_visible_rect()
+#	printerr("ActionCamera.gd: start(): not sure the aspectRatio calculation is right.")
+#	var aspectRatio = viewportRect.size.x / viewportRect.size.y
+#	DesiredZoom.y = DesiredZoom.x * aspectRatio
+
+
+func calculatePlanetViewRect(planetsObj):
+	
 	var planets = planetsObj.get_all_planets()
 	if planets.size() == 0:
 		return
-		
-	var AA = Vector2(1000000,1000000)
-	var BB = Vector2(0, 0)
 
 	var allX = []
 	var allY = []
@@ -38,41 +65,11 @@ func start(levelObj, planetsObj):
 		allX.push_back(planet.get_global_position().x)
 		allY.push_back(planet.get_global_position().y)
 
-	AA = Vector2(allX.min(),allY.min())
-	BB = Vector2(allX.max(), allY.max())
+	var AA = Vector2(allX.min(),allY.min())
+	var BB = Vector2(allX.max(), allY.max())
 	
-
 	var extents : Rect2 = Rect2(AA, BB-AA)
-	print("extents position = " + str(extents.position))
-	print("extents size = " + str(extents.size))
-	
-	
-	print("Camera2D.gd extents: " + str(extents))
-	# ok, the rectangle should now include everything.
-	# how do we turn that into camera scale?
-
-	self.set_offset(extents.position + (extents.size / 2.0))
-	#self.set_offset(extents.position)
-	
-	# what's the viewport size?
-	# compare that to the required rect2
-	# then set the zoom (bigger numbers zoom out, smaller zoom in)
-	var viewport = get_viewport()
-	var viewportToRectRatio = viewport.size.x * (1/extents.size.x * 2)
-	print("Camera2D.gd" + str(viewportToRectRatio))
-#	DesiredZoom = Vector2(viewportToRectRatio, viewportToRectRatio) # ??? Guess? some relationship to viewport size and extents size
-	DesiredZoom = Vector2(1.0,1.0)
-	DesiredZoom.x = extents.size.x / 250
-	var viewportRect = get_viewport().get_visible_rect()
-	printerr("ActionCamera.gd: start(): not sure the aspectRatio calculation is right.")
-	var aspectRatio = viewportRect.size.x / viewportRect.size.y
-	DesiredZoom.y = DesiredZoom.x * aspectRatio
-	
-	
-	# get the AABB rect2 which includes all the planets.
-	# move the camera origin to the center of mass
-	# set the camera scale to include every planet in the viewport
-	
+	return extents
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
