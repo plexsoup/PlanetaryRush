@@ -16,7 +16,6 @@ layer = 3
 script = ExtResource( 7 )
 
 [node name="InLevelGUI" parent="Foreground" instance=ExtResource( 3 )]
-visible = false
 
 [node name="PauseMenu" type="Control" parent="Foreground"]
 margin_right = 40.0

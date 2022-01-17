@@ -110,11 +110,6 @@ func askLevelForPath(planet):
 	emit_signal("new_path_requested", planet, FactionObj, self)
 	disconnect("new_path_requested", Level, "_on_new_path_requested")
 
-# the planet decides this and notifies the path directly so we don't have to keep track
-#func notifyLevelPathNoLongerRequired(planet, faction):
-#	connect("path_no_longer_required", global.level, "_on_path_no_longer_required")
-#	emit_signal("path_no_longer_required", planet, faction)
-#	disconnect("path_no_longer_required", global.level, "_on_path_no_longer_required")
 
 
 #################################################################################
@@ -140,7 +135,7 @@ func _on_ShipPath_finished_drawing(path, destinationPlanet):
 	State = States.ACTIVE
 
 func _on_PlayerController_Clicked(): # signal emulates a mouse click, but it could come from AI
-	if global.State == global.States.FIGHTING:
+	if Level.State == Level.States.PLAYING:
 		current_planet = get_closest_planet()
 		if current_planet:
 			#lock_cursor_on(current_planet)

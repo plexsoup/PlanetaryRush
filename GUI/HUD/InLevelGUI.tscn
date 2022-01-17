@@ -33,6 +33,7 @@ __meta__ = {
 }
 
 [node name="PlanetListTree" type="Tree" parent="MarginContainer"]
+visible = false
 margin_right = 192.0
 margin_bottom = 600.0
 custom_styles/bg = SubResource( 1 )
@@ -48,7 +49,9 @@ __meta__ = {
 
 [node name="Panel" type="PanelContainer" parent="TopHUD"]
 margin_left = 502.0
+margin_top = 10.0
 margin_right = 522.0
+margin_bottom = 30.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 

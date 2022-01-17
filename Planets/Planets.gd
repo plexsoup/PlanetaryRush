@@ -147,6 +147,12 @@ func isColliding(new_planet):
 func get_all_planets():
 	return self.get_children()
 	
+func get_planet_count():
+	return self.get_child_count()
+
+func count_planets():
+	return self.get_child_count()
+	
 func get_nearest_planet(pos):
 	var closest = null
 	var closest_dist_sq = 10000000

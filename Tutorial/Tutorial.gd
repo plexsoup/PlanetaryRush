@@ -14,7 +14,7 @@ func _ready():
 			child.connect("ended", self, "_on_stage_ended")
 	
 	
-	pass # Replace with function body.
+	#activate(self)
 
 func construct_tutorial_stage_selection_menu():
 	$DynamicMenu.start()
@@ -26,6 +26,10 @@ func show_tutorial_stage_selection_menu():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
+
+func start(callBackObj):
+	activate(callBackObj)
+	
 
 func activate(callBackObj):
 	print("Tutorial.gd: activate()")

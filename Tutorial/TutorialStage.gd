@@ -1,19 +1,21 @@
 extends Node2D
 # spawn level, ingest blueprint
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
+var Level
 
 signal finished(nodeObj)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	connect("finished", get_parent(), "_on_stage_finished")
+	# The Dynamic Menu should establish the callback for the finished signal.
+	
 	#hide_children()
+	pass
 
-func start():
+func start(callbackObj):
 	#show_children()
+
+	spawnLevel()
 
 	# if it's a blueprint level, import the blueprint
 	if self.has_node("blueprint") and self.has_node("Level"):
@@ -23,6 +25,14 @@ func start():
 			$Level.start() # no blueprint
 	else: # probably just a regular menu
 		pass
+
+func spawnLevel():
+	var levelScene = preload("res://Levels/Level.tscn")
+	var level = levelScene.instance()
+	self.add_child(level)
+	level.name = "Level"
+	level.start($blueprint)
+	Level = level
 
 func show_children():
 	# note, CanvasLayers by default have no hide or show methods.
@@ -41,11 +51,17 @@ func hide_children():
 			child.hide()
 		else:
 			printerr(child.name  + " has no hide() method. Consider attaching the res://GUI/CanvasLayerHack.gd script to canvas layer nodes.")
-		
+
+func terminate_level():
+	if is_instance_valid(Level):
+		Level.call_deferred("queue_free")
+	else:
+		printerr("TutorialStage.gd may have redundant functionality in terminate_level. Level is already gone.")
 	
 func end():
-	global.Main.show_main_camera()
+	#global.Main.show_main_camera() # Main can probably handle this when it gets control back via menus
 	hide_children()
+	terminate_level()
 	emit_signal("finished", self)
 	
 

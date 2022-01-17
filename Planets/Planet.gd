@@ -235,7 +235,7 @@ func spawn_fleet(numShips, path, destinationPlanet): # coming from Planet
 	var fleetScene = load("res://Ships/Fleet.tscn")
 
 	var fleet = fleetScene.instance()
-	global.level.FleetContainer.add_child(fleet)
+	Level.FleetContainer.add_child(fleet)
 	fleet.set_global_position(get_global_position())
 	fleet.start(path, FactionObj, numShips, shipScene, originPlanet, destinationPlanet, Level)
 
@@ -284,11 +284,13 @@ func notify_faction_planet_switched(faction, newFaction):
 	disconnect("switched_faction", faction, "_on_planet_switched_faction")
 
 func notify_referee_planet_switched(newFaction, oldFaction):
-	var refereeObj = Level.get_referee()
-	connect("switched_faction", refereeObj, "_on_planet_switched_faction")
-	emit_signal("switched_faction", self, newFaction)
-	disconnect("switched_faction", refereeObj, "_on_planet_switched_faction")
-	
+	if is_instance_valid(Level):
+		var refereeObj = Level.get_referee()
+		connect("switched_faction", refereeObj, "_on_planet_switched_faction")
+		emit_signal("switched_faction", self, newFaction)
+		disconnect("switched_faction", refereeObj, "_on_planet_switched_faction")
+	else:
+		printerr("Planet.gd doesn't have a valid Level object")
 
 ##################################################################################
 # Incoming Signals
@@ -297,7 +299,7 @@ func _on_ProductionTimer_timeout():
 	if is_instance_valid(FactionObj):
 		increase_units_from_timed_production()
 
-# signal coming from cursor via global.level
+# signal coming from cursor via Level
 func _on_ShipPath_finished_drawing(path, destinationPlanet):
 	# send half your ships along the path
 	if path.FactionObj == FactionObj and units_present >= 2:

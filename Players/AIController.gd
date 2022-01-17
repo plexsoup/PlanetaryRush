@@ -229,7 +229,7 @@ func end():
 
 
 func _on_DecisionTimer_timeout():
-	if global.State != global.States.FIGHTING:
+	if Level.State != Level.States.PLAYING:
 		restart_timer()
 		return
 	else: # paused or dead?

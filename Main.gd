@@ -13,19 +13,30 @@ var CurrentScene : Node2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	
+	
+	
 	# load_level(levels[0]) # this happens when start button is pushed
 	randomize()
 	global.Main = self
-	hide_all_scenes()
-	show_single_scene("SplashScreen")
-
+	#hide_all_scenes()
+	$SplashScreen.connect("finished", self, "_on_SplashScreen_finished")
+	$SplashScreen.show()
+	$SplashScreen.start(self)
+	
 func show_main_camera():
 	$MainCamera._set_current(true)
 	
+func showSplashScreen():
+	$SplashScreen.connect("finished", self, "_on_SplashScreen_finished")
+	$SplashScreen.show()
+	$SplashScreen.start(self)
+
 	
 func show_single_scene(desiredSceneNodeName):
 	print("showing scene now: " + desiredSceneNodeName)
-
+	$Scenes.show()
+	
 	$MainCamera._set_current(true)
 	$MainCamera.set_zoom(Vector2(1,1))
 #		remove_level()
@@ -47,6 +58,9 @@ func show_single_scene(desiredSceneNodeName):
 			pass
 
 func hide_all_scenes():
+	$DynamicMenu.hide()
+	$Scenes.hide()
+	
 	for sceneNode in $Scenes.get_children():
 		if sceneNode.has_method("deactivate"):
 			sceneNode.deactivate()
@@ -177,3 +191,16 @@ func _on_level_completed(sceneObj):
 func _on_tutorial_finished():
 	show_single_scene("MainMenu")
 	
+func _on_SplashScreen_finished():
+	print("main.gd splashscreen is finished")
+	$SplashScreen.hide()
+	$DynamicMenu.start($Scenes, self)
+	$DynamicMenu.show()
+	
+func _on_menu_finished():
+	showSplashScreen()
+	
+#func _on_button_pressed(buttonName): # entirely contained in Dynamic Menu now
+#	print("main.gd received _on_button_pressed " + buttonName)
+#	hide_all_scenes()
+#	show_single_scene(buttonName)

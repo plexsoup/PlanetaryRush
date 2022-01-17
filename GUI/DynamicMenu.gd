@@ -8,10 +8,16 @@ export var MenuName : String = "Dynamic Menu"
 var ScenesContainer : Node
 var ButtonsContainer : Control
 
+var CallBackObj : Node # who to tell when we're done or when a scene completes or whatever
+
 #signal finished()
 
 func start(scenesContainer : Node = null, callBackObj : Node = null):
-	ButtonsContainer = get_node(ButtonsContainerPath)
+	if has_node(ButtonsContainerPath):
+		ButtonsContainer = get_node(ButtonsContainerPath)
+	else:
+		printerr("DynamicMenu.gd: invalid button container on " + str(self) + self.name )
+		return
 	
 	# cleanup first.. cause this was creating endless buttons
 	if ButtonsContainer.get_child_count() > 0:
@@ -22,11 +28,10 @@ func start(scenesContainer : Node = null, callBackObj : Node = null):
 		scenesContainer = get_node(ScenesContainerPath)
 	if callBackObj == null:
 		callBackObj = get_parent()
-		
+	CallBackObj = callBackObj
+	
 	if is_instance_valid(scenesContainer):
 		ScenesContainer = scenesContainer
-		
-		
 		if is_instance_valid(ButtonsContainer):
 			createButtons(scenesContainer, ButtonsContainer)
 			createReturnButton(ButtonsContainer, callBackObj)
@@ -76,7 +81,7 @@ func createButton(scene, buttonsContainer):
 		newButton.name = scene.name # not sure if we should escape slashes for this or convert to camel case
 		newButton.set_text(scene.name)
 		buttonsContainer.add_child(newButton)
-		print("DynamicMenu.gd creating new button: " + newButton.name)
+		#print("DynamicMenu.gd creating new button: " + newButton.name)
 		newButton.connect("pressed", self, "_on_button_pressed", [newButton.name])
 
 
@@ -88,6 +93,8 @@ func instantiateNewButtonContainer():
 	panel.add_child(vbox)
 	return vbox
  
+################################################################################
+# Signals
 
 func _on_button_pressed(buttonName):
 	print("DynamicMenu.gd _on_button_pressed("+ buttonName +") called")
@@ -97,7 +104,14 @@ func _on_button_pressed(buttonName):
 		self.set_visible(false)
 
 		if newScene.has_method("start"):
-			newScene.start()
+			newScene.start(CallBackObj)
 		else:
-			printerr("DynamicMenu.gd: newScene, " + newScene.name + ", has no start() function.")
+			printerr("DynamicMenu.gd: newScene, " + newScene.name + ", requires a 'start' function.")
+		
+		if newScene.has_signal("finished"):
+			newScene.connect("finished", self, "_on_scene_finished")
+		else:
+			printerr("DynamicMenu.gd: newScene, " + newScene.name + ", requires a 'finished' signal.")
 	
+func _on_scene_finished(scene):
+	self.set_visible(true)

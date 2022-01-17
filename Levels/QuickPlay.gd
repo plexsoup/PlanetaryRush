@@ -1,9 +1,10 @@
 extends Node2D
 
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
+var CallBackObj
+
+signal finished
+
 
 
 # Called when the node enters the scene tree for the first time.
@@ -15,13 +16,25 @@ func _ready():
 #func _process(delta):
 #	pass
 
-func activate(callBackObj):
-	print(str(get_children()))
-	$Level.start()
+func start(callBackObj):
+	CallBackObj = callBackObj
+	spawnLevel()
+
+	
+func spawnLevel():
+	var levelScene = load("res://Levels/Level.tscn")
+	var level = levelScene.instance()
+	self.add_child(level)
+	level.name = "Level"
+	level.start()
 	$EndScreen.hide()
 	
 func deactivate():
-	$Level.end()
+	var level
+	if has_node("Level"):
+		level = get_node("Level")
+	if level and is_instance_valid(level):
+		level.end()
 
 	
 func _on_level_completed(isPlayerWinner):

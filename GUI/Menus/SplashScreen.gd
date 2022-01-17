@@ -3,6 +3,7 @@ extends Node2D
 
 # Declare member variables here. Examples:
 signal level_completed(sceneObj)
+signal finished()
 export var AnimationName = "DropLogo"
 
 
@@ -15,15 +16,17 @@ func _ready():
 #func _process(delta):
 #	pass
 
-func activate(callBackObj):
+func start(callBackObj):
 	$AnimationPlayer.play(AnimationName)
 
-	
+
+func activate(callBackObj):
+	start(callBackObj)
+
 func deactivate():
 	$AnimationPlayer.stop()
 
 
 func _on_Timer_timeout():
-	connect("level_completed", global.Main, "_on_level_completed")
-	emit_signal("level_completed", self)
-	disconnect("level_completed", global.Main, "_on_level_completed")
+	#emit_signal("level_completed", self)
+	emit_signal("finished")

@@ -4,12 +4,12 @@ extends Node2D
 export var NextSceneName : String
 export var PreviousSceneName : String
 
-export var IsCurrent : bool = false
-export var Bespoke : bool = false # bespoke levels are handcrafted in the Godot 2D editor. Useful for campaign
+#export var IsCurrent : bool = false
+#export var Bespoke : bool = false # bespoke levels are handcrafted in the Godot 2D editor. Useful for campaign
 export var RequireNeutralCapture : bool = false
 
-export var DesiredNumPlanets : int
-export var DesiredNumFactions : int
+export var DesiredNumPlanets : int = 15
+export var DesiredNumFactions : int = 4
 var NumPlanets : int = 0
 var NumFactions : int = 0
 
@@ -45,24 +45,27 @@ func _ready():
 	#call_deferred("start")
 	# this is causing a problem. The AI starts before the player has clicked out of the menu
 	print("Hi, I'm level.gd, inside: " + get_parent().name)
-	
+	#start()
 
 func start(blueprintContainer : Node2D = null):
-	global.level = self # why? Shouldn't be necessary anymore
-	global.BulletContainer = $Bullets # why? Who uses this?
+	#Note: since we're now spawning levels dynamically, we should add numplanets and numfactions to the start function (pseudo constructor)
+	
+	global.BulletContainer = $Bullets # why? Who uses this? Need to refactor weapons.gd
+	printerr("Level.gd should not require registering a BulletContainer with global.")
 
-	NumPlanets = DesiredNumPlanets
-	NumFactions = DesiredNumFactions
+
 	
 	# spawn a bunch of neutral planets, then change NumFactions to their unique faction.
-	if not Bespoke:
+	if not is_instance_valid(blueprintContainer):
+		NumPlanets = DesiredNumPlanets
+		NumFactions = DesiredNumFactions
 		spawn_factions(DesiredNumFactions)  # produces factionObj's in FactionContainer
 		spawn_planets(NumPlanets)
 		for faction in FactionContainer.get_children():
 			var randomPlanet = PlanetContainer.get_random_neutral_planet()
 			randomPlanet.switch_faction(faction)
 			randomPlanet.set_initial_population(4.0)
-	elif is_instance_valid(blueprintContainer):
+	else:
 		build_level_from_blueprint(blueprintContainer)
 
 	spawn_in_level_GUI()
@@ -148,12 +151,17 @@ func spawn_path(planet, factionObj, cursorObj):
 	pathFollowNode.start(planet, factionObj, cursorObj, self)
 
 func build_level_from_blueprint(blueprintContainer):
+	DesiredNumFactions = 0
+	DesiredNumPlanets = 0
+	
 	# look at the blueprint and identify existing planets, factions, etc.
 	# make sure they get catalogued and initialized correctly
 	print("Level.gd is identifying objects placed manually in the level designer.")
 	# enumerate all the planets in the blueprint node
 	# then spawn factions accordingly
 	# then move the planets into the PlanetContainer
+	
+	#NumFactions = blueprintContainer.NumFactions
 	
 	var factionNums = []
 	var planetsInLevel = blueprintContainer.get_children()
@@ -174,12 +182,15 @@ func build_level_from_blueprint(blueprintContainer):
 
 	for templatePlanet in planetsInLevel:
 		var newPlanet = PlanetContainer.spawnPlanet(self, templatePlanet.Size, templatePlanet.get_global_position())
-		newPlanet.start(self, templatePlanet.Size)
-		newPlanet.switch_faction(templatePlanet.FactionNum)
-		newPlanet.set_initial_population(templatePlanet.Size)
-		templatePlanet.hide()
+		if is_instance_valid(newPlanet):
+			newPlanet.start(self, templatePlanet.Size)
+			newPlanet.switch_faction(templatePlanet.FactionNum)
+			newPlanet.set_initial_population(templatePlanet.Size)
+			templatePlanet.hide()
 
-	#blueprintContainer.hide() # why isn't this working?
+	blueprintContainer.hide() # why isn't this working?
+
+	var numPlanets = PlanetContainer.get_planet_count()
 
 
 func remove_entities():

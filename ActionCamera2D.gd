@@ -25,6 +25,9 @@ func start(levelObj, planetsObj):
 	# zoom extents to capture all the planets.
 	
 	var planets = planetsObj.get_all_planets()
+	if planets.size() == 0:
+		return
+		
 	var AA = Vector2(1000000,1000000)
 	var BB = Vector2(0, 0)
 

@@ -4,6 +4,8 @@ extends Node2D
 # Declare member variables here. Examples:
 var FactionObj
 var Level
+var CursorObj
+
 signal click_mouse(position)
 var lerp_toward_mouse_speed : float = 0.8 # Not higher than 1!
 
@@ -15,6 +17,7 @@ func _ready():
 func start(levelObj, factionObj): # called by Cursor.gd
 	Level = levelObj
 	FactionObj = factionObj
+	CursorObj = get_parent()
 
 func check_requirements():
 	if lerp_toward_mouse_speed > 0.9:
@@ -24,8 +27,8 @@ func check_requirements():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	
-	if get_parent().State == get_parent().States.ACTIVE and get_parent().is_inside_margins():
-		get_parent().set_global_position(lerp(get_global_position(), get_global_mouse_position(), lerp_toward_mouse_speed))
+	if CursorObj.State == CursorObj.States.ACTIVE and CursorObj.is_inside_margins():
+		CursorObj.set_global_position(lerp(get_global_position(), get_global_mouse_position(), lerp_toward_mouse_speed))
 	
 	
 	
@@ -34,9 +37,9 @@ func _input(event):
 	if Input.is_action_just_pressed("left_click") and is_instance_valid(FactionObj):
 		if FactionObj.IsLocalHumanPlayer:
 			#signal the parent that we clicked.
-			connect("click_mouse", get_parent(), "_on_PlayerController_Clicked")
+			connect("click_mouse", CursorObj, "_on_PlayerController_Clicked")
 			emit_signal("click_mouse")
-			disconnect("click_mouse", get_parent(), "_on_PlayerController_Clicked")
+			disconnect("click_mouse", CursorObj, "_on_PlayerController_Clicked")
 
 	elif Input.is_action_just_pressed("ui_pause_action"):
 		print("user requested a soft pause toggle")
