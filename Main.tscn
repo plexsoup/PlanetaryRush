@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=22 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://Scenery/AnimatedSpaceships.tscn" type="PackedScene" id=2]
@@ -12,6 +12,7 @@
 [ext_resource path="res://Scenery/stars.png" type="Texture" id=10]
 [ext_resource path="res://Tutorial/Tutorial.tscn" type="PackedScene" id=11]
 [ext_resource path="res://Scenery/VQGAN Art/library.jpg" type="Texture" id=12]
+[ext_resource path="res://Levels/QuickCampaign.tscn" type="PackedScene" id=13]
 [ext_resource path="res://Levels/QuickPlay.gd" type="Script" id=15]
 [ext_resource path="res://GUI/Icons/PlexSoup.png" type="Texture" id=17]
 [ext_resource path="res://GUI/Menus/SplashScreen.gd" type="Script" id=18]
@@ -148,6 +149,9 @@ BackgroundImage = ExtResource( 12 )
 position = Vector2( 18, 24 )
 
 [node name="Tutorial" parent="Game" instance=ExtResource( 11 )]
+visible = false
+
+[node name="QuickCampaign" parent="Game" instance=ExtResource( 13 )]
 visible = false
 
 [node name="QuickPlay" type="Node2D" parent="Game"]

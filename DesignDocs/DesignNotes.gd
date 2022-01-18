@@ -126,6 +126,7 @@ func Bugs():
 	pass
 	
 	var Bugs = {
+		"cursor stops" :"cursor can't go past certain limits.. enlarge the playable area",
 		"tutorial menu keeps changing button names every time it restarts":"figure out how to not restart it over and over",
 		"restarting": "doesn't remove previous level instance. need more cleanup",
 		"pausing" : "pausing should show the options menu",
@@ -255,6 +256,10 @@ Node Conquest games:
 - many newgrounds games: Phage Wars/Tentacle Wars/Civilization Wars/Virus Wars
 - FreeOrion
 - Auralux
+- micro wars by kalt
+- phage wars
+- oil rush
+- microcosmum
 
 
 TBS Games with bases

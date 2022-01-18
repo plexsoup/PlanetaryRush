@@ -3,7 +3,7 @@ extends Area2D
 enum States { PAUSED, ACTIVE, LOCKED, DRAWING, SEEKING }
 var State = States.ACTIVE
 
-var cursor_range : float = 3000
+var cursor_range : float = 30000
 var Level
 
 var current_planet : StaticBody2D
