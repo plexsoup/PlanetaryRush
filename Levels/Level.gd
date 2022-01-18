@@ -49,12 +49,16 @@ func _ready():
 	pass
 	#start()
 
-func start(blueprintContainer : Node2D = null, callbackObj = get_parent()):
+func start(blueprintContainer : Node2D = null, callbackObj = get_parent(), desiredNumPlanets = null, desiredNumFactions = null):
 	#Note: since we're now spawning levels dynamically, we should add numplanets and numfactions to the start function (pseudo constructor)
 	
 	global.BulletContainer = $Bullets # why? Who uses this? Need to refactor weapons.gd
 	printerr("Level.gd should not require registering a BulletContainer with global.")
 
+	if desiredNumFactions != null:
+		DesiredNumFactions = desiredNumFactions
+	if desiredNumPlanets != null:
+		DesiredNumPlanets = desiredNumPlanets
 
 	
 	# spawn a bunch of neutral planets, then change NumFactions to their unique faction.

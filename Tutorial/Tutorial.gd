@@ -4,6 +4,8 @@ extends Node2D
 # Declare member variables here. Examples:
 var CallBackObj
 
+
+
 signal finished()
 
 # Called when the node enters the scene tree for the first time.
@@ -37,8 +39,11 @@ func activate(callBackObj):
 	
 	hide_all_stages()
 	
-	$DynamicMenu.show()
-	$DynamicMenu.start() # relying on the path to be set manually in the inspector
+	var tutorialMenu = $DynamicMenu
+	tutorialMenu.show()
+	
+	# refactor: figure out how to prevent multiple restarts.. it's causing problems
+	tutorialMenu.start(self, self) # relying on the path to be set manually in the inspector
 	
 	
 	
@@ -83,12 +88,14 @@ func _on_Stage_Button_pressed(stageName):
 			newStageNode.start()
 			newStageNode.show()
 		
-func _on_menu_finished():
+func _on_menu_finished(sceneObj):
+	print("Tutorial.gd signals: " + str(get_signal_connection_list("finished")))
 	# signal main that the tutorial menu is done. User wants to get back to main menu.
 	printerr("Tutorial.gd needs development in _on_menu_finished")
-	connect("finished", CallBackObj, "_on_tutorial_finished")
-	emit_signal("finished")
-	disconnect("finished", CallBackObj, "_on_tutorial_finished")
+	#connect("finished", CallBackObj, "_on_tutorial_finished")
+	print("Tutorial.gd connections for finished: " + str(self.get_signal_connection_list("finished")))
+	emit_signal("finished", self)
+	#disconnect("finished", CallBackObj, "_on_tutorial_finished")
 	
 func _on_level_finished(scene):
 	# can probably just ignore the scene.. you know it's coming from your Level.tscn

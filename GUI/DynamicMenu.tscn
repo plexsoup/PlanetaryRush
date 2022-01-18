@@ -1,7 +1,6 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://GUI/Themes/CyberTheme.tres" type="Theme" id=1]
-[ext_resource path="res://Scenery/VQGAN Art/professor.jpg" type="Texture" id=2]
 [ext_resource path="res://GUI/DynamicMenu.gd" type="Script" id=3]
 
 [node name="DynamicMenu" type="Node2D"]
@@ -24,7 +23,6 @@ __meta__ = {
 [node name="bgImage" type="TextureRect" parent="Control"]
 margin_right = 1056.0
 margin_bottom = 704.0
-texture = ExtResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }

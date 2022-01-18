@@ -126,7 +126,7 @@ func Bugs():
 	pass
 	
 	var Bugs = {
-		
+		"tutorial menu keeps changing button names every time it restarts":"figure out how to not restart it over and over",
 		"restarting": "doesn't remove previous level instance. need more cleanup",
 		"pausing" : "pausing should show the options menu",
 		"actionCamera viewport" : "actioncamera viewport is squashed/stretched",

@@ -18,6 +18,7 @@ func _ready():
 
 func start(callBackObj):
 	$AnimationPlayer.play(AnimationName)
+	$Timer.start()
 
 
 func activate(callBackObj):

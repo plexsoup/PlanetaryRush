@@ -2,6 +2,8 @@ extends Node2D
 # spawn level, ingest blueprint
 
 var Level
+export var NumPlanets : int
+export var NumFactions : int
 
 signal finished(nodeObj)
 
@@ -13,7 +15,8 @@ func _ready():
 
 func start(callbackObj):
 
-	spawnLevel()
+
+	spawnLevel(NumPlanets, NumFactions)
 
 	# if it's a blueprint level, import the blueprint
 #	if self.has_node("blueprint") and self.has_node("Level"):
@@ -24,7 +27,7 @@ func start(callbackObj):
 #	else: # probably just a regular menu
 #		pass
 
-func spawnLevel():
+func spawnLevel(numPlanets, numFactions):
 	var levelScene = preload("res://Levels/Level.tscn")
 	var level = levelScene.instance()
 	self.add_child(level)
@@ -33,7 +36,10 @@ func spawnLevel():
 		level.connect("finished", self, "_on_level_finished")
 	else:
 		printerr("Level requires a finished signal.")
-	level.start($blueprint, self)
+	if has_node("blueprint"):
+		level.start($blueprint, self, numPlanets, numFactions)
+	else:
+		level.start(null, self, numPlanets, numFactions)
 	Level = level
 
 func show_children():

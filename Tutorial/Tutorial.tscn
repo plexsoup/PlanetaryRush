@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Planets/PlanetBlueprint.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Levels/LevelBlueprint.gd" type="Script" id=2]
 [ext_resource path="res://GUI/Themes/CyberTheme.tres" type="Theme" id=3]
 [ext_resource path="res://Tutorial/TutorialStage.gd" type="Script" id=4]
 [ext_resource path="res://GUI/DynamicMenu.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Scenery/VQGAN Art/professor.jpg" type="Texture" id=6]
 [ext_resource path="res://Tutorial/Tutorial.gd" type="Script" id=7]
 
 [node name="Tutorial" type="Node2D"]
@@ -12,6 +13,7 @@ script = ExtResource( 7 )
 
 [node name="DynamicMenu" parent="." instance=ExtResource( 5 )]
 MenuName = "Tutorial"
+BackgroundImage = ExtResource( 6 )
 
 [node name="Stage 1" type="Node2D" parent="."]
 script = ExtResource( 4 )
@@ -81,7 +83,11 @@ align = 1
 [node name="Stage 2" type="Node2D" parent="."]
 visible = false
 script = ExtResource( 4 )
+NumPlanets = 5
+NumFactions = 2
 
 [node name="Stage 3" type="Node2D" parent="."]
 visible = false
 script = ExtResource( 4 )
+NumPlanets = 15
+NumFactions = 3

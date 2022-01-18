@@ -32,7 +32,10 @@ func show_main_camera():
 	$MainCamera._set_current(true)
 	
 func showSplashScreen():
-	$SplashScreen.connect("finished", self, "_on_SplashScreen_finished")
+	var splashScreen = $SplashScreen
+	if splashScreen.has_method("finished"):
+		if not splashScreen.is_connected("finished", self, "_on_SplashScreen_finished"):
+			$SplashScreen.connect("finished", self, "_on_SplashScreen_finished")
 	$SplashScreen.show()
 	$SplashScreen.start(self)
 
@@ -189,20 +192,36 @@ func _on_level_completed(sceneObj):
 	if sceneObj.name == "SplashScreen":
 		show_single_scene("Game")
 	
-func _on_tutorial_finished():
+func _on_tutorial_finished(sceneObj):
+	$Game.show()
+	$Game/DynamicMenu.start($Game, self)
 	show_single_scene("Game")
 	
 func _on_SplashScreen_finished():
 	print("main.gd splashscreen is finished")
 	$SplashScreen.hide()
 	$Game.show()
-	$Game/DynamicMenu.start($Game, self)
-	#$Game/DynamicMenu.show()
+	var gameMenu = $Game/DynamicMenu
+	if not gameMenu.is_connected("finished", self, "_on_game_menu_finished"):
+		gameMenu.connect("finished", self, "_on_game_menu_finished")
+		gameMenu.start($Game, self)
+	gameMenu.show()
 	
-func _on_menu_finished():
-	showSplashScreen()
+func _on_menu_finished(sceneObj):
+	print("Main.gd received _on_menu finished from " + sceneObj.name)
+	$Game.hide()
+	$SplashScreen.start(self)
+	$SplashScreen.show()
 	
 #func _on_button_pressed(buttonName): # entirely contained in Dynamic Menu now
 #	print("main.gd received _on_button_pressed " + buttonName)
 #	hide_all_scenes()
 #	show_single_scene(buttonName)
+
+func _on_game_menu_finished(sceneObj):
+	printerr("Main.gd: _on_game_menu_finished: maybe duplicate signals coming in.")
+	print("Main.gd received signal for _on_game_menu_finished from " + sceneObj.name)
+	$Game.hide()
+	$SplashScreen.start(self)
+	$SplashScreen.show()
+	

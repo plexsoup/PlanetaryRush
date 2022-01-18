@@ -10,7 +10,8 @@ var ButtonsContainer : Control
 
 var CallBackObj : Node # who to tell when we're done or when a scene completes or whatever
 
-#signal finished()
+
+signal finished() # when user presses the return button to go up one level
 
 func start(scenesContainer : Node = null, callBackObj : Node = null):
 	if has_node(ButtonsContainerPath):
@@ -76,7 +77,7 @@ func createReturnButton(buttonsContainer, callBackObj):
 		buttonsContainer.add_child(newButton)
 		print("DynamicMenu.gd creating new button: " + newButton.name)
 		if callBackObj.has_method("_on_menu_finished"):
-			newButton.connect("pressed", callBackObj, "_on_menu_finished")
+			newButton.connect("pressed", callBackObj, "_on_menu_finished", [self])
 		else:
 			printerr("When adding a dynamic menu, you need an _on_menu_finished function in the callback object to receive it's signal for when a user presses the Back button.")
 
@@ -128,6 +129,12 @@ func _on_button_pressed(buttonName):
 		
 
 func _on_scene_finished(scene):
-	print("Dynamic Menu received _on_scene_finished signal")
+	print("Dynamic Menu received signal _on_scene_finished for " + scene.name)
+	print("CallbackObj is " + CallBackObj.name)
+	
+	scene.hide()
+	
 	$Camera2D._set_current(true)
 	self.set_visible(true)
+	if scene.name == CallBackObj.name:
+		emit_signal("finished", self)
