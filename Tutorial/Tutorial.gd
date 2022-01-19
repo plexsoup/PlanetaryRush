@@ -43,7 +43,7 @@ func activate(callBackObj):
 	tutorialMenu.show()
 	
 	# refactor: figure out how to prevent multiple restarts.. it's causing problems
-	tutorialMenu.start(self, self) # relying on the path to be set manually in the inspector
+	tutorialMenu.start(self) # relying on the path to be set manually in the inspector
 	
 	
 	

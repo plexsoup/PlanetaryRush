@@ -3,7 +3,7 @@ extends Node2D
 
 # Declare member variables here. Examples:
 signal level_completed(sceneObj)
-signal finished()
+signal finished(sceneObj)
 export var AnimationName = "DropLogo"
 
 
@@ -30,4 +30,4 @@ func deactivate():
 
 func _on_Timer_timeout():
 	#emit_signal("level_completed", self)
-	emit_signal("finished")
+	emit_signal("finished", self)

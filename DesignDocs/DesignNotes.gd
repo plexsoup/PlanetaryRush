@@ -104,6 +104,7 @@ func _on_button_pressed(args):
 
 func Current_Work_Effort():
 	var currentWorkEffort = {
+		"menus" : "refactoring menus so stages are children of DynamicMenu.tscn",
 		"Tutorial Back Button" : "doesn't work",
 		"clean main scene tree" : "figure out which scenes need to be visible/hidden. Ensure that happens in code",
 		"remove level obj" : "instantiate levels in code instead of in the inspector",
@@ -234,6 +235,10 @@ func Maybe_Someday():
 		"Mods?" : "if you want it to be moddable, sprites and faction / ship properties should be loaded from files",
 		"Mod reference" : "https://docs.godotengine.org/en/stable/getting_started/workflow/export/exporting_pcks.html#overview-of-pck-files",
 		"Diegetic menus" : "Why are menus buttons? You could have users draw a path for a spaceship into a portal",
+		"persistent supply lines" : "draw from one planet to another and you get a persistent line. after fleet arrives another one is sent",
+		"econ planets" : "produce faster, but ships have no weapons.",
+		"research planets" : "develop tech. weapons, engines, shields, satelites, econ bonuses, etc.",
+		"obstacles" : "stars, black holes, nebulae impede free flow of movement",
 	}
 	
 	return maybeSomeday
@@ -260,7 +265,8 @@ Node Conquest games:
 - phage wars
 - oil rush
 - microcosmum
-
+- city takeover on google app store
+- bug war, tentacle war, civilization wars, little stars for little wars
 
 TBS Games with bases
 - hex empire

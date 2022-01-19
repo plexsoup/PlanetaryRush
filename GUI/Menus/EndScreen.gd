@@ -14,8 +14,8 @@ func _ready():
 	
 func connect_signals():
 	connect("Restart_pressed", get_parent(), "_on_Restart_pressed")
-	connect("Quit_pressed", global.Main, "_on_Quit_pressed")
-	connect("player_requested_scene", global.Main, "_on_player_requested_scene")
+	connect("Quit_pressed", get_parent(), "_on_Quit_pressed")
+	connect("player_requested_scene", get_parent(), "_on_player_requested_scene")
 
 func win():
 	print("endscreen received call to: win()")

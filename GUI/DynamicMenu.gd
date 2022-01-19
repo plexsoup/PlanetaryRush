@@ -2,43 +2,40 @@ extends Node2D
 # Place this node inside a node, with siblings for each button item
 
 export var ScenesContainerPath : String = ""
-export var ButtonsContainerPath : String = "Control/bgImage/CenterContainer/PanelContainer/VBoxContainer/Label"
+var ButtonsContainerPath : String = "Control/bgImage/CenterContainer/PanelContainer/VBoxContainer"
 export var MenuName : String = "Dynamic Menu"
+var MenuTitleLabelPath = "Control/bgImage/CenterContainer/PanelContainer/VBoxContainer/MenuTitle"
 export var BackgroundImage : Texture
 var ScenesContainer : Node
-var ButtonsContainer : Control
+var ButtonsContainer : VBoxContainer
 
 var CallBackObj : Node # who to tell when we're done or when a scene completes or whatever
 
 
 signal finished() # when user presses the return button to go up one level
 
-func start(scenesContainer : Node = null, callBackObj : Node = null):
-	if has_node(ButtonsContainerPath):
-		ButtonsContainer = get_node(ButtonsContainerPath)
-	else:
-		printerr("DynamicMenu.gd: invalid button container on " + str(self) + self.name )
+func start(callBackObj : Node = null):
+	setTitle(MenuName)
+	self.set_visible(true)
+	if verifyContainers() == false:
+		printerr("Problem in DynamicMenu.gd on " + self.name + " ButtonContainerPath or ScenesContainerPath are incorrect")
 		return
-	
-	# cleanup first.. cause this was creating endless buttons
-	if ButtonsContainer.get_child_count() > 0:
-		for button in ButtonsContainer.get_children():
-			button.call_deferred("queue_free")
-			
-	if scenesContainer == null:
-		scenesContainer = get_node(ScenesContainerPath)
+	else:
+		ScenesContainer = get_node(ScenesContainerPath)
+		ButtonsContainer = get_node(ButtonsContainerPath)
+
+	cleanup_old_buttons()
+		
 	if callBackObj == null:
 		callBackObj = get_parent()
 	CallBackObj = callBackObj
 	
-	if is_instance_valid(scenesContainer):
-		ScenesContainer = scenesContainer
-		if is_instance_valid(ButtonsContainer):
-			createButtons(scenesContainer, ButtonsContainer)
-			createReturnButton(ButtonsContainer, callBackObj)
-		else:
-			printerr("DynamicMenu.gd " + self.name + " problem locating button container")
-	setTitle()
+	if is_instance_valid(ButtonsContainer):
+		createButtons(ScenesContainer, ButtonsContainer)
+		createReturnButton(ButtonsContainer, callBackObj)
+	else:
+		printerr("DynamicMenu.gd " + self.name + " problem locating button container")
+
 	
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -54,12 +51,35 @@ func _ready():
 	else:
 		printerr("Dynamic Menu should have an image set in the inspector.")
 
+	if ScenesContainerPath != "":
+		ScenesContainer = get_node(ScenesContainerPath)
+		if is_instance_valid(ScenesContainer):
+			hide_all_scenes(ScenesContainer)
 
+func cleanup_old_buttons():
+	# script was creating endless buttons. easy fix is to free old buttons
+	if ButtonsContainer.get_child_count() > 1: # allowed to have a label
+		for button in ButtonsContainer.get_children():
+			if button.is_class("Button"):
+				button.call_deferred("queue_free")
+	
 
-func setTitle():
+func verifyContainers():
+	var valid : bool = false # until proven otherwise
+	if has_node(ScenesContainerPath) and is_instance_valid(get_node(ScenesContainerPath)):
+		if has_node(ButtonsContainerPath) and is_instance_valid(get_node(ButtonsContainerPath)):
+			valid = true
+	return valid
+	
+
+func hide_all_scenes(scenesContainer):
+	for scene in scenesContainer.get_children():
+		scene.hide()
+
+func setTitle(titleString):
 	var labelNode = find_node("MenuTitle")
 	if is_instance_valid(labelNode):
-		labelNode.set_text(MenuName)
+		labelNode.set_text(titleString)
 		
 
 func createButtons(scenesContainer, buttonsContainer):
@@ -77,7 +97,7 @@ func createReturnButton(buttonsContainer, callBackObj):
 		buttonsContainer.add_child(newButton)
 		print("DynamicMenu.gd creating new button: " + newButton.name)
 		if callBackObj.has_method("_on_menu_finished"):
-			newButton.connect("pressed", callBackObj, "_on_menu_finished", [self])
+			newButton.connect("pressed", self, "_on_menu_finished", [self])
 		else:
 			printerr("When adding a dynamic menu, you need an _on_menu_finished function in the callback object to receive it's signal for when a user presses the Back button.")
 
@@ -114,7 +134,7 @@ func _on_button_pressed(buttonName):
 	if ScenesContainer.has_node(buttonName):
 		var newScene = ScenesContainer.get_node(buttonName)
 		newScene.set_visible(true)
-		self.set_visible(false)
+		#self.set_visible(false)
 
 		if newScene.has_signal("finished"):
 			if not newScene.is_connected("finished", self, "_on_scene_finished"):
@@ -123,10 +143,13 @@ func _on_button_pressed(buttonName):
 			printerr("Dynamic menu expects all scenes to have a finished function")
 
 		if newScene.has_method("start"):
-			newScene.start(CallBackObj)
+			#newScene.start(CallBackObj)
+			newScene.start(self)
+			
 		else:
 			printerr("DynamicMenu.gd: newScene, " + newScene.name + ", requires a 'start' function.")
-		
+	else:
+		printerr("DynamicMenu.gd Scenes container doesn't have a scene matching name: " + buttonName)
 
 func _on_scene_finished(scene):
 	print("Dynamic Menu received signal _on_scene_finished for " + scene.name)
@@ -138,3 +161,7 @@ func _on_scene_finished(scene):
 	self.set_visible(true)
 	if scene.name == CallBackObj.name:
 		emit_signal("finished", self)
+
+func _on_menu_finished(scene):
+	self.hide()
+	emit_signal("finished", self)

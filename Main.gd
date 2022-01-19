@@ -8,96 +8,42 @@ Show an option screen
 extends Node2D
 
 #var CurrentLevel : Node2D
-var levels: Array = ["res://Levels/Level.tscn"]
+#var levels: Array = ["res://Levels/Level.tscn"]
 var CurrentScene : Node2D
+var Scenes : Dictionary
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	
-	
-	
-	# load_level(levels[0]) # this happens when start button is pushed
-	randomize()
-	global.Main = self
-	#hide_all_scenes()
-	
-	$Game.hide()
-	$EndScreen.hide()
-	
-	$SplashScreen.connect("finished", self, "_on_SplashScreen_finished")
-	$SplashScreen.show()
-	$SplashScreen.start(self)
-	
-func show_main_camera():
-	$MainCamera._set_current(true)
-	
-func showSplashScreen():
-	var splashScreen = $SplashScreen
-	if splashScreen.has_method("finished"):
-		if not splashScreen.is_connected("finished", self, "_on_SplashScreen_finished"):
-			$SplashScreen.connect("finished", self, "_on_SplashScreen_finished")
-	$SplashScreen.show()
-	$SplashScreen.start(self)
+	Scenes = {
+		"SplashScreen" : $SplashScreen,
+		"Game" : $Game,
+		"EndScreen" : $EndScreen
+	}
 
+
+	show_single_scene(Scenes["SplashScreen"]) # requires scenes to have a .start() function
 	
-func show_single_scene(desiredSceneNodeName):
-	print("showing scene now: " + desiredSceneNodeName)
 	
+func show_single_scene(sceneObj):
+	print("Main.gd show_single_scene called with " + sceneObj.name)
 	$MainCamera._set_current(true)
 	$MainCamera.set_zoom(Vector2(1,1))
-#		remove_level()
 
-	var currentSceneCache = CurrentScene
-	for sceneNode in get_children():
-		
-		if sceneNode.name == desiredSceneNodeName:
-			sceneNode.show()
-			if sceneNode.has_method("activate"):
-				print("Main.gd show_single_scene: " + sceneNode.name)
-				sceneNode.activate(self)
-				CurrentScene = sceneNode
-		elif sceneNode == currentSceneCache:
-			if sceneNode.has_method("deactivate"):
-				sceneNode.deactivate()
-			sceneNode.hide()
+	for sceneName in Scenes:
+		if Scenes[sceneName] != sceneObj:
+			Scenes[sceneName].hide()
 		else:
-			pass
+			Scenes[sceneName].show()
+			
+			if not Scenes[sceneName].is_connected("finished", self, "_on_scene_finished"):
+				Scenes[sceneName].connect("finished", self, "_on_scene_finished")
+				Scenes[sceneName].start(self)
+			else:
+				print("Scene already has signals connected. starting anyways")
+				Scenes[sceneName].start(self)
 
-func hide_all_scenes():
-	
-	for sceneNode in get_children():
-		if sceneNode.has_method("deactivate"):
-			sceneNode.deactivate()
-		sceneNode.hide()
-
-
-func show_end_screen(playerWon):
-	if playerWon:
-		$Scenes/EndCredits/EndScreen.win()
-	else:
-		$Scenes/EndCredits/EndScreen.lose()
-	show_single_scene("EndCredits")
-
-
-#func hide_end_screen():
-#	$Scenes/EndCredits.hide()
-
-
-#func show_start_screen():
-#	$Scenes/TitleScreen.show()
-
-
-
-
-func print_debug_info():
-	if global.Debug:
-		# print_tree_pretty()
-#		print("We could put more debug info in Main.gd print_debug_info.")
-#		print("But right now it's empty.")
-#		print("If you need it, you could add a print_tree_pretty() call.")
-		pass
-		
 func updateInGameTimers(speed):
+	#refactor. Move this to Level
 	printerr("Main.gd updateInGameTimers needs development")
 	var timerNodes = get_tree().get_nodes_in_group("InGameTimers")
 	for timerNode in timerNodes:
@@ -105,123 +51,31 @@ func updateInGameTimers(speed):
 
 	
 func restart():
-	print("Main.gd restart() called")
-	hide_all_scenes()
-	show_single_scene("QuickPlay")
+	show_single_scene(Scenes["QuickPlay"])
 
-
-	
-	
-	#global.State = global.States.FIGHTING
-
-################################################################################
-# Incoming Signals
-
-# HMM.. Why does main ever care when a single faction lost?
-# They should only care that the player lost.
-#func _on_faction_lost(factionObj):
-#	printerr("Main.gd _on_faction_lost. Consider deprecating in favour of _on_player_lost")
-#	if factionObj.IsLocalHumanPlayer:
-#		var playerWon = false
-#		show_end_screen(playerWon)
-#	else:
-#		pass # cause, who cares?
-
-
-#func _on_player_lost(): # coming from Level
-#	print("Main.gd got notified that player lost. _on_player_lost()")
-#	# should we just trust that Level got it right?
-#	var playerWon = false
-#	show_end_screen(playerWon)
-
-#func _on_faction_won(factionObj):
-#	# This should come after the planets all celebrate.
-#	# verify a faction won and the celebration is over,
-#	# then show the end-screen
-#	printerr("Main.gd _on_faction_won shouldn't have to know anything about faction. Just show the end screen")
-#
-#	if is_instance_valid(factionObj) == false:
-#		printerr("A faction queued free before it won?")
-#		return
-#	else: # factionObj is valid
-#		printerr("Main.gd: _on_faction_won logic: move this to level.gd")
-#		if factionObj.IsLocalHumanPlayer:
-#			show_end_screen(true)
-#		else:
-#			if CurrentLevel.FactionContainer.get_child_count() <= 1:
-#				show_end_screen(false)
 
 func _on_Quit_pressed():
 	$AudioStreamPlayer.stop()
-	hide_all_scenes()
 	show_single_scene("GoodByeScreen")
-	
-
 	yield(get_tree().create_timer(1.5),"timeout")
-
 	get_tree().quit()
 
 func _on_player_requested_scene(sceneName):
+	printerr("Do we still use _on_player_requested_scene?")
 	if $Scenes.find_node(sceneName):
 		show_single_scene(sceneName)
-	
-	
-#func _on_quickplay_button_pressed():
-#	restart()
-
 	
 func _on_restart_button_pressed():
 	restart()
 
-#func _on_main_menu_requested():
-#	show_single_scene("MainMenu")
-	
-#func _on_Restart_pressed():
-#
-#	restart()
 
 
-func _on_DebugTimer_timeout():
-	print_debug_info()
+func _on_scene_finished(sceneObj):
+	show_single_scene(Scenes["Game"])
 
-#func _on_tutorial_requested():
-#	hide_all_scenes()
-#	show_single_scene("Tutorial")
 
-func _on_level_completed(sceneObj):
-	if sceneObj.name == "SplashScreen":
-		show_single_scene("Game")
-	
-func _on_tutorial_finished(sceneObj):
-	$Game.show()
-	$Game/DynamicMenu.start($Game, self)
-	show_single_scene("Game")
-	
-func _on_SplashScreen_finished():
-	print("main.gd splashscreen is finished")
-	$SplashScreen.hide()
-	$Game.show()
-	var gameMenu = $Game/DynamicMenu
-	if not gameMenu.is_connected("finished", self, "_on_game_menu_finished"):
-		gameMenu.connect("finished", self, "_on_game_menu_finished")
-		gameMenu.start($Game, self)
-	gameMenu.show()
-	
+
+
 func _on_menu_finished(sceneObj):
-	print("Main.gd received _on_menu finished from " + sceneObj.name)
-	$Game.hide()
-	$SplashScreen.start(self)
-	$SplashScreen.show()
-	
-#func _on_button_pressed(buttonName): # entirely contained in Dynamic Menu now
-#	print("main.gd received _on_button_pressed " + buttonName)
-#	hide_all_scenes()
-#	show_single_scene(buttonName)
-
-func _on_game_menu_finished(sceneObj):
-	printerr("Main.gd: _on_game_menu_finished: maybe duplicate signals coming in.")
-	print("Main.gd received signal for _on_game_menu_finished from " + sceneObj.name)
-	$Game.hide()
-	$SplashScreen.start(self)
-	$SplashScreen.show()
-	
+	sceneObj.hide()
+	show_single_scene(Scenes["SplashScreen"])
