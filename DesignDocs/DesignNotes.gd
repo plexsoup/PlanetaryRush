@@ -104,6 +104,9 @@ func _on_button_pressed(args):
 
 func Current_Work_Effort():
 	var currentWorkEffort = {
+		"":"",
+		
+		
 		"menus" : "refactoring menus so stages are children of DynamicMenu.tscn",
 		"Tutorial Back Button" : "doesn't work",
 		"clean main scene tree" : "figure out which scenes need to be visible/hidden. Ensure that happens in code",
@@ -127,6 +130,8 @@ func Bugs():
 	pass
 	
 	var Bugs = {
+		"menus":"go tut, back, tut again and you'll see only animated spaceships?",
+		
 		"cursor stops" :"cursor can't go past certain limits.. enlarge the playable area",
 		"tutorial menu keeps changing button names every time it restarts":"figure out how to not restart it over and over",
 		"restarting": "doesn't remove previous level instance. need more cleanup",

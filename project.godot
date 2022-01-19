@@ -20,6 +20,11 @@ _global_script_classes=[ {
 "path": "res://GUI/Menus/MenuEntry.gd"
 }, {
 "base": "Node2D",
+"class": "OutroScreen",
+"language": "GDScript",
+"path": "res://GUI/Menus/OutroScreen.gd"
+}, {
+"base": "Node2D",
 "class": "SplashScreen",
 "language": "GDScript",
 "path": "res://GUI/Menus/SplashScreen.gd"
@@ -27,6 +32,7 @@ _global_script_classes=[ {
 _global_script_class_icons={
 "DynamicMenu": "res://GUI/icons/open-book-g.svg",
 "MenuEntry": "res://GUI/icons/theater-curtains.svg",
+"OutroScreen": "res://GUI/icons/hand.svg",
 "SplashScreen": "res://GUI/icons/film-spool.svg"
 }
 
@@ -34,7 +40,7 @@ _global_script_class_icons={
 
 config/name="Planetary Rush"
 run/main_scene="res://Main.tscn"
-config/icon="res://GUI/Icons/icon.png"
+config/icon="res://GUI/Icons/IconFactionBlue2.png"
 
 [autoload]
 

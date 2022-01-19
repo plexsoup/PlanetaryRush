@@ -1,5 +1,5 @@
 extends Node2D
-class_name MenuEntry, "res://GUI/icons/theater-curtains.svg"
+class_name OutroScreen, "res://GUI/icons/hand.svg" 
 
 # Declare member variables here. Examples:
 signal level_completed(sceneObj)
@@ -21,31 +21,18 @@ func start(callBackObj):
 
 	if has_node("Timer"):
 		$Timer.start()
+		
 	else:
 		_on_Timer_timeout()
 
 
-func launch_menu():
-	var menu
-	if get_children()[0].is_class("DynamicMenu"):
-		menu = get_children()[0]
-	else:
-		menu = find_node("*Menu")
-	print("MenuEntry.gd in launch_menu() found menu: " + str(menu) + " " + menu.name)
-	menu.connect("finished", self, "_on_menu_finished")
-	menu.start(self)
-	menu.show()
-	
+
 
 func end():
-	if has_node("AnimationPlayer"):
-		$AnimationPlayer.stop()
-	emit_signal("finished", self)
+	$AnimationPlayer.stop()
+	get_tree().quit()
 
 ################################################################################
 # Incoming Signals
 func _on_Timer_timeout():
-	launch_menu()
-
-func _on_menu_finished(sceneFinishing):
 	end()

@@ -1,10 +1,12 @@
-[gd_scene load_steps=20 format=2]
+[gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://Scenery/AnimatedSpaceships.tscn" type="PackedScene" id=2]
 [ext_resource path="res://GUI/DynamicMenu.tscn" type="PackedScene" id=3]
+[ext_resource path="res://GUI/Menus/OutroScreen.gd" type="Script" id=4]
 [ext_resource path="res://BGMusic/hearts-unraveled.ogg" type="AudioStream" id=5]
 [ext_resource path="res://GUI/Menus/MenuEntry.gd" type="Script" id=6]
+[ext_resource path="res://GUI/Menus/SplashScreen.gd" type="Script" id=7]
 [ext_resource path="res://Scenery/stars.png" type="Texture" id=10]
 [ext_resource path="res://Planets/PlanetBlueprint.tscn" type="PackedScene" id=11]
 [ext_resource path="res://Scenery/VQGAN Art/library.jpg" type="Texture" id=12]
@@ -13,7 +15,6 @@
 [ext_resource path="res://Levels/QuickPlay.gd" type="Script" id=15]
 [ext_resource path="res://Tutorial/TutorialStage.gd" type="Script" id=16]
 [ext_resource path="res://GUI/Icons/PlexSoup.png" type="Texture" id=17]
-[ext_resource path="res://GUI/Menus/SplashScreen.gd" type="Script" id=18]
 [ext_resource path="res://effects/536104__eminyildirim__sword-hit-heavy.wav" type="AudioStream" id=19]
 [ext_resource path="res://GUI/Themes/CyberTheme.tres" type="Theme" id=20]
 
@@ -117,7 +118,7 @@ script = ExtResource( 1 )
 
 [node name="SplashScreen" type="Node2D" parent="."]
 visible = false
-script = ExtResource( 18 )
+script = ExtResource( 7 )
 
 [node name="PlexSoupLogo" type="Sprite" parent="SplashScreen"]
 position = Vector2( 512, -272 )
@@ -145,6 +146,7 @@ script = ExtResource( 6 )
 ScenesContainerPath = "../GameModes"
 MenuName = "Game Menu"
 BackgroundImage = ExtResource( 12 )
+ShowReturnButton = false
 
 [node name="MenuEffects" parent="Game/GameMenu" instance=ExtResource( 2 )]
 position = Vector2( 18, 24 )
@@ -260,34 +262,33 @@ visible = false
 [node name="PlanetMap" type="Node2D" parent="Game/GameModes/Campaign"]
 visible = false
 
-[node name="EndScreen" type="Node2D" parent="."]
+[node name="Quit" type="Node2D" parent="Game/GameModes"]
 visible = false
-script = ExtResource( 18 )
+script = ExtResource( 4 )
 AnimationName = "RaiseLogo"
 
-[node name="PlexSoupLogo" type="Sprite" parent="EndScreen"]
+[node name="PlexSoupLogo" type="Sprite" parent="Game/GameModes/Quit"]
 position = Vector2( 512, -272 )
 z_index = 1
 texture = ExtResource( 17 )
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="EndScreen"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Game/GameModes/Quit"]
 anims/DropLogo = SubResource( 2 )
 anims/RaiseLogo = SubResource( 3 )
 
-[node name="Timer" type="Timer" parent="EndScreen"]
+[node name="Timer" type="Timer" parent="Game/GameModes/Quit"]
 wait_time = 1.2
 one_shot = true
-autostart = true
 
-[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="EndScreen"]
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="Game/GameModes/Quit"]
 stream = ExtResource( 19 )
 
-[node name="background" type="Sprite" parent="EndScreen"]
+[node name="background" type="Sprite" parent="Game/GameModes/Quit"]
 position = Vector2( 508, 302 )
 z_index = -1
 texture = ExtResource( 10 )
 
-[node name="Panel" type="Panel" parent="EndScreen"]
+[node name="Panel" type="Panel" parent="Game/GameModes/Quit"]
 margin_left = 376.0
 margin_top = 182.0
 margin_right = 643.0
@@ -298,7 +299,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="EndScreen/Panel"]
+[node name="Label" type="Label" parent="Game/GameModes/Quit/Panel"]
 margin_top = 39.0
 margin_right = 61.0
 margin_bottom = 92.0
@@ -324,4 +325,4 @@ autoplay = true
 bus = "Music"
 
 [connection signal="timeout" from="SplashScreen/Timer" to="SplashScreen" method="_on_Timer_timeout"]
-[connection signal="timeout" from="EndScreen/Timer" to="EndScreen" method="_on_Timer_timeout"]
+[connection signal="timeout" from="Game/GameModes/Quit/Timer" to="Game/GameModes/Quit" method="_on_Timer_timeout"]

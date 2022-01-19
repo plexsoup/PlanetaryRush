@@ -67,6 +67,7 @@ script = ExtResource( 1 )
 z_index = -10
 
 [node name="Sprite" type="Sprite" parent="FinalBackground"]
+visible = false
 position = Vector2( 509, 283 )
 scale = Vector2( 0.6, 0.6 )
 texture = ExtResource( 2 )

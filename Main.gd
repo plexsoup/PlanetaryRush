@@ -16,8 +16,7 @@ var Scenes : Dictionary
 func _ready():
 	Scenes = {
 		"SplashScreen" : $SplashScreen,
-		"Game" : $Game,
-		"EndScreen" : $EndScreen
+		"Game" : $Game
 	}
 
 
@@ -74,8 +73,8 @@ func _on_scene_finished(sceneObj):
 	
 	if sceneObj == Scenes["SplashScreen"]:
 		show_single_scene(Scenes["Game"])
-	elif sceneObj == Scenes["Game"]:
-		show_single_scene(Scenes["EndScreen"])
+#	elif sceneObj == Scenes["Game"]:
+#		show_single_scene(Scenes["EndScreen"])
 
 
 

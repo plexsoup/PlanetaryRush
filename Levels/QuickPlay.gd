@@ -32,7 +32,7 @@ func spawnLevel():
 		printerr("Level has no 'finished' signal to connect")
 	level.start(null, self)
 	
-	$EndScreen.hide()
+	#$EndScreen.hide()
 	
 func deactivate():
 	var level

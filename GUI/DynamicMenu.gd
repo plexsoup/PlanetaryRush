@@ -5,10 +5,12 @@ class_name DynamicMenu, "res://GUI/icons/open-book-g.svg"
 # Place this node inside a node, with siblings for each button item
 
 export var ScenesContainerPath : String = ""
-var ButtonsContainerPath : String = "Control/bgImage/CenterContainer/PanelContainer/VBoxContainer"
 export var MenuName : String = "Dynamic Menu"
-var MenuTitleLabelPath = "Control/bgImage/CenterContainer/PanelContainer/VBoxContainer/MenuTitle"
 export var BackgroundImage : Texture
+export var ShowReturnButton: bool = true
+
+var ButtonsContainerPath : String = "Control/bgImage/CenterContainer/PanelContainer/VBoxContainer"
+var MenuTitleLabelPath = "Control/bgImage/CenterContainer/PanelContainer/VBoxContainer/MenuTitle"
 var ScenesContainer : Node
 var ButtonsContainer : VBoxContainer
 
@@ -38,7 +40,8 @@ func start(callBackObj : Node = null):
 	
 	if is_instance_valid(ButtonsContainer):
 		createButtons(ScenesContainer, ButtonsContainer)
-		createReturnButton(ButtonsContainer, callBackObj)
+		if ShowReturnButton:
+			createReturnButton(ButtonsContainer, callBackObj)
 	else:
 		printerr("DynamicMenu.gd " + self.name + " problem locating button container")
 
@@ -114,7 +117,7 @@ func createReturnButton(buttonsContainer, callBackObj):
 		buttonsContainer.add_child(newButton)
 		print("DynamicMenu.gd creating new button: " + newButton.name)
 		if callBackObj.has_method("_on_menu_finished"):
-			newButton.connect("pressed", self, "_on_menu_finished", [self])
+			newButton.connect("pressed", callBackObj, "_on_menu_finished", [self])
 		else:
 			printerr("When adding a dynamic menu, you need an _on_menu_finished function in the callback object to receive it's signal for when a user presses the Back button.")
 
@@ -156,7 +159,7 @@ func _on_button_pressed(buttonName):
 	if ScenesContainer.has_node(buttonName):
 		var newScene = ScenesContainer.get_node(buttonName)
 		newScene.set_visible(true)
-		#self.set_visible(false)
+		self.set_visible(false)
 
 		if newScene.has_signal("finished"):
 			if not newScene.is_connected("finished", self, "_on_scene_finished"):
@@ -187,4 +190,4 @@ func _on_scene_finished(scene):
 
 func _on_menu_finished(scene):
 	self.hide()
-	emit_signal("finished", self)
+	emit_signal("finished", self) # to CallbackObj
