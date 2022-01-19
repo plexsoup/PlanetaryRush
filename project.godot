@@ -8,8 +8,26 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "Node2D",
+"class": "DynamicMenu",
+"language": "GDScript",
+"path": "res://GUI/DynamicMenu.gd"
+}, {
+"base": "Node2D",
+"class": "MenuEntry",
+"language": "GDScript",
+"path": "res://GUI/Menus/MenuEntry.gd"
+}, {
+"base": "Node2D",
+"class": "SplashScreen",
+"language": "GDScript",
+"path": "res://GUI/Menus/SplashScreen.gd"
+} ]
 _global_script_class_icons={
+"DynamicMenu": "res://GUI/icons/open-book-g.svg",
+"MenuEntry": "res://GUI/icons/theater-curtains.svg",
+"SplashScreen": "res://GUI/icons/film-spool.svg"
 }
 
 [application]

@@ -71,11 +71,15 @@ func _on_restart_button_pressed():
 
 
 func _on_scene_finished(sceneObj):
-	show_single_scene(Scenes["Game"])
+	
+	if sceneObj == Scenes["SplashScreen"]:
+		show_single_scene(Scenes["Game"])
+	elif sceneObj == Scenes["Game"]:
+		show_single_scene(Scenes["EndScreen"])
 
 
 
 
-func _on_menu_finished(sceneObj):
-	sceneObj.hide()
-	show_single_scene(Scenes["SplashScreen"])
+#func _on_menu_finished(sceneObj):
+#	sceneObj.hide()
+#	show_single_scene(Scenes["SplashScreen"])

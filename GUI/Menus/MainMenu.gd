@@ -12,7 +12,9 @@ func _ready():
 
 
 func activate(callBackObj):
-	$TitleScreenUI.show()
+	#$TitleScreenUI.show()
+	pass
 	
 func deactivate():
-	$TitleScreenUI.hide()
+	#$TitleScreenUI.hide()
+	pass

@@ -1,4 +1,7 @@
 extends Node2D
+
+class_name DynamicMenu, "res://GUI/icons/open-book-g.svg"
+
 # Place this node inside a node, with siblings for each button item
 
 export var ScenesContainerPath : String = ""
@@ -16,7 +19,9 @@ signal finished() # when user presses the return button to go up one level
 
 func start(callBackObj : Node = null):
 	setTitle(MenuName)
-	self.set_visible(true)
+	
+
+	
 	if verifyContainers() == false:
 		printerr("Problem in DynamicMenu.gd on " + self.name + " ButtonContainerPath or ScenesContainerPath are incorrect")
 		return
@@ -24,6 +29,7 @@ func start(callBackObj : Node = null):
 		ScenesContainer = get_node(ScenesContainerPath)
 		ButtonsContainer = get_node(ButtonsContainerPath)
 
+	hide_all_scenes(ScenesContainer)
 	cleanup_old_buttons()
 		
 	if callBackObj == null:
@@ -35,6 +41,8 @@ func start(callBackObj : Node = null):
 		createReturnButton(ButtonsContainer, callBackObj)
 	else:
 		printerr("DynamicMenu.gd " + self.name + " problem locating button container")
+
+	self.show()
 
 	
 # Called when the node enters the scene tree for the first time.
@@ -73,8 +81,17 @@ func verifyContainers():
 	
 
 func hide_all_scenes(scenesContainer):
+	printerr("DynamicMenu.gd - hide_all_scenes needs attention")
+
+	printerr("DynamicMenu.gd: hide_all_scenes: Beware: We're hiding menuEffects, but we probably never unhide them.")
 	for scene in scenesContainer.get_children():
-		scene.hide()
+		# hide menu effects or whatever else we put in the menu
+		if scene != scenesContainer:
+			scene.hide()
+#		else:
+#			for subScene in scenesContainer.get_children():
+#				subScene.hide()
+			
 
 func setTitle(titleString):
 	var labelNode = find_node("MenuTitle")
@@ -103,11 +120,14 @@ func createReturnButton(buttonsContainer, callBackObj):
 
 
 func createButton(scene, buttonsContainer):
+	print("DynamicMenu " + self.name + " creating button: " + scene.name)
 	# create the button and connect the signals
 	
 	if not is_instance_valid(buttonsContainer):
 		buttonsContainer = instantiateNewButtonContainer()
 		ButtonsContainer = buttonsContainer
+	else:
+		pass # buttonsContainer is already good
 	
 	if is_instance_valid(buttonsContainer):
 		var newButton = Button.new()
@@ -131,6 +151,8 @@ func instantiateNewButtonContainer():
 
 func _on_button_pressed(buttonName):
 	print("DynamicMenu.gd _on_button_pressed("+ buttonName +") called")
+	hide_all_scenes(ScenesContainer)
+	$Control.hide()
 	if ScenesContainer.has_node(buttonName):
 		var newScene = ScenesContainer.get_node(buttonName)
 		newScene.set_visible(true)
@@ -156,6 +178,7 @@ func _on_scene_finished(scene):
 	print("CallbackObj is " + CallBackObj.name)
 	
 	scene.hide()
+	$Control.show()
 	
 	$Camera2D._set_current(true)
 	self.set_visible(true)
