@@ -2,7 +2,7 @@ extends Path2D
 
 var last_point : Vector2
 var min_point_separation : float = 15.0
-var MyPlanet : StaticBody2D
+var OriginPlanet : StaticBody2D
 var DestinationPlanet : StaticBody2D
 
 enum States { DRAWING, FINISHED }
@@ -29,7 +29,7 @@ func _ready():
 func start(planet, factionObj, cursorObj, levelObj):
 	print("ShipPath.gd start() called. Creating a path. hopefully only once per user-draw-action")
 	Level = levelObj
-	MyPlanet = planet
+	OriginPlanet = planet
 	CursorObj = cursorObj
 	FactionObj = factionObj
 	warp_to_planet(planet) # why?
@@ -63,7 +63,7 @@ func createNewPathFollowNode():
 	var pathFollowScene = preload("res://Paths/FleetNavigationMarker.tscn")
 	var pathFollowNode = pathFollowScene.instance()
 	pathFollowNode.set_offset(0.0)
-	add_child(pathFollowNode)
+	call_deferred("add_child", pathFollowNode)
 
 	return pathFollowNode
 
@@ -105,23 +105,25 @@ func finish_path(destinationPlanet):
 		else:
 			LinksTwoFriendlyPlanets = false
 
-	notifyPlanetsAndCursorPathIsReady(destinationPlanet)
+	notifyPlanetsAndCursorPathIsReady(OriginPlanet, destinationPlanet)
 
 func askOriginPlanetForMoreShips():
-	connect("requested_ships", MyPlanet, "_on_ShipPath_requested_more_ships")
+	connect("requested_ships", OriginPlanet, "_on_ShipPath_requested_more_ships")
 	emit_signal("requested_ships", self, DestinationPlanet)
-	disconnect("requested_ships", MyPlanet, "_on_ShipPath_requested_more_ships")
+	disconnect("requested_ships", OriginPlanet, "_on_ShipPath_requested_more_ships")
 
 ###############################################################################
 # Outbound Signals
 
-func notifyPlanetsAndCursorPathIsReady(destinationPlanet):
-	connect("finished_drawing", MyPlanet, "_on_ShipPath_finished_drawing")
+func notifyPlanetsAndCursorPathIsReady(originPlanet, destinationPlanet):
+	connect("finished_drawing", originPlanet, "_on_ShipPath_finished_drawing")
+	connect("finished_drawing", destinationPlanet, "_on_ShipPath_finished_drawing")
 	connect("finished_drawing", CursorObj, "_on_ShipPath_finished_drawing")
 	
-	emit_signal("finished_drawing", self, destinationPlanet)
+	emit_signal("finished_drawing", self, originPlanet, destinationPlanet)
 
-	disconnect("finished_drawing", MyPlanet, "_on_ShipPath_finished_drawing")
+	disconnect("finished_drawing", originPlanet, "_on_ShipPath_finished_drawing")
+	disconnect("finished_drawing", destinationPlanet, "_on_ShipPath_finished_drawing")
 	disconnect("finished_drawing", CursorObj, "_on_ShipPath_finished_drawing")
 
 ###############################################################################
@@ -160,7 +162,12 @@ func _draw():
 		#var behindFleet: bool = pointRatio < targetRatio
 		var pointSizeScaleFactor = 30.0
 		var pointSize = remainingRatio * pointSizeScaleFactor
-#		if behindFleet and not LinksTwoFriendlyPlanets:
+		if LinksTwoFriendlyPlanets:
+			pointColor.a = 0.66
+		else:
+			pointColor.a = 0.33
+
+		#if behindFleet and not LinksTwoFriendlyPlanets:
 #			pointColor.a = 0.1
 #		elif behindFleet:
 #			pointColor.a = 0.5
@@ -205,8 +212,14 @@ func _on_planet_cannot_send_ships():
 		print("ShipPath.gd _on_planet_cannot_send_ships wait time = " + str(waitTime))
 		#$ShipRequestTimer.start()
 		
+func _on_planet_switched_faction(planet, newFaction):
+	if newFaction != self.FactionObj:
+		if LinksTwoFriendlyPlanets:
+			LinksTwoFriendlyPlanets = false
+
+
 func _on_fleet_destroyed():
-	print("FleetPath.gd _on_fleet_destroyed triggered")
+	#print("FleetPath.gd _on_fleet_destroyed triggered")
 	if not LinksTwoFriendlyPlanets:
 		die()
 	else:
@@ -216,12 +229,14 @@ func _on_fleet_released(fleetNode, pathFollowNode):
 	# do nothing. We'll take action on _on_fleet_destroyed instead
 	return
 	
-#	print("ShipPath.gd _on_fleet_released signal received. Maybe too often?")
-#	if LinksTwoFriendlyPlanets:
-#		askOriginPlanetForMoreShips()
-#	else:
-#		die()
-	
+
+
+func _on_planet_replaced_path():
+	# disconnect a persistent connection
+	if LinksTwoFriendlyPlanets:
+		LinksTwoFriendlyPlanets = false
+		
+
 func _on_fleet_requests_navigation(callbackFleetObj):
 	var fleetTargetNode = createNewPathFollowNode()
 	connect("navigation_confirmed", callbackFleetObj, "_on_navigation_received")

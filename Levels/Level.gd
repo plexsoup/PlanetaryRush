@@ -50,6 +50,11 @@ func _ready():
 	#start()
 
 func start(blueprintContainer : Node2D = null, callbackObj = get_parent(), desiredNumPlanets = null, desiredNumFactions = null):
+	call_deferred("delayedStart", [blueprintContainer, callbackObj, desiredNumPlanets, desiredNumFactions])
+
+func delayedStart(blueprintContainer : Node2D = null, callbackObj = get_parent(), desiredNumPlanets = null, desiredNumFactions = null):
+
+
 	#Note: since we're now spawning levels dynamically, we should add numplanets and numfactions to the start function (pseudo constructor)
 	
 	global.BulletContainer = $Bullets # why? Who uses this? Need to refactor weapons.gd
@@ -69,8 +74,9 @@ func start(blueprintContainer : Node2D = null, callbackObj = get_parent(), desir
 		spawn_planets(NumPlanets)
 		for faction in FactionContainer.get_children():
 			var randomPlanet = PlanetContainer.get_random_neutral_planet()
-			randomPlanet.switch_faction(faction)
-			randomPlanet.set_initial_population(4.0)
+			if is_instance_valid(randomPlanet):
+				randomPlanet.switch_faction(self, faction)
+				randomPlanet.set_initial_population(4.0)
 	else:
 		build_level_from_blueprint(blueprintContainer)
 
@@ -197,7 +203,7 @@ func build_level_from_blueprint(blueprintContainer):
 		var newPlanet = PlanetContainer.spawnPlanet(self, templatePlanet.Size, templatePlanet.get_global_position())
 		if is_instance_valid(newPlanet):
 			newPlanet.start(self, templatePlanet.Size)
-			newPlanet.switch_faction(templatePlanet.FactionNum)
+			newPlanet.switch_faction(self, templatePlanet.FactionNum)
 			newPlanet.set_initial_population(templatePlanet.Size)
 			templatePlanet.hide()
 
@@ -227,6 +233,8 @@ func end():
 	#call_deferred("queue_free")
 	$Foreground/InLevelGUI.end()
 	remove_entities()
+	emit_signal("finished", self) # to whoever connected it on level spawn. Presumably Main.gd
+	call_deferred("queue_free")
 
 func count_player_planets():
 	var count = 0
@@ -237,6 +245,16 @@ func count_player_planets():
 
 func get_referee():
 	return $Referee
+	
+	
+func get_paths_to(planet):
+	var pathsToPlanet : Array = []
+	for path in PathContainer.get_children():
+		if path.DestinationPlanet == planet:
+			pathsToPlanet.push_back(path)
+	return pathsToPlanet
+			
+	
 	
 func start_celebration():
 	# lock out player inputs?
@@ -342,9 +360,7 @@ func _on_faction_won(faction):
 
 func _on_BackButton_pressed():
 	print("Level.gd received _on_BackButton_pressed signal")
-	if self.has_signal("finished"):
-		print("Signalling 'finished' to: "+ str(get_signal_connection_list("finished")))
-	emit_signal("finished", self)
-	print("Level.gd queuing_free now.")
-	call_deferred("queue_free")
+	
+	
+	end()
 	

@@ -129,13 +129,13 @@ func resumeMoving():
 
 func release_fleet():
 	#let the ships return to the nearest planet, at their own discretion
-	print("Fleet.gd release_fleet() State == " + States.keys()[State])
+	#print("Fleet.gd release_fleet() State == " + States.keys()[State])
 	if State == States.WAITING:
 		var nearestPlanet = get_closest_friendly_planet(NavTarget.get_global_position())
 		for ship in $ShipsContainer.get_children():
 			notifyShipItsReleased(ship, nearestPlanet)
 		notifyPathFleetReleased()
-		print("Fleet.gd NavTarget is " + str(NavTarget) + " " + NavTarget.name)
+		#print("Fleet.gd NavTarget is " + str(NavTarget) + " " + NavTarget.name)
 		if NavTarget.is_class("Position2D"):
 			FleetPathFollowNode.call_deferred("queue_free")
 		State = States.FINISHED # just because the fleet is released from the path, doesn't mean the fleet is finished.. merely that they've completed their intended path
@@ -176,15 +176,17 @@ func get_closest_friendly_planet(pos):
 
 
 func spawnShips(factionObj, numShips, shipScene, destinationPlanet):
+	# this needs a state check. Level may be ending
 	for i in range(numShips):
 		var shipNode = shipScene.instance()
-		$ShipsContainer.add_child(shipNode)
-		shipNode.start(factionObj, NavTarget, OriginPlanet, destinationPlanet, Level)
+		$ShipsContainer.add_child(shipNode) # why does this give errors sometimes?
+		shipNode.start(self, factionObj, NavTarget, OriginPlanet, destinationPlanet, Level)
 		# stick to local coords for this
 		shipNode.set_position(Vector2(rand_range(-50, 50), rand_range(-50, 50)))
 
 		# added the next line so ships orient themselves toward the cursor.
 		shipNode.set_rotation(shipNode.get_angle_to(factionObj.CursorObj.get_global_position()))
+		CurrentShips.push_back(shipNode)
 
 func countAliveShips(): # may not need this anymore.. we maintain an array of live ships: CurrentShips
 	var numAlive = 0
@@ -243,11 +245,14 @@ func _on_navigation_received(pathFollowNode : PathFollow2D):
 		State = States.MOVING
 	
 
-func _on_ship_created(shipObj):
-	if not CurrentShips.has(shipObj):
-		CurrentShips.push_back(shipObj)
-	else:
-		printerr("Ship is trying to register itself with fleet, but it's already registered.")
+#func _on_ship_created(shipObj):
+#	printerr("Fleet.gd _on_ship_created isn't necessary because we create the ship.")
+#	return
+#
+#	if not CurrentShips.has(shipObj):
+#		CurrentShips.push_back(shipObj)
+#	else:
+#		printerr("Ship is trying to register itself with fleet, but it's already registered.")
 	
 func _on_ship_destroyed(shipObj):
 	CurrentShips.erase(shipObj)

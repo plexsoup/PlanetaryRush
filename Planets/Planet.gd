@@ -34,9 +34,13 @@ var ease_mode = Tween.EASE_IN_OUT
 var focused : bool = false
 var FactionObj : Node2D
 
+var OutboundPath : Path2D = null
+#var InboundPaths : Array = []
+
 signal switched_faction(planetObj, newFactionObj)
 signal assigned_fleet(fleetObj)
 signal no_ships_available()
+signal path_replaced()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -48,6 +52,8 @@ func _ready():
 	State = States.READY
 	
 func start(levelObj = null, size : float = 1.0):
+	if levelObj == null:
+		print("wtf Planet.gd?")
 	Level = levelObj
 	Size = size
 	var myName = generateName()
@@ -56,14 +62,12 @@ func start(levelObj = null, size : float = 1.0):
 	$Sprite.set_self_modulate(Color.darkcyan)
 	$FocusRing.hide()
 
-	#switch_faction(factionObj) # note: switch_faction sets units_present == 1
 	set_planet_size(size)
-	set_initial_population(size) # must come after switch_faction
-	#set_difficulty(factionObj)
+	set_initial_population(size)
 	update_unit_label()
 
-	if FactionNum != 0:
-		switch_faction(FactionNum) # means level has to spawn factions before planets
+#	if FactionNum != 0:
+#		switch_faction(FactionNum) # means level has to spawn factions before planets
 
 	
 	if global.Debug:
@@ -124,11 +128,8 @@ func set_planet_size(size):
 	
 func set_initial_population(size):
 	units_present = size * 5.0
-#	printerr("Planet.gd has a temporary hack to give the player advantage for testing")
-#	if FactionObj == global.PlayerFactionObj:
-#		units_present = 40
-	
-	
+
+
 func update_unit_label():
 	$Production/ProductionLabel.set_text(str(floor(units_present)))
 	$Production.set_scale(lerp($Production.get_scale(), get_font_scale(), 0.8))
@@ -161,8 +162,8 @@ func set_faction(factionObj):
 	$Sprite.set_self_modulate(myColor)
 	$FocusRing.set_modulate(myColor)
 	
-func switch_faction(newFaction):
-	
+func switch_faction(level, newFaction):
+	var interestedEntities : Array = []
 	if not is_instance_valid(newFaction):
 		if typeof(newFaction) == TYPE_INT:
 			newFaction = Level.LookupFaction(newFaction)
@@ -173,10 +174,23 @@ func switch_faction(newFaction):
 		units_present = 1.0
 		update_unit_label()
 		# notify factions about the change in planets
-		for faction in [newFaction, oldFaction]:
-			if is_instance_valid(faction):
-				notify_faction_planet_switched(faction, newFaction)
-		notify_referee_planet_switched(newFaction, oldFaction)
+		
+		interestedEntities.push_back(newFaction)
+		interestedEntities.push_back(oldFaction)
+		interestedEntities.push_back(level.get_referee()) # This is causing errors
+		
+		var activePaths : Array = []
+		
+		if is_instance_valid(Level):
+			activePaths = Level.get_paths_to(self)
+			interestedEntities.append_array(activePaths)
+		
+		notifyEntities_planet_switched_faction(interestedEntities, oldFaction, newFaction)
+		
+#		for faction in [newFaction, oldFaction]:
+#			if is_instance_valid(faction):
+#				notify_faction_planet_switched(faction, newFaction)
+#		notify_referee_planet_switched(newFaction, oldFaction)
 
 
 
@@ -277,24 +291,32 @@ func get_population():
 ##################################################################################
 # Outgoing Signals
 
+func notifyEntities_planet_switched_faction(interestedEntities : Array, oldFaction, newFaction):
+	# inbound and outbound paths, referee, new and old factions
+	for entity in interestedEntities:
+		if is_instance_valid(entity):
+			connect("switched_faction", entity, "_on_planet_switched_faction")
+	emit_signal("switched_faction", self, newFaction)
+	for entity in interestedEntities:
+		if is_instance_valid(entity):
+			disconnect("switched_faction", entity, "_on_planet_switched_faction")
+	
+
 func notify_path_PlanetCannotSendShips(path):
 	connect("no_ships_available", path, "_on_planet_cannot_send_ships")
 	emit_signal("no_ships_available")
 	disconnect("no_ships_available", path, "_on_planet_cannot_send_ships")
 
-func notify_faction_planet_switched(faction, newFaction):
-	connect("switched_faction", faction, "_on_planet_switched_faction")
-	emit_signal("switched_faction", self, newFaction)
-	disconnect("switched_faction", faction, "_on_planet_switched_faction")
 
-func notify_referee_planet_switched(newFaction, oldFaction):
-	if is_instance_valid(Level):
-		var refereeObj = Level.get_referee()
-		connect("switched_faction", refereeObj, "_on_planet_switched_faction")
-		emit_signal("switched_faction", self, newFaction)
-		disconnect("switched_faction", refereeObj, "_on_planet_switched_faction")
-	else:
-		printerr("Planet.gd doesn't have a valid Level object")
+func notify_path_replaced(path):
+	printerr("bug: if the destination planet changes hands, no one notifies the path")
+	
+	# used to tell an old path it's no longer needed, since the planet has a new path.
+	# each planet only gets one OutboundPath.
+	if is_instance_valid(path):
+		connect("path_replaced", path, "_on_planet_replaced_path")
+		emit_signal("path_replaced")
+		disconnect("path_replaced", path, "_on_planet_replaced_path")
 
 ##################################################################################
 # Incoming Signals
@@ -304,13 +326,22 @@ func _on_ProductionTimer_timeout():
 		increase_units_from_timed_production()
 
 # signal coming from cursor via Level
-func _on_ShipPath_finished_drawing(path, destinationPlanet):
-	# send half your ships along the path
-	if path.FactionObj == FactionObj and units_present >= 2:
-		send_ships(units_present/2, path, destinationPlanet)
-	else:
-		# respond with a denial so the path can kill itself.
-		notify_path_PlanetCannotSendShips(path)
+func _on_ShipPath_finished_drawing(newPath, originPlanet, destinationPlanet):
+	if originPlanet == self:
+		# send half your ships along the path
+		if OutboundPath != null: # new path replaces old path.
+			notify_path_replaced(OutboundPath)
+		
+		if newPath.FactionObj == FactionObj and units_present >= 2:
+			send_ships(units_present/2, newPath, destinationPlanet)
+			OutboundPath = newPath
+		else:
+			# respond with a denial so the path can kill itself.
+			notify_path_PlanetCannotSendShips(newPath)
+			
+#	elif destinationPlanet == self:
+#		InboundPaths.push_back(newPath) # this might be dumb.
+		# do we really need to keep a list of inbound paths? It'll get out of date as paths kill themselves
 	
 func _on_ShipPath_requested_more_ships(path, destinationPlanet):
 	if path.FactionObj == FactionObj and units_present >= 2:
@@ -325,7 +356,7 @@ func _on_hit(damage, factionObj, location = get_global_position()):
 	if factionObj != FactionObj:
 		remove_units(damage)
 		if units_present <= 0:
-			switch_faction(factionObj)
+			switch_faction(Level, factionObj)
 			
 		units_present = 0
 		
@@ -336,11 +367,11 @@ func _on_ship_landed(damage, factionObj):
 	
 	if self.FactionObj == null:
 		if units_present < 1.0: # empty neutral, claim it. #under 1.0 will look like zero in-game
-			switch_faction(factionObj)
+			switch_faction(Level, factionObj)
 		else: # populated neutral, reduce population
 			remove_units(damage)
 			if units_present < 1.0:
-				switch_faction(factionObj)
+				switch_faction(Level, factionObj)
 				
 				
 	elif FactionObj == factionObj: # friendly planet, add population
@@ -348,9 +379,9 @@ func _on_ship_landed(damage, factionObj):
 	else: # enemy planet, reduce population
 		remove_units(damage)
 		if units_present <= 0:
-			switch_faction(factionObj)
+			switch_faction(Level, factionObj)
 
 
 func _on_initialize_faction(factionObj):
-	switch_faction(factionObj)
+	switch_faction(Level, factionObj)
 	set_initial_population(Size)

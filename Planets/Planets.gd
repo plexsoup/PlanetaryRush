@@ -111,7 +111,6 @@ func spawnPlanet(levelObj, planetSize, targetPos):
 	var planetScene = load("res://Planets/Planet.tscn")
 	var newPlanet = planetScene.instance()
 	add_child(newPlanet)
-	#newPlanet.call_deferred("start", factionObj, planetSize)
 
 
 	var safe_location_found : bool = false

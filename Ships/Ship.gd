@@ -55,11 +55,11 @@ func _ready():
 
 
 # Called by fleet
-func start(factionObj, navTarget, originPlanet, destinationPlanet, levelObj):
+func start(fleetObj, factionObj, navTarget, originPlanet, destinationPlanet, levelObj):
 	Level = levelObj
 	FactionObj = factionObj
-	MyFleet = get_parent().get_parent() # each fleet has a ShipsContainer node
-	registerShipWithFleet()
+	MyFleet = fleetObj # each fleet has a ShipsContainer node
+	#registerShipWithFleet()
 	if FactionObj.IsLocalHumanPlayer:
 		IsHumanPlayer = true
 	set_color(factionObj)
@@ -243,7 +243,7 @@ func get_dogfighting_vector():
 func get_fleet_path_vector():
 	var returnVec = Vector2.ZERO
 	var myPos = get_global_position()
-	if NavTarget != null and is_instance_valid(NavTarget):
+	if NavTarget != null and is_instance_valid(NavTarget) and NavTarget.is_inside_tree():
 		var targetPos = NavTarget.get_global_position()
 		returnVec += (targetPos - myPos).normalized()
 	return returnVec
@@ -396,10 +396,10 @@ func notifyPlanetShipLanded(planet, damage):
 	disconnect("landed", planet, "_on_ship_landed")
 	
 
-func registerShipWithFleet(): # seems unnecessary, since fleet created us?
-	connect("created", MyFleet, "_on_ship_created")
-	emit_signal("created", self)
-	disconnect("created", MyFleet, "_on_ship_created")
+#func registerShipWithFleet(): # seems unnecessary, since fleet created us?
+#	connect("created", MyFleet, "_on_ship_created")
+#	emit_signal("created", self)
+#	disconnect("created", MyFleet, "_on_ship_created")
 	
 	
 func deregisterShipWithFleet():

@@ -132,15 +132,15 @@ func _on_pause_menu_opened():
 func _on_pause_menu_closed():
 	State = States.ACTIVE
 	
-func _on_ShipPath_finished_drawing(path, destinationPlanet):
+func _on_ShipPath_finished_drawing(path, originPlanet, destinationPlanet):
 	State = States.ACTIVE
 
 func _on_PlayerController_Clicked(): # signal emulates a mouse click, but it could come from AI
 	if Level.State == Level.States.PLAYING:
-		if FactionObj.IsLocalHumanPlayer:
-			print("Cursor.gd, _on_PlayerController_Clicked. Human click.")
-		else:
-			print("Cursor.gd, _on_PlayerController_Clicked. AI click.")
+#		if FactionObj.IsLocalHumanPlayer:
+#			print("Cursor.gd, _on_PlayerController_Clicked. Human click.")
+#		else:
+#			print("Cursor.gd, _on_PlayerController_Clicked. AI click.")
 		current_planet = get_closest_planet()
 		if current_planet:
 			#lock_cursor_on(current_planet)
