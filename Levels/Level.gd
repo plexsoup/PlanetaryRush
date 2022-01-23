@@ -41,7 +41,7 @@ signal finished()
 signal set_initial_faction(factionObj)
 signal gameplay_started()
 
-var PathFollowScene = preload("res://Paths/ShipPath.tscn")
+var PathFollowScene = preload("res://Paths/FleetPath.tscn")
 
 func _ready():
 	#call_deferred("start")

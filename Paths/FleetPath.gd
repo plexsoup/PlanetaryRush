@@ -3,6 +3,7 @@ extends Path2D
 var last_point : Vector2
 var min_point_separation : float = 15.0
 var MyPlanet : StaticBody2D
+var DestinationPlanet : StaticBody2D
 
 enum States { DRAWING, FINISHED }
 var State = States.DRAWING
@@ -12,9 +13,12 @@ var AssignedFleet : Node2D # will this ever be an array instead of a single obje
 
 var Level
 
+var LinksTwoFriendlyPlanets : bool = false
+
 signal finished_drawing(path)
 signal encountered_enemy(fleetObj)
-
+signal requested_ships(path, destinationPlanet)
+signal navigation_confirmed(pathFollowNode)
 
 func _ready():
 	State = States.DRAWING
@@ -23,6 +27,7 @@ func _ready():
 
 
 func start(planet, factionObj, cursorObj, levelObj):
+	print("ShipPath.gd start() called. Creating a path. hopefully only once per user-draw-action")
 	Level = levelObj
 	MyPlanet = planet
 	CursorObj = cursorObj
@@ -54,7 +59,13 @@ func initialize_path():
 	var newCurve = Curve2D.new()
 	set_curve(newCurve)
 	
+func createNewPathFollowNode():
+	var pathFollowScene = preload("res://Paths/FleetNavigationMarker.tscn")
+	var pathFollowNode = pathFollowScene.instance()
+	pathFollowNode.set_offset(0.0)
+	add_child(pathFollowNode)
 
+	return pathFollowNode
 
 func add_point():
 	var cursorPos : Vector2
@@ -71,18 +82,40 @@ func add_point():
 		last_point = cursorPos
 	$MousePolling.start()
 		
-func find_faction_cursor():
-	return null
+#func find_faction_cursor():
+#	return null
+
+func withinDistanceTolerance(sourceObj, targetObj):
+	var distSqTolerance = 125*125
+	if sourceObj.get_global_position().distance_squared_to(targetObj.get_global_position()) < distSqTolerance:
+		return true
+	else:
+		return false
+
+
+func finish_path(destinationPlanet):
+	DestinationPlanet = destinationPlanet
+	$MousePolling.stop()
+	State = States.FINISHED
+
+	
+	if destinationPlanet.FactionObj == self.FactionObj:
+		if withinDistanceTolerance(CursorObj, destinationPlanet):
+			LinksTwoFriendlyPlanets = true
+		else:
+			LinksTwoFriendlyPlanets = false
+
+	notifyPlanetsAndCursorPathIsReady(destinationPlanet)
+
+func askOriginPlanetForMoreShips():
+	connect("requested_ships", MyPlanet, "_on_ShipPath_requested_more_ships")
+	emit_signal("requested_ships", self, DestinationPlanet)
+	disconnect("requested_ships", MyPlanet, "_on_ShipPath_requested_more_ships")
 
 ###############################################################################
 # Outbound Signals
 
-
-func finish_path(destinationPlanet):
-	
-	$MousePolling.stop()
-	State = States.FINISHED
-	
+func notifyPlanetsAndCursorPathIsReady(destinationPlanet):
 	connect("finished_drawing", MyPlanet, "_on_ShipPath_finished_drawing")
 	connect("finished_drawing", CursorObj, "_on_ShipPath_finished_drawing")
 	
@@ -107,7 +140,9 @@ func _draw():
 	if not is_instance_valid(FactionObj):
 		return
 
-	var pathFollowNode = get_node("PathFollow2D")
+#	printerr("ShipPath shouldn't care where the fleet is?")
+#	printerr("ShipPath might have multiple fleets, each with their own pathfollow node")
+	#var pathFollowNode = get_node("PathFollow2D")
 	var myCurve = self.get_curve()
 	var lineLength = myCurve.get_baked_length()
 	var points = myCurve.get_baked_points()
@@ -115,20 +150,27 @@ func _draw():
 	var i : int = 0
 	var factionColor = FactionObj.fColor
 
+	var lastPointPos : Vector2
 	for point in points:
 		var pointColor = factionColor
 		#Note: points have already been converted to_local for the draw function to work.
 		var pointRatio: float = float(i)/float(numPoints)
 		var remainingRatio: float = 1.0 - pointRatio
-		var targetRatio = pathFollowNode.get_unit_offset()
-		var behindFleet: bool = pointRatio < targetRatio
+		#var targetRatio = pathFollowNode.get_unit_offset()
+		#var behindFleet: bool = pointRatio < targetRatio
 		var pointSizeScaleFactor = 30.0
 		var pointSize = remainingRatio * pointSizeScaleFactor
-		if behindFleet:
-			pointColor.a = 0.05
+#		if behindFleet and not LinksTwoFriendlyPlanets:
+#			pointColor.a = 0.1
+#		elif behindFleet:
+#			pointColor.a = 0.5
 		# seems like the baked curve has more points than we originally added into it.
 		if i % 5 == 0:
+
 			draw_circle(point, pointSize, pointColor)
+			if LinksTwoFriendlyPlanets:
+				draw_line(point, lastPointPos, Color.white, 2.0)
+				lastPointPos = point
 		i+= 1
 
 
@@ -154,11 +196,37 @@ func _on_planet_assigned_fleet(fleetObj):
 
 func _on_planet_cannot_send_ships():
 	# oh well, better luck next time. Either the planet has no units or it switched factions before you requested ships.
-	die()
-
+	if not LinksTwoFriendlyPlanets:
+		die()
+	else:
+		# ask again in a bit?
+		$ShipRequestTimer.set_wait_time(3.0/max(global.game_speed, 0.001))
+		var waitTime = $ShipRequestTimer.get_wait_time()
+		print("ShipPath.gd _on_planet_cannot_send_ships wait time = " + str(waitTime))
+		#$ShipRequestTimer.start()
+		
 func _on_fleet_destroyed():
-	die()
+	print("FleetPath.gd _on_fleet_destroyed triggered")
+	if not LinksTwoFriendlyPlanets:
+		die()
+	else:
+		askOriginPlanetForMoreShips()
 	
-func _on_fleet_released():
-	die()
+func _on_fleet_released(fleetNode, pathFollowNode):
+	# do nothing. We'll take action on _on_fleet_destroyed instead
+	return
 	
+#	print("ShipPath.gd _on_fleet_released signal received. Maybe too often?")
+#	if LinksTwoFriendlyPlanets:
+#		askOriginPlanetForMoreShips()
+#	else:
+#		die()
+	
+func _on_fleet_requests_navigation(callbackFleetObj):
+	var fleetTargetNode = createNewPathFollowNode()
+	connect("navigation_confirmed", callbackFleetObj, "_on_navigation_received")
+	emit_signal("navigation_confirmed", fleetTargetNode)
+	disconnect("navigation_confirmed", callbackFleetObj, "_on_navigation_received")
+
+func _on_ShipRequestTimer_timeout():
+	askOriginPlanetForMoreShips()

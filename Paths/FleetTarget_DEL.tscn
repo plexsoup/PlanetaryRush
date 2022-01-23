@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 125.0
+
+[node name="FleetTarget" type="Position2D"]
+
+[node name="FleetDogfightZone" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FleetDogfightZone"]
+shape = SubResource( 1 )

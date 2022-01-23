@@ -54,6 +54,7 @@ func start(levelObj = null, size : float = 1.0):
 	self.name = myName
 	
 	$Sprite.set_self_modulate(Color.darkcyan)
+	$FocusRing.hide()
 
 	#switch_faction(factionObj) # note: switch_faction sets units_present == 1
 	set_planet_size(size)
@@ -158,6 +159,7 @@ func set_faction(factionObj):
 	if global.Debug: 
 		myColor.a = 0.5
 	$Sprite.set_self_modulate(myColor)
+	$FocusRing.set_modulate(myColor)
 	
 func switch_faction(newFaction):
 	
@@ -205,12 +207,14 @@ func take_focus(): # called by Cursor
 		if self.FactionObj.IsLocalHumanPlayer:
 			popUp(original_scale, original_scale * juicy_bounce_factor)
 			focused = true
+			$FocusRing.show()
 
 func lose_focus(): # called by Cursor
 	if is_instance_valid(FactionObj):
 		if self.FactionObj.IsLocalHumanPlayer:
 			popUp(original_scale * juicy_bounce_factor, original_scale)
 			focused = false
+			$FocusRing.hide()
 
 func popUp(initial_scale, final_scale):
 	if State == States.INITIALIZING:
@@ -273,7 +277,7 @@ func get_population():
 ##################################################################################
 # Outgoing Signals
 
-func notifyPath_PlanetCannotSendShips(path):
+func notify_path_PlanetCannotSendShips(path):
 	connect("no_ships_available", path, "_on_planet_cannot_send_ships")
 	emit_signal("no_ships_available")
 	disconnect("no_ships_available", path, "_on_planet_cannot_send_ships")
@@ -306,8 +310,16 @@ func _on_ShipPath_finished_drawing(path, destinationPlanet):
 		send_ships(units_present/2, path, destinationPlanet)
 	else:
 		# respond with a denial so the path can kill itself.
-		notifyPath_PlanetCannotSendShips(path)
+		notify_path_PlanetCannotSendShips(path)
 	
+func _on_ShipPath_requested_more_ships(path, destinationPlanet):
+	if path.FactionObj == FactionObj and units_present >= 2:
+		send_ships(units_present/2.0, path, destinationPlanet)
+	else:
+		# respond with a denial so the path can kill itself.
+		notify_path_PlanetCannotSendShips(path)
+		
+
 func _on_hit(damage, factionObj, location = get_global_position()):
 	# maybe ships lasers are too powerful
 	if factionObj != FactionObj:

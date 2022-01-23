@@ -3,7 +3,7 @@ extends Node2D
 # Declare member variables here. Examples:
 var FleetPath : Path2D
 var FleetPathFollowNode : PathFollow2D
-var NavTarget
+var NavTarget : Position2D
 var Speed : float = 160.0 # try to keep the navTarget just a bit faster than the ships
 var FactionObj : Node2D
 var OriginPlanet
@@ -22,22 +22,25 @@ signal fleet_engaged(enemyFleet)
 signal resumed_moving()
 signal fleet_destroyed()
 signal fleet_released()
+signal request_navigation(callbackObj)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	print("ShipFleet.gd _ready() called. Creating a fleet. Hopefully once per user-draw-action")
 	State = States.DEPLOYING
 	Name = self.name
 
 # called from Planet
 func start(fleetPath, factionObj, numShips, shipScene, originPlanet, destinationPlanet, levelObj):
+	#print("ShipPath start() called. Initializing a fleet. Hopefully once per user-draw-action")
 	Level = levelObj
 	FactionObj = factionObj
 	FleetPath = fleetPath
-	FleetPathFollowNode = fleetPath.get_node("PathFollow2D") # this is fragile
-	NavTarget = FleetPathFollowNode.get_node("FleetTarget")
+	
+	request_navigation() # ask Path2D for a unique PathFollow2D node
+	
 	OriginPlanet = originPlanet
 	DestinationPlanet = destinationPlanet
-	State = States.MOVING
 	spawnShips(factionObj, numShips, shipScene, destinationPlanet)
 
 
@@ -88,13 +91,13 @@ func move_fleet_NavTarget(delta):
 		FleetPathFollowNode.set_offset(FleetPathFollowNode.get_offset() + delta * Speed * global.game_speed)
 		# tell the path how far we've gotten, so the path can remove the line behind us
 		
-		
-		if FleetPathFollowNode.get_unit_offset() > 0.98:
-			# move the fleet somewhere else so the path can can queue_free
-			# send the ships home
-			State = States.WAITING
-			#yield(get_tree().create_timer(1.0), "timeout")
-			release_fleet()
+		if State == States.MOVING:
+			if FleetPathFollowNode.get_unit_offset() > 0.98:
+				# move the fleet somewhere else so the path can can queue_free
+				# send the ships home
+				State = States.WAITING # gets changed again in release_fleet()
+				#yield(get_tree().create_timer(1.0), "timeout")
+				release_fleet()
 
 
 func GetCurrentPosition():
@@ -126,14 +129,16 @@ func resumeMoving():
 
 func release_fleet():
 	#let the ships return to the nearest planet, at their own discretion
-	
-	for ship in $ShipsContainer.get_children():
-		ship.NavTarget = get_closest_friendly_planet(ship.get_global_position())
-		
-		notifyShipItsReleased(ship)
-		
-	notifyPathFleetReleased()
-	State = States.FINISHED # just because the fleet is released from the path, doesn't mean the fleet is finished.. merely that they've completed their intended path
+	print("Fleet.gd release_fleet() State == " + States.keys()[State])
+	if State == States.WAITING:
+		var nearestPlanet = get_closest_friendly_planet(NavTarget.get_global_position())
+		for ship in $ShipsContainer.get_children():
+			notifyShipItsReleased(ship, nearestPlanet)
+		notifyPathFleetReleased()
+		print("Fleet.gd NavTarget is " + str(NavTarget) + " " + NavTarget.name)
+		if NavTarget.is_class("Position2D"):
+			FleetPathFollowNode.call_deferred("queue_free")
+		State = States.FINISHED # just because the fleet is released from the path, doesn't mean the fleet is finished.. merely that they've completed their intended path
 
 
 
@@ -204,10 +209,10 @@ func GetShipCount():
 #################################################
 # Outbound Signals
 
-func notifyShipItsReleased(shipObj):
+func notifyShipItsReleased(shipObj, nearestPlanet):
 	if is_instance_valid(shipObj):
 		connect("ship_released", shipObj, "_on_fleet_released_ship")
-		emit_signal("ship_released")
+		emit_signal("ship_released", nearestPlanet)
 		disconnect("ship_released", shipObj, "_on_fleet_released_ship")
 
 func notifyPathFleetDestroyed():
@@ -219,13 +224,24 @@ func notifyPathFleetDestroyed():
 func notifyPathFleetReleased():
 	if is_instance_valid(FleetPath):
 		connect("fleet_released", FleetPath, "_on_fleet_released")
-		emit_signal("fleet_released")
+		emit_signal("fleet_released", self, self.FleetPathFollowNode)
 		disconnect("fleet_released", FleetPath, "_on_fleet_released")
 
-	
-	
+func request_navigation():
+	connect("request_navigation", FleetPath, "_on_fleet_requests_navigation")
+	emit_signal("request_navigation", self)
+	disconnect("request_navigation", FleetPath, "_on_fleet_requests_navigation")
+
+
 #################################################
 # Incoming Signals
+
+func _on_navigation_received(pathFollowNode : PathFollow2D):
+	if is_instance_valid(pathFollowNode):
+		FleetPathFollowNode = pathFollowNode
+		NavTarget = pathFollowNode.get_node("FleetTarget")
+		State = States.MOVING
+	
 
 func _on_ship_created(shipObj):
 	if not CurrentShips.has(shipObj):

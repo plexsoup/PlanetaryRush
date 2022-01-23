@@ -50,6 +50,7 @@ func spawn_player_controller(factionObj, isLocalHumanPlayer):
 		newAIController.start(factionObj, Level)
 		ControllerObj = newAIController
 
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if global.Debug:
@@ -116,12 +117,12 @@ func askLevelForPath(planet):
 # Incoming Signals
 
 func _on_Cursor_body_entered(body):
-	if body.is_in_group("planets"):
+	if FactionObj.IsLocalHumanPlayer and body.is_in_group("planets"):
 		if body.has_method("take_focus"):
 			body.take_focus()
 
 func _on_Cursor_body_exited(body):
-	if body.is_in_group("planets"):
+	if FactionObj.IsLocalHumanPlayer and body.is_in_group("planets"):
 		if body.has_method("lose_focus"):
 			body.lose_focus()
 
@@ -136,6 +137,10 @@ func _on_ShipPath_finished_drawing(path, destinationPlanet):
 
 func _on_PlayerController_Clicked(): # signal emulates a mouse click, but it could come from AI
 	if Level.State == Level.States.PLAYING:
+		if FactionObj.IsLocalHumanPlayer:
+			print("Cursor.gd, _on_PlayerController_Clicked. Human click.")
+		else:
+			print("Cursor.gd, _on_PlayerController_Clicked. AI click.")
 		current_planet = get_closest_planet()
 		if current_planet:
 			#lock_cursor_on(current_planet)

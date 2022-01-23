@@ -15,6 +15,7 @@ MenuName = "Tutorial"
 BackgroundImage = ExtResource( 7 )
 
 [node name="Stage 1" type="Node2D" parent="."]
+visible = false
 script = ExtResource( 5 )
 
 [node name="blueprint" type="Node2D" parent="Stage 1"]
@@ -54,57 +55,93 @@ position = Vector2( -552, 529 )
 FactionNum = -1
 
 [node name="Stage 2" type="Node2D" parent="."]
-visible = false
 script = ExtResource( 5 )
 
 [node name="blueprint" type="Node2D" parent="Stage 2"]
 script = ExtResource( 4 )
 
 [node name="PlanetBlueprint" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
-position = Vector2( -271, -48 )
+position = Vector2( -504, 151 )
+Size = 2.0
+
+[node name="PlanetBlueprint2" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+position = Vector2( 2268, 245 )
+FactionNum = -1
+Size = 2.0
 
 [node name="PlanetBlueprint3" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+position = Vector2( 1569, 879 )
+FactionNum = -1
+
+[node name="PlanetBlueprint4" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+position = Vector2( 1842, 866 )
+FactionNum = -1
+
+[node name="PlanetBlueprint5" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+position = Vector2( 1785, 663 )
+FactionNum = -1
+
+[node name="PlanetBlueprint6" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+position = Vector2( -209, 758 )
+
+[node name="PlanetBlueprint7" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+position = Vector2( -241, 415 )
+
+[node name="PlanetBlueprint8" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+position = Vector2( -552, 529 )
+
+[node name="Stage 3" type="Node2D" parent="."]
+visible = false
+script = ExtResource( 5 )
+
+[node name="blueprint" type="Node2D" parent="Stage 3"]
+script = ExtResource( 4 )
+
+[node name="PlanetBlueprint" parent="Stage 3/blueprint" instance=ExtResource( 2 )]
+position = Vector2( -271, -48 )
+
+[node name="PlanetBlueprint3" parent="Stage 3/blueprint" instance=ExtResource( 2 )]
 position = Vector2( -634, 395 )
 Size = 2.0
 
-[node name="PlanetBlueprint4" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+[node name="PlanetBlueprint4" parent="Stage 3/blueprint" instance=ExtResource( 2 )]
 position = Vector2( -207, 684 )
 
-[node name="PlanetBlueprint12" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+[node name="PlanetBlueprint12" parent="Stage 3/blueprint" instance=ExtResource( 2 )]
 position = Vector2( -997, 742 )
 
-[node name="PlanetBlueprint13" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+[node name="PlanetBlueprint13" parent="Stage 3/blueprint" instance=ExtResource( 2 )]
 position = Vector2( -997, 123 )
 
-[node name="PlanetBlueprint5" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+[node name="PlanetBlueprint5" parent="Stage 3/blueprint" instance=ExtResource( 2 )]
 position = Vector2( -576, 951 )
 
-[node name="PlanetBlueprint2" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+[node name="PlanetBlueprint2" parent="Stage 3/blueprint" instance=ExtResource( 2 )]
 position = Vector2( 496, 302 )
 FactionNum = -1
 Size = 3.0
 
-[node name="PlanetBlueprint6" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+[node name="PlanetBlueprint6" parent="Stage 3/blueprint" instance=ExtResource( 2 )]
 position = Vector2( 1110, 638 )
 FactionNum = 1
 
-[node name="PlanetBlueprint7" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+[node name="PlanetBlueprint7" parent="Stage 3/blueprint" instance=ExtResource( 2 )]
 position = Vector2( 1270, -78 )
 FactionNum = 1
 
-[node name="PlanetBlueprint8" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+[node name="PlanetBlueprint8" parent="Stage 3/blueprint" instance=ExtResource( 2 )]
 position = Vector2( 1467, 291 )
 FactionNum = 1
 Size = 2.0
 
-[node name="PlanetBlueprint9" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+[node name="PlanetBlueprint9" parent="Stage 3/blueprint" instance=ExtResource( 2 )]
 position = Vector2( 1723, -3 )
 FactionNum = 1
 
-[node name="PlanetBlueprint10" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+[node name="PlanetBlueprint10" parent="Stage 3/blueprint" instance=ExtResource( 2 )]
 position = Vector2( 1302, 931 )
 FactionNum = 1
 
-[node name="PlanetBlueprint11" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
+[node name="PlanetBlueprint11" parent="Stage 3/blueprint" instance=ExtResource( 2 )]
 position = Vector2( 1782, 621 )
 FactionNum = 1

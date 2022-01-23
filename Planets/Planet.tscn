@@ -1,9 +1,11 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Planets/Planet.gd" type="Script" id=1]
 [ext_resource path="res://Planets/planets.png" type="Texture" id=2]
 [ext_resource path="res://effects/voot.wav" type="AudioStream" id=3]
 [ext_resource path="res://GUI/fonts/neuropol/neuropol.ttf" type="DynamicFontData" id=4]
+[ext_resource path="res://Planets/FocusRing-back.png" type="Texture" id=5]
+[ext_resource path="res://Planets/FocusRing-front.png" type="Texture" id=6]
 
 [sub_resource type="DynamicFont" id=1]
 size = 128
@@ -67,5 +69,17 @@ align = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="FocusRing" type="Node2D" parent="."]
+scale = Vector2( 1.7651, 1.7651 )
+
+[node name="FocusRingFront" type="Sprite" parent="FocusRing"]
+texture = ExtResource( 6 )
+offset = Vector2( 0, 22 )
+
+[node name="FocusRingBack" type="Sprite" parent="FocusRing"]
+z_index = -1
+texture = ExtResource( 5 )
+offset = Vector2( 0, -22 )
 
 [connection signal="timeout" from="ProductionTimer" to="." method="_on_ProductionTimer_timeout"]

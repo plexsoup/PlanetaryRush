@@ -464,8 +464,9 @@ func _on_Ship_area_entered(area):
 func _on_SwapMagazineTimer_timeout(): #Weapons say they're ready again
 	enable_firingArc()
 	
-func _on_fleet_released_ship():
+func _on_fleet_released_ship(nearestPlanet):
 	setState(States.RETURNING)
+	NavTarget = nearestPlanet
 
 
 func _on_FuelLimitTimer_timeout():
