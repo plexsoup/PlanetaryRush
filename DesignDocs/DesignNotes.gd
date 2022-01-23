@@ -1,34 +1,40 @@
 
 extends Node
 
+export var ButtonTex : StreamTexture
 var DetailTextBox
-var BuglistTreeObj
+var BuglistTreeObj : Tree
+
+var JSONBugList
 
 func _ready():
 	start()
 
 func start():
 	var bugList = Bugs()
+
+	var treeDict = {}
+#	var treeDict = {
+#		"Current Effort" : Current_Work_Effort(),
+#		"Bugs" : Bugs(),
+#		"Refactoring" : Refactoring_Required(),
+#		"QC Testing Required" : QC(),
+#		"Features to Add" : Features_to_Add(),
+#		"Game Feel" : Game_Feel(),
+#		"Design" : Design(),
+#		"Hard Design Problems" : Hard_Design_Problems(),
+#		"Engineering" : Engineering(),
+#		"Maybe Someday" : Maybe_Someday(),
+#
+#	}
 	
-	var treeDict = {
-		"Current Effort" : Current_Work_Effort(),
-		"Bugs" : Bugs(),
-		"Refactoring" : Refactoring_Required(),
-		"QC Testing Required" : QC(),
-		"Features to Add" : Features_to_Add(),
-		"Game Feel" : Game_Feel(),
-		"Design" : Design(),
-		"Hard Design Problems" : Hard_Design_Problems(),
-		"Engineering" : Engineering(),
-		"Maybe Someday" : Maybe_Someday(),
-	
-	}
+	JSONBugList = to_json(treeDict)
 	
 	#make_pretty_buttons(bugList.keys())
-	var tree = make_pretty_tree(treeDict)
+	make_pretty_tree(treeDict)
 	
 
-func make_pretty_tree(buglistDictionary):
+func make_pretty_tree(buglistDictionary) -> void:
 	var marginBox = MarginContainer.new()
 	marginBox.set_name("MarginBox")
 	marginBox.margin_left = 10
@@ -36,14 +42,16 @@ func make_pretty_tree(buglistDictionary):
 	marginBox.margin_bottom = get_viewport().size.y
 	marginBox.anchor_left = 1
 	marginBox.anchor_right = 1
-	self.add_child(marginBox)
+	$VBoxContainer/BuglistPanel.add_child(marginBox)
 	var tree = Tree.new()
 	tree.set_name("Tree")
-	tree.set_columns(2)
+	tree.set_columns(3)
 	tree.set_column_expand(0,false)
 	tree.set_column_min_width(0, 200)
-	
+	tree.set_select_mode(tree.SELECT_ROW)
 	tree.set_column_expand(1,true)
+	
+	tree.connect("button_pressed", self, "_on_tree_button_pressed")
 	
 	marginBox.add_child(tree)
 	BuglistTreeObj = tree
@@ -59,11 +67,14 @@ func populate_branch(treeObj, currentTreeItemNode, branchName, branchContents):
 	
 	var newBranchNode = treeObj.create_item(currentTreeItemNode)
 	newBranchNode.set_text(0, branchName)
-	print(branchContents)
+	#print(branchContents)
 	for key in branchContents.keys():
 		var itemObj = treeObj.create_item(newBranchNode)
 		itemObj.set_text(0, key)
 		itemObj.set_text(1, branchContents[key])
+		#itemObj.set_cell_mode(2, itemObj.CELL_MODE_CHECK )
+		itemObj.add_button(2, ButtonTex )
+
 		
 #	for itemStr in list:
 #		var itemObj = tree.create_item(root)
@@ -71,33 +82,53 @@ func populate_branch(treeObj, currentTreeItemNode, branchName, branchContents):
 
 
 	
-func make_pretty_buttons(list):
+#func make_pretty_buttons(list):
+#
+#	var hbox = HBoxContainer.new()
+#	add_child(hbox)
+#	hbox.set_owner(get_tree().edited_scene_root)
+#
+#	var leftSide = MarginContainer.new()
+#	leftSide.set_owner(get_tree().edited_scene_root)
+#	var rightSide = MarginContainer.new()
+#	rightSide.set_owner(get_tree().edited_scene_root)
+#	hbox.add_child(leftSide)
+#	hbox.add_child(rightSide)
+#
+#	var vbox = VBoxContainer.new()
+#	leftSide.add_child(vbox)
+#
+#	var detailBox = Label.new()
+#	rightSide.add_child(detailBox)
+#	DetailTextBox = detailBox
+#	DetailTextBox.set_text("Hi")
+#
+#	for item in list:
+#		var button = Button.new()
+#		button.set_text(item)
+#		vbox.add_child(button)
+#		button.set_owner(get_tree().edited_scene_root)
+#		button.connect("pressed", self, "_on_button_pressed", [button.get_text()])
+
+func saveBugList(path):
+	print("Saving Buglist to JSON file: " + path)
+	var file = File.new()
+	file.open(path, File.WRITE)
+	file.store_string(JSONBugList)
+	file.close()
+
+func loadBugList(path):
 	
-	var hbox = HBoxContainer.new()
-	add_child(hbox)
-	hbox.set_owner(get_tree().edited_scene_root)
-	
-	var leftSide = MarginContainer.new()
-	leftSide.set_owner(get_tree().edited_scene_root)
-	var rightSide = MarginContainer.new()
-	rightSide.set_owner(get_tree().edited_scene_root)
-	hbox.add_child(leftSide)
-	hbox.add_child(rightSide)
-	
-	var vbox = VBoxContainer.new()
-	leftSide.add_child(vbox)
-	
-	var detailBox = Label.new()
-	rightSide.add_child(detailBox)
-	DetailTextBox = detailBox
-	DetailTextBox.set_text("Hi")
-	
-	for item in list:
-		var button = Button.new()
-		button.set_text(item)
-		vbox.add_child(button)
-		button.set_owner(get_tree().edited_scene_root)
-		button.connect("pressed", self, "_on_button_pressed", [button.get_text()])
+	var file = File.new()
+	file.open(path, File.READ)
+	var content = file.get_as_text()
+	file.close()
+	return content
+
+
+func _on_tree_button_pressed(item, column, button_id):
+	#var button = BuglistTreeObj.get_pressed_button()
+	print("pressed button: " + str(item.get_text(0)))
 
 func _on_button_pressed(args):
 	DetailTextBox.set_text(Bugs()[args])
@@ -283,3 +314,20 @@ Line-Drawing games
 
 """
 
+
+
+func _on_SaveButton_pressed():
+	$SaveDialog.popup_centered()
+
+func _on_LoadButton_pressed():
+	$LoadDialog.popup_centered()
+
+
+func _on_LoadDialog_file_selected(path):
+	JSONBugList = loadBugList(path)
+	make_pretty_tree(parse_json(JSONBugList))
+	
+
+
+func _on_SaveDialog_file_selected(path):
+	saveBugList(path)

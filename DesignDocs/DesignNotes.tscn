@@ -1,6 +1,91 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://DesignDocs/DesignNotes.gd" type="Script" id=1]
+[ext_resource path="res://GUI/Icons/checkbox.png" type="Texture" id=2]
+[ext_resource path="res://GUI/Icons/open-folder.svg" type="Texture" id=3]
+[ext_resource path="res://GUI/Icons/FloppyDisk.png" type="Texture" id=4]
 
-[node name="DesignNotes" type="Node2D"]
+[node name="DesignNotes" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+ButtonTex = ExtResource( 2 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+margin_right = 1024.0
+margin_bottom = 57.0
+size_flags_horizontal = 3
+size_flags_vertical = 9
+alignment = 2
+
+[node name="SaveButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+margin_left = 913.0
+margin_right = 957.0
+margin_bottom = 57.0
+icon = ExtResource( 4 )
+
+[node name="LoadButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+margin_left = 961.0
+margin_right = 1024.0
+margin_bottom = 57.0
+icon = ExtResource( 3 )
+
+[node name="BuglistPanel" type="PanelContainer" parent="VBoxContainer"]
+margin_top = 61.0
+margin_right = 1024.0
+margin_bottom = 600.0
+rect_min_size = Vector2( 400, 300 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SaveDialog" type="FileDialog" parent="."]
+visible = true
+margin_left = 282.0
+margin_top = 170.0
+margin_right = 782.0
+margin_bottom = 470.0
+rect_min_size = Vector2( 500, 300 )
+popup_exclusive = true
+window_title = "Save Buglist"
+resizable = true
+access = 1
+current_dir = "user://"
+current_path = "user://"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LoadDialog" type="FileDialog" parent="."]
+visible = true
+margin_left = 282.0
+margin_top = 170.0
+margin_right = 782.0
+margin_bottom = 470.0
+rect_min_size = Vector2( 500, 300 )
+popup_exclusive = true
+window_title = "Open a File"
+resizable = true
+mode = 0
+access = 1
+current_dir = "user://"
+current_path = "user://"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/SaveButton" to="." method="_on_SaveButton_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/LoadButton" to="." method="_on_LoadButton_pressed"]
+[connection signal="file_selected" from="SaveDialog" to="." method="_on_SaveDialog_file_selected"]
+[connection signal="file_selected" from="LoadDialog" to="." method="_on_LoadDialog_file_selected"]
