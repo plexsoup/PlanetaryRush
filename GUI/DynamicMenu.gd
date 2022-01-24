@@ -148,16 +148,12 @@ func instantiateNewButtonContainer():
 	var vbox = VBoxContainer.new()
 	panel.add_child(vbox)
 	return vbox
- 
-################################################################################
-# Signals
 
-func _on_button_pressed(buttonName):
-	print("DynamicMenu.gd _on_button_pressed("+ buttonName +") called")
+func launchScene(sceneName):
 	hide_all_scenes(ScenesContainer)
 	$Control.hide()
-	if ScenesContainer.has_node(buttonName):
-		var newScene = ScenesContainer.get_node(buttonName)
+	if ScenesContainer.has_node(sceneName):
+		var newScene = ScenesContainer.get_node(sceneName)
 		newScene.set_visible(true)
 		self.set_visible(false)
 
@@ -174,7 +170,17 @@ func _on_button_pressed(buttonName):
 		else:
 			printerr("DynamicMenu.gd: newScene, " + newScene.name + ", requires a 'start' function.")
 	else:
-		printerr("DynamicMenu.gd Scenes container doesn't have a scene matching name: " + buttonName)
+		printerr("DynamicMenu.gd Scenes container doesn't have a scene matching name: " + sceneName)
+
+
+ 
+################################################################################
+# Signals
+
+func _on_button_pressed(buttonName):
+	print("DynamicMenu.gd _on_button_pressed("+ buttonName +") called")
+	launchScene(buttonName)
+
 
 func _on_scene_finished(scene):
 	print("Dynamic Menu received signal _on_scene_finished for " + scene.name)

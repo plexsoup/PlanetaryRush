@@ -1,18 +1,37 @@
 
 extends Node
 
-export var ButtonTex : StreamTexture
+export var CheckMarkButtonTex : StreamTexture
+export var DownArrowTex : StreamTexture
+export var UpArrowTex : StreamTexture
+
 var DetailTextBox
 var BuglistTreeObj : Tree
 
+var BugCollection : Array = [] # resource objects to manipulate bugs
+
 var JSONBugList
 
+var Columns = ["id", "title", "details", "actions"]
+var ColDetails = {
+	"id":{"width":75, "expand":false, "editable":false},
+	"title":{"width":225, "expand":false, "editable":true},
+	"details":{"width":425, "expand":true, "editable":true},
+	"actions":{"width":250, "expand":false, "editable":false},
+}
+
+signal finished
+
 func _ready():
-	start()
+	if get_tree().get_root().get_children().has(self): # running scene solo
+		call_deferred("start", [null])
+	else: # running scene in the game
+		print(str(get_tree().get_root().get_children()))
+		# The main menu will call start when the user requests it
 
-func start():
-	var bugList = Bugs()
-
+func start(callbackObj):
+	setPanelSize()
+	
 	var treeDict = {}
 #	var treeDict = {
 #		"Current Effort" : Current_Work_Effort(),
@@ -28,11 +47,13 @@ func start():
 #
 #	}
 	
-	JSONBugList = to_json(treeDict)
+	JSONBugList = loadBugList("user://saved_buglist.dat")
+	make_pretty_tree(parse_json(JSONBugList))
 	
-	#make_pretty_buttons(bugList.keys())
-	make_pretty_tree(treeDict)
-	
+
+func setPanelSize():
+	var viewportSize = get_viewport().get_size()
+	self.rect_size = viewportSize
 
 func make_pretty_tree(buglistDictionary) -> void:
 	var marginBox = MarginContainer.new()
@@ -44,18 +65,25 @@ func make_pretty_tree(buglistDictionary) -> void:
 	marginBox.anchor_right = 1
 	$VBoxContainer/BuglistPanel.add_child(marginBox)
 	var tree = Tree.new()
-	tree.set_name("Tree")
-	tree.set_columns(3)
-	tree.set_column_expand(0,false)
-	tree.set_column_min_width(0, 200)
-	tree.set_select_mode(tree.SELECT_ROW)
-	tree.set_column_expand(1,true)
+	tree.set_name("Buglist Tree")
 	
+	tree.set_columns(Columns.size())
+	
+	for colNum in Columns.size():
+		tree.set_column_expand(colNum, ColDetails[Columns[colNum]]["expand"])
+		tree.set_column_min_width(colNum, ColDetails[Columns[colNum]]["width"])
+	
+	tree.set_select_mode(tree.SELECT_SINGLE)
+
 	tree.connect("button_pressed", self, "_on_tree_button_pressed")
 	
 	marginBox.add_child(tree)
 	BuglistTreeObj = tree
 	var root = tree.create_item()
+	
+	for colNum in range(Columns.size()):
+		tree.set_column_title(colNum, Columns[colNum])
+	tree.set_column_titles_visible(true)
 	
 	for buglistSubDict in buglistDictionary:
 		populate_branch(tree, tree.get_root(), buglistSubDict, buglistDictionary[buglistSubDict])
@@ -68,48 +96,33 @@ func populate_branch(treeObj, currentTreeItemNode, branchName, branchContents):
 	var newBranchNode = treeObj.create_item(currentTreeItemNode)
 	newBranchNode.set_text(0, branchName)
 	#print(branchContents)
+	var i = 0
 	for key in branchContents.keys():
 		var itemObj = treeObj.create_item(newBranchNode)
-		itemObj.set_text(0, key)
-		itemObj.set_text(1, branchContents[key])
-		#itemObj.set_cell_mode(2, itemObj.CELL_MODE_CHECK )
-		itemObj.add_button(2, ButtonTex )
-
+		itemObj.set_text(0, str(i))
+		itemObj.set_text(1, key)
+		itemObj.set_text(2, branchContents[key])
+		itemObj.add_button(3, CheckMarkButtonTex )
+		itemObj.add_button(3, DownArrowTex)
+		itemObj.add_button(3, UpArrowTex)
 		
-#	for itemStr in list:
-#		var itemObj = tree.create_item(root)
-#		itemObj.set_text(0, itemStr)
+		for colNum in Columns.size():
+			itemObj.set_editable(colNum, ColDetails[Columns[colNum]]["editable"])
+		
+		i += 1
 
 
+
+func convertTableToGroups(groupColumn, table):
+	# make a nested json, grouped by a given column in a flat table
+	printerr("DesignNotes.gd: convertTableToGroups needs development")
+
+func updateJSONFromTable():
+	printerr("DesignNotes.gd: updateJSONFromTable needs development")
+	var newDict = {}
+	for item in BuglistTreeObj.get_items():
+		pass
 	
-#func make_pretty_buttons(list):
-#
-#	var hbox = HBoxContainer.new()
-#	add_child(hbox)
-#	hbox.set_owner(get_tree().edited_scene_root)
-#
-#	var leftSide = MarginContainer.new()
-#	leftSide.set_owner(get_tree().edited_scene_root)
-#	var rightSide = MarginContainer.new()
-#	rightSide.set_owner(get_tree().edited_scene_root)
-#	hbox.add_child(leftSide)
-#	hbox.add_child(rightSide)
-#
-#	var vbox = VBoxContainer.new()
-#	leftSide.add_child(vbox)
-#
-#	var detailBox = Label.new()
-#	rightSide.add_child(detailBox)
-#	DetailTextBox = detailBox
-#	DetailTextBox.set_text("Hi")
-#
-#	for item in list:
-#		var button = Button.new()
-#		button.set_text(item)
-#		vbox.add_child(button)
-#		button.set_owner(get_tree().edited_scene_root)
-#		button.connect("pressed", self, "_on_button_pressed", [button.get_text()])
-
 func saveBugList(path):
 	print("Saving Buglist to JSON file: " + path)
 	var file = File.new()
@@ -117,7 +130,7 @@ func saveBugList(path):
 	file.store_string(JSONBugList)
 	file.close()
 
-func loadBugList(path):
+func loadBugList(path): # Loads JSON from a file
 	
 	var file = File.new()
 	file.open(path, File.READ)
@@ -127,7 +140,7 @@ func loadBugList(path):
 
 
 func _on_tree_button_pressed(item, column, button_id):
-	#var button = BuglistTreeObj.get_pressed_button()
+	
 	print("pressed button: " + str(item.get_text(0)))
 
 func _on_button_pressed(args):
@@ -325,6 +338,7 @@ func _on_LoadButton_pressed():
 
 func _on_LoadDialog_file_selected(path):
 	JSONBugList = loadBugList(path)
+	BuglistTreeObj.queue_free()
 	make_pretty_tree(parse_json(JSONBugList))
 	
 

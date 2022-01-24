@@ -9,9 +9,10 @@ var fColor : Color
 var CursorObj : Node2D
 
 
-var CurrentPlanetList = []
+var CurrentPlanetList = [] # should be weakrefs
 #var CurrentShipList = [] 
-var CurrentFleetList = [] # keep track so we can stay alive until the last fleet is gone
+var CurrentFleetList = [] # should be weakrefs
+# keep track so we can stay alive until the last fleet is gone
 
 enum States { PAUSED, PLAYING, DEAD} # not really using PAUSED yet
 var State = States.PAUSED
@@ -53,7 +54,7 @@ func spawnCursor(isLocalHumanPlayer):
 
 
 func registerFleet(fleetObj):
-	CurrentFleetList.push_back(fleetObj)
+	CurrentFleetList.push_back(weakref(fleetObj))
 	
 func deregisterFleet(fleetObj):
 	CurrentFleetList.erase(fleetObj)

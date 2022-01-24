@@ -180,6 +180,9 @@ func spawnShips(factionObj, numShips, shipScene, destinationPlanet):
 	for i in range(numShips):
 		var shipNode = shipScene.instance()
 		$ShipsContainer.add_child(shipNode) # why does this give errors sometimes?
+		
+		
+		
 		shipNode.start(self, factionObj, NavTarget, OriginPlanet, destinationPlanet, Level)
 		# stick to local coords for this
 		shipNode.set_position(Vector2(rand_range(-50, 50), rand_range(-50, 50)))

@@ -1,9 +1,11 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://DesignDocs/DesignNotes.gd" type="Script" id=1]
 [ext_resource path="res://GUI/Icons/checkbox.png" type="Texture" id=2]
-[ext_resource path="res://GUI/Icons/open-folder.svg" type="Texture" id=3]
+[ext_resource path="res://GUI/Icons/FileFolder.png" type="Texture" id=3]
 [ext_resource path="res://GUI/Icons/FloppyDisk.png" type="Texture" id=4]
+[ext_resource path="res://GUI/Icons/arrowDown.png" type="Texture" id=5]
+[ext_resource path="res://GUI/Icons/arrowUp.png" type="Texture" id=6]
 
 [node name="DesignNotes" type="Control"]
 anchor_right = 1.0
@@ -12,7 +14,9 @@ script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
-ButtonTex = ExtResource( 2 )
+CheckMarkButtonTex = ExtResource( 2 )
+DownArrowTex = ExtResource( 5 )
+UpArrowTex = ExtResource( 6 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchor_right = 1.0
@@ -25,25 +29,25 @@ __meta__ = {
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 margin_right = 1024.0
-margin_bottom = 57.0
+margin_bottom = 37.0
 size_flags_horizontal = 3
 size_flags_vertical = 9
 alignment = 2
 
 [node name="SaveButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-margin_left = 913.0
-margin_right = 957.0
-margin_bottom = 57.0
+margin_left = 934.0
+margin_right = 977.0
+margin_bottom = 37.0
 icon = ExtResource( 4 )
 
 [node name="LoadButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-margin_left = 961.0
+margin_left = 981.0
 margin_right = 1024.0
-margin_bottom = 57.0
+margin_bottom = 37.0
 icon = ExtResource( 3 )
 
 [node name="BuglistPanel" type="PanelContainer" parent="VBoxContainer"]
-margin_top = 61.0
+margin_top = 41.0
 margin_right = 1024.0
 margin_bottom = 600.0
 rect_min_size = Vector2( 400, 300 )
