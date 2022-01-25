@@ -8,15 +8,27 @@ export var UpArrowTex : StreamTexture
 var DetailTextBox
 var BuglistTreeObj : Tree
 
-var BugCollection : Array = [] # resource objects to manipulate bugs
+#var BugCollection : Array = [] # resource objects to manipulate bugs
 
 var JSONBugList
 
-var Columns = ["id", "title", "details", "actions"]
+#var Columns = ["id", "title", "details", "actions"]
+#var ColDetails = {
+#	"id":{"width":75, "expand":false, "editable":false},
+#	"title":{"width":225, "expand":false, "editable":true},
+#	"details":{"width":425, "expand":true, "editable":true},
+#	"actions":{"width":250, "expand":false, "editable":false},
+#}
+
+var Columns = ["category", "id", "title", "details", "priority", "dependencies", "date"]
 var ColDetails = {
+	"category":{"width":75, "expand":false, "editable":false},
 	"id":{"width":75, "expand":false, "editable":false},
 	"title":{"width":225, "expand":false, "editable":true},
 	"details":{"width":425, "expand":true, "editable":true},
+	"priority":{"width":75, "expand":false, "editable":true},
+	"dependencies":{"width":75, "expand":false, "editable":false},
+	"date":{"width":75, "expand":false, "editable":false},
 	"actions":{"width":250, "expand":false, "editable":false},
 }
 
@@ -26,36 +38,46 @@ func _ready():
 	if get_tree().get_root().get_children().has(self): # running scene solo
 		call_deferred("start", [null])
 	else: # running scene in the game
-		print(str(get_tree().get_root().get_children()))
+		pass
 		# The main menu will call start when the user requests it
 
 func start(callbackObj):
 	setPanelSize()
 	
-	var treeDict = {}
-#	var treeDict = {
-#		"Current Effort" : Current_Work_Effort(),
-#		"Bugs" : Bugs(),
-#		"Refactoring" : Refactoring_Required(),
-#		"QC Testing Required" : QC(),
-#		"Features to Add" : Features_to_Add(),
-#		"Game Feel" : Game_Feel(),
-#		"Design" : Design(),
-#		"Hard Design Problems" : Hard_Design_Problems(),
-#		"Engineering" : Engineering(),
-#		"Maybe Someday" : Maybe_Someday(),
-#
-#	}
 	
-	JSONBugList = loadBugList("user://saved_buglist.dat")
-	make_pretty_tree(parse_json(JSONBugList))
-	
+	var jsonBugList = loadBugList("user://saved_buglist.dat")
+	var buglist = generateBugCollection(jsonBugList)
+	var tree = createTree()
+	populateTree(tree, buglist)
 
 func setPanelSize():
 	var viewportSize = get_viewport().get_size()
 	self.rect_size = viewportSize
 
-func make_pretty_tree(buglistDictionary) -> void:
+func populateTree(treeNode, collectionOfBugs):
+	var rootItem = treeNode.get_root()
+	var categories = []
+	for bug in collectionOfBugs:
+		if not categories.has(bug.Category):
+			categories.push_back(bug.Category)
+	
+	for category in categories:
+		var categoryItem = treeNode.create_item(rootItem)
+		categoryItem.set_text(0, category)
+	
+		for bug in collectionOfBugs:
+			if bug.Category == category:
+				var bugItem = treeNode.create_item(categoryItem)
+				bugItem.set_text(1, str(bug.ID))
+				bugItem.set_text(2, bug.Title)
+				bugItem.set_text(3, bug.Details)
+				bugItem.set_text(4, bug.Priority)
+				bugItem.set_text(5, str(bug.Dependencies))
+				bugItem.set_text(6, str(bug.DateCreated))
+	
+	
+	
+func createTree() -> Tree:
 	var marginBox = MarginContainer.new()
 	marginBox.set_name("MarginBox")
 	marginBox.margin_left = 10
@@ -81,17 +103,21 @@ func make_pretty_tree(buglistDictionary) -> void:
 	BuglistTreeObj = tree
 	var root = tree.create_item()
 	
+	
 	for colNum in range(Columns.size()):
 		tree.set_column_title(colNum, Columns[colNum])
 	tree.set_column_titles_visible(true)
+
+	return tree
+
 	
-	for buglistSubDict in buglistDictionary:
-		populate_branch(tree, tree.get_root(), buglistSubDict, buglistDictionary[buglistSubDict])
-		
+#	for buglistSubDict in buglistDictionary:
+#		old_populate_branch(tree, tree.get_root(), buglistSubDict, buglistDictionary[buglistSubDict])
+#
 
 
 	
-func populate_branch(treeObj, currentTreeItemNode, branchName, branchContents):
+func old_populate_branch(treeObj, currentTreeItemNode, branchName, branchContents):
 	
 	var newBranchNode = treeObj.create_item(currentTreeItemNode)
 	newBranchNode.set_text(0, branchName)
@@ -112,8 +138,24 @@ func populate_branch(treeObj, currentTreeItemNode, branchName, branchContents):
 		i += 1
 
 
-
-func convertTableToGroups(groupColumn, table):
+func converGroupsToTable(nestedBuglistDict : Dictionary) -> Dictionary:
+	var tempFlatBuglistDict = {}
+	var categories = []
+	var id = 0
+	for categoryName in nestedBuglistDict.keys(): # top level categories
+		categories.push_back(categoryName)
+		for bug in nestedBuglistDict[categoryName]:
+			tempFlatBuglistDict[id] = bug
+			tempFlatBuglistDict[id]["category"] = categoryName
+			tempFlatBuglistDict[id]["refID"] = id
+			tempFlatBuglistDict[id]["priority"] = "medium"
+			id += 1
+	
+	return tempFlatBuglistDict
+	
+	
+	
+func convertTableToGroups(groupColumn : int, table : Dictionary):
 	# make a nested json, grouped by a given column in a flat table
 	printerr("DesignNotes.gd: convertTableToGroups needs development")
 
@@ -130,14 +172,75 @@ func saveBugList(path):
 	file.store_string(JSONBugList)
 	file.close()
 
-func loadBugList(path): # Loads JSON from a file
+func loadBugList(path) -> String : # Loads JSON from a file
+	# does not populate the tree
 	
 	var file = File.new()
 	file.open(path, File.READ)
 	var content = file.get_as_text()
 	file.close()
-	return content
+	var bugList = generateBugCollection(content) # now we have a BugCollection array containing a resource for each bug
+	return content 
 
+func generateBugCollection(jsonBugList:String) -> Array:
+	var bugCollection : Array = []
+	var parseResult : JSONParseResult = JSON.parse(jsonBugList)
+	var tempBuglist : Dictionary = parseResult.result
+	var bugResource = preload("res://DesignDocs/bug_resource.tres")
+	# if the dictionary is multi-level?
+	if isDictNested(tempBuglist):
+		var i : int = 0
+		for categoryName in tempBuglist.keys():
+			#print(categoryName)
+			for bugDict in tempBuglist[categoryName]:
+				#print(bugDict)
+				var bug = bugResource.duplicate() # resources are weird. They don't have new or instance functions.
+				bug.Category = categoryName
+				bug.ID = i # we'll want to change this once we have a flat table
+				#print(tempBuglist[categoryName])
+				bug.Title = bugDict
+				bug.Details = tempBuglist[categoryName][bugDict]
+				bug.Priority = "medium"
+				bug.Dependencies = []
+				bug.DateCreated = OS.get_unix_time()
+				bugCollection.push_back(bug)
+				i += 1
+	else: # not nested. We've already converted it into a flattened table
+		var i : int = 0
+		for bugItem in tempBuglist:
+			var bug = bugResource.new()
+			bug.Category = bugItem["Category"]
+			bug.ID = bugItem["ID"] # we'll want to change this once we have a flat table
+			bug.Title = bugItem["Title"]
+			bug.Details = bugItem["Details"]
+			bug.Priority = bugItem["Priority"]
+			bug.Dependencies = bugItem["Dependencies"]
+			bug.DateCreated = bugItem["DateCreated"]
+			bugCollection.push_back(bug)
+			i += 1
+	prettyPrintBugs(bugCollection)
+	return bugCollection
+
+func prettyPrintBugs(bugCollection : Array):
+	for bug in bugCollection:
+
+		print("ID: " + str(bug.ID))
+		print("Category: " + str(bug.Category))
+		print("Title: " + str(bug.Title))
+		print("Details: " + str(bug.Details))
+		print("Priority: " + str(bug.Priority))
+		print("Dependencies: " + str(bug.Dependencies))
+		print("Date Created: " + str(bug.DateCreated))
+		print("-----------------------------------")
+
+func isDictNested(dict : Dictionary):
+	var isNested : bool = false
+	for value in dict.values():
+		# if any of the top-level entries contain another dictionary
+		if typeof(value) == TYPE_DICTIONARY:
+			isNested = true
+	return isNested
+	
 
 func _on_tree_button_pressed(item, column, button_id):
 	
@@ -338,8 +441,8 @@ func _on_LoadButton_pressed():
 
 func _on_LoadDialog_file_selected(path):
 	JSONBugList = loadBugList(path)
-	BuglistTreeObj.queue_free()
-	make_pretty_tree(parse_json(JSONBugList))
+	BuglistTreeObj.clear()
+	populateTree(BuglistTreeObj, generateBugCollection(parse_json(JSONBugList)))
 	
 
 

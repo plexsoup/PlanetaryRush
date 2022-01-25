@@ -2,13 +2,13 @@ extends Reference
 
 
 # Declare member variables here. Examples:
-var Category : String = "Bug" # could be MaybeSomeday, Design, etc
-var ID : String = "" # 
-var Title : String
-var Details : String
-var Priority : String # high, medium, low
-var Dependencies : Array # list of other bugs
-var DateCreated : Dictionary
+export var Category : String = "Bug" # could be MaybeSomeday, Design, etc
+export var ID : int # 
+export var Title : String
+export var Details : String
+export var Priority : String # high, medium, low
+export var Dependencies : Array # list of other bugs
+export var DateCreated : int # in unix_time because I don't want to store another dictionary
 
 
 # Called when the node enters the scene tree for the first time.
