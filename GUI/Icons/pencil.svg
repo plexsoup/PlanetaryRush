@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" version="1.1" viewBox="0 0 4 4" xmlns="http://www.w3.org/2000/svg">
+ <rect transform="rotate(-45)" x="-1.9356" y="2.4657" width=".18565" height=".74137" fill="#666" stroke-width="0" style="paint-order:markers fill stroke"/>
+ <rect transform="rotate(-45)" x="1.62" y="2.4657" width=".18565" height=".74137" fill="#666" stroke-width="0" style="paint-order:markers fill stroke"/>
+ <g fill="#fff" stroke-width="0">
+  <path d="m0.45143 3.0369 2.5031-2.5031 0.52356 0.52356-2.5031 2.5031-0.077935-0.24242-0.1811-0.016616-0.046522-0.20415z" style="paint-order:markers fill stroke"/>
+  <path d="m3.0298 0.45966 0.52304 0.52304c0.097091-0.097091 0.19418-0.19418 0.29127-0.29127 0.082362-0.082361 0.083013-0.21356 0.0020071-0.29456l-0.22875-0.22875c-0.081006-0.081006-0.2122-0.080354-0.29456 0.0020068-0.09814 0.095681-0.19423 0.19076-0.29301 0.28954z" style="paint-order:markers fill stroke"/>
+  <path d="m0.89908 3.6364-0.34181 0.08679-0.35648 0.088897 0.086154-0.35728 0.088575-0.34197 0.2204 0.057994 0.047508 0.19508 0.18021 0.025581z" style="paint-order:markers fill stroke"/>
+ </g>
+ <rect transform="rotate(-45)" x="-1.8072" y="2.6129" width="3.4092" height=".091411" ry=".045706" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width=".031868" style="paint-order:markers fill stroke"/>
+ <rect transform="rotate(-45)" x="-1.8072" y="2.9328" width="3.4092" height=".091411" ry=".045706" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width=".031868" style="paint-order:markers fill stroke"/>
+</svg>

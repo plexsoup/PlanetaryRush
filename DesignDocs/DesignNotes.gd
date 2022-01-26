@@ -3,11 +3,16 @@ extends Node
 
 export var CheckMarkButtonTex : StreamTexture
 export var DeleteIconTex : StreamTexture
-export var DownArrowTex : StreamTexture
 export var UpArrowTex : StreamTexture
+export var DownArrowTex : StreamTexture
+export var PencilTex : StreamTexture
+
+var BugActionButtonTextures = {}
 
 var DetailTextBox
 var BuglistTreeObj : Tree
+
+var BugResource = preload("res://DesignDocs/bug_resource.tres")
 
 var BugCollection : Array = [] # resource objects to manipulate bugs
 
@@ -21,16 +26,17 @@ var JSONBugList
 #	"actions":{"width":250, "expand":false, "editable":false},
 #}
 
-var Columns = ["category", "id", "title", "details", "priority", "dependencies", "date", "actions"]
+var BugProperties = ["Category", "Id", "Title", "Details", "Priority", "Dependencies", "DateCreated", "Actions"]
+var Columns = ["Category", "Id", "Title", "Details", "Priority", "Dependencies", "DateCreated", "Actions"]
 var ColDetails = {
-	"category":{"width":75, "expand":false, "editable":false},
-	"id":{"width":25, "expand":false, "editable":false},
-	"title":{"width":150, "expand":false, "editable":true},
-	"details":{"width":200, "expand":true, "editable":true},
-	"priority":{"width":75, "expand":false, "editable":true},
-	"dependencies":{"width":25, "expand":false, "editable":false},
-	"date":{"width":55, "expand":false, "editable":false},
-	"actions":{"width":85, "expand":false, "editable":false},
+	"Category":{"width":75, "expand":false, "editable":false},
+	"Id":{"width":25, "expand":false, "editable":false},
+	"Title":{"width":150, "expand":false, "editable":true},
+	"Details":{"width":200, "expand":true, "editable":true},
+	"Priority":{"width":75, "expand":false, "editable":true},
+	"Dependencies":{"width":25, "expand":false, "editable":false},
+	"DateCreated":{"width":55, "expand":false, "editable":false},
+	"Actions":{"width":85, "expand":false, "editable":false},
 }
 
 signal finished
@@ -43,51 +49,62 @@ func _ready():
 		# The main menu will call start when the user requests it
 
 func start(callbackObj):
+	BugActionButtonTextures = {
+		"Delete" : DeleteIconTex,
+		"Move to top": UpArrowTex,
+		"Move to bottom": DownArrowTex,
+		"Edit" : PencilTex,
+	}
+
 	setPanelSize()
 	
 	
 	var jsonBugList = loadBugList("user://saved_buglist.dat")
 	var buglist = generateBugCollection(jsonBugList)
 	var tree = createTree()
-	populateTree(tree, buglist)
+	populateTree(tree, buglist, "category")
 	BugCollection = buglist
 
 func setPanelSize():
 	var viewportSize = get_viewport().get_size()
 	self.rect_size = viewportSize
 
-func populateTree(treeNode, collectionOfBugs):
+func populateTree(treeNode : Tree, collectionOfBugs : Array, groupBy : String) -> void:
+	find_node("GroupingLabel", true).set_text(groupBy)
 	var rootItem = treeNode.get_root()
-	var categories = []
+	var groupMembersCollection = []
 	for bug in collectionOfBugs:
-		if not categories.has(bug.Category):
-			categories.push_back(bug.Category)
+		if not groupMembersCollection.has(bug.get(toPythonCase(groupBy))):
+			groupMembersCollection.push_back(bug.get(toPythonCase(groupBy)))
 	
-	for category in categories:
-		var categoryItem = treeNode.create_item(rootItem)
-		categoryItem.set_text(0, category)
+	for grouping in groupMembersCollection:
+		var groupItem = treeNode.create_item(rootItem)
+		groupItem.set_text(0, str(grouping))
 	
 		for bug in collectionOfBugs:
-			if bug.Category == category:
-				var bugItem = treeNode.create_item(categoryItem)
-				bugItem.set_text(1, str(bug.ID))
-				bugItem.set_text(2, bug.Title)
-				bugItem.set_editable(2, true)
-				bugItem.set_text(3, bug.Details)
-				bugItem.set_editable(3, true)
-				bugItem.set_text(4, bug.Priority)
-				bugItem.set_editable(2, true)
-				bugItem.set_text(5, str(bug.Dependencies))
-				bugItem.set_text(6, str(bug.DateCreated))
-				bugItem.add_button(7, DeleteIconTex )
-				bugItem.add_button(7, DownArrowTex)
-				bugItem.add_button(7, UpArrowTex)
-		
+			if bug.get(groupBy.capitalize()) == grouping:
+				var bugItem = treeNode.create_item(groupItem)
+				
+				var i = 0
+				for columnName in Columns:
+					if columnName != "Actions":
+						var cellText = bug.get(toPythonCase(columnName))
+						if cellText == null:
+							cellText = ""
+						bugItem.set_text(i, str(cellText))
+						bugItem.set_editable(i, ColDetails[columnName]["editable"])
+						i += 1
+				addButtons(bugItem, 7)
 	
-func scaleButtons(tree, column, scale):
+func addButtons(treeItem, column):
 	
-	var root = tree.get_root()
-	
+	var i = 0
+	for texture in BugActionButtonTextures.values():
+		var disabled = false
+		var tooltip = BugActionButtonTextures.keys()[i]
+#		treeItem.add_button(column, BugActionButtonTextures[i], i, disabled, str(BugActionButtonIndex.keys()[i]) )
+		treeItem.add_button(column, texture, i, disabled, tooltip )
+		i += 1
 	
 	
 func createTree() -> Tree:
@@ -115,6 +132,7 @@ func createTree() -> Tree:
 	
 	tree.connect("button_pressed", self, "_on_tree_button_pressed")
 	tree.connect("item_edited", self, "_on_Tree_item_edited")
+	tree.connect("column_title_pressed", self, "_on_Tree_column_title_pressed")
 
 	marginBox.add_child(tree)
 	BuglistTreeObj = tree
@@ -126,32 +144,9 @@ func createTree() -> Tree:
 
 	return tree
 
-	
-#	for buglistSubDict in buglistDictionary:
-#		old_populate_branch(tree, tree.get_root(), buglistSubDict, buglistDictionary[buglistSubDict])
-#
 
 
-	
-func old_populate_branch(treeObj, currentTreeItemNode, branchName, branchContents):
-	
-	var newBranchNode = treeObj.create_item(currentTreeItemNode)
-	newBranchNode.set_text(0, branchName)
-	#print(branchContents)
-	var i = 0
-	for key in branchContents.keys():
-		var itemObj = treeObj.create_item(newBranchNode)
-		itemObj.set_text(0, str(i))
-		itemObj.set_text(1, key)
-		itemObj.set_text(2, branchContents[key])
-		itemObj.add_button(3, CheckMarkButtonTex )
-		itemObj.add_button(3, DownArrowTex)
-		itemObj.add_button(3, UpArrowTex)
-		
-		for colNum in Columns.size():
-			itemObj.set_editable(colNum, ColDetails[Columns[colNum]]["editable"])
-		
-		i += 1
+
 
 
 func converGroupsToTable(nestedBuglistDict : Dictionary) -> Dictionary:
@@ -169,32 +164,24 @@ func converGroupsToTable(nestedBuglistDict : Dictionary) -> Dictionary:
 	
 	return tempFlatBuglistDict
 	
-	
-	
-func convertTableToGroups(groupColumn : int, table : Dictionary):
-	# make a nested json, grouped by a given column in a flat table
-	printerr("DesignNotes.gd: convertTableToGroups needs development")
 
-func updateJSONFromTable():
-	printerr("DesignNotes.gd: updateJSONFromTable needs development")
-	var newDict = {}
-	for item in BuglistTreeObj.get_items():
-		pass
+	
+
 	
 
 func jsonifyBuglist() -> String :
 	var blDict = {}
 	var jsonBuglist = ""
-	var cols = ["category", "id", "title", "details", "priority", "dependencies", "date"]
+	#var cols = ["Category", "ID", "Title", "Details", "Priority", "Dependencies", "DateCreated"]
 	for bug in BugCollection:
 		blDict[bug.ID] = {
-			"category" : bug.Category,
-			"id" : bug.ID,
-			"title" : bug.Title,
-			"details" : bug.Details,
-			"priority" : bug.Priority,
-			"dependencies" : bug.Dependencies,
-			"date" : bug.DateCreated,
+			"Category" : bug.Category,
+			"ID" : bug.ID,
+			"Title" : bug.Title,
+			"Details" : bug.Details,
+			"Priority" : bug.Priority,
+			"Dependencies" : bug.Dependencies,
+			"DateCreated" : bug.DateCreated,
 		}
 	jsonBuglist = JSON.print(blDict, "\t")
 	return jsonBuglist
@@ -221,43 +208,39 @@ func generateBugCollection(jsonBugList:String) -> Array:
 	var bugCollection : Array = []
 	var parseResult : JSONParseResult = JSON.parse(jsonBugList)
 	var tempBuglist : Dictionary = parseResult.result
-	var bugResource = preload("res://DesignDocs/bug_resource.tres")
+	
 	# if the dictionary is multi-level?
-	if isDictNested(tempBuglist):
-		var i : int = 0
-		for categoryName in tempBuglist.keys():
-			#print(categoryName)
-			for bugDict in tempBuglist[categoryName]:
-				#print(bugDict)
-				var bug = bugResource.duplicate() # resources are weird. They don't have new or instance functions.
-				bug.Category = categoryName
-				bug.ID = i # we'll want to change this once we have a flat table
-				#print(tempBuglist[categoryName])
-				bug.Title = bugDict
-				bug.Details = tempBuglist[categoryName][bugDict]
-				bug.Priority = "medium"
-				bug.Dependencies = []
-				bug.DateCreated = OS.get_unix_time()
-				bugCollection.push_back(bug)
-				i += 1
-	else: # not nested. We've already converted it into a flattened table
-		var i : int = 0
-		for bugItem in tempBuglist.values():
-			var bug = bugResource.duplicate()
-			bug.Category = bugItem["category"]
-			bug.ID = bugItem["id"] # we'll want to change this once we have a flat table
-			
-			
-			bug.Title = bugItem["title"]
-			
-			bug.Details = bugItem["details"]
-			bug.Priority = bugItem["priority"]
-			bug.Dependencies = bugItem["dependencies"]
-			bug.DateCreated = bugItem["date"]
-			bugCollection.push_back(bug)
-			i += 1
-	#prettyPrintBugs(bugCollection)
+
+	
+	var i : int = 0
+	for bugItem in tempBuglist.values():
+		var bug = BugResource.duplicate()
+		for propertyName in Columns:
+			if propertyName != "Actions": # buttons don't have properties in the buglist
+				var propertyNamePC = toPythonCase(propertyName)
+				if bugItem.has(propertyName): # lower case?
+					bug.set(toPythonCase(propertyNamePC), bugItem[propertyName])
+				elif bugItem.has(propertyNamePC): # capitalized
+					bug.set(propertyNamePC, bugItem[propertyNamePC])
+				else:
+					printerr("DesignNotes.gd: we have a problem in generateBugCollection")
+					print("propertyName == " + propertyName + ". propertyNamePC == " + propertyNamePC)
+			# careful with capitalize(). it'll add spaces. May want to use one-word titles
+		bugCollection.push_back(bug)
+		i += 1
+
 	return bugCollection
+
+func toPythonCase(propertyName) -> String :
+	# we want to convert any string to PythonCase so we can reference property varialbes with set/get
+	var pythonCasifiedString = ""
+	propertyName = propertyName.capitalize() # capitalize adds spaces
+	var words = propertyName.split(" ")
+	for word in words:
+		pythonCasifiedString += word
+	
+	return pythonCasifiedString
+
 
 func prettyPrintBugs(bugCollection : Array):
 	for bug in bugCollection:
@@ -289,9 +272,6 @@ func isDictNested(dict : Dictionary):
 #	return isNested
 	
 
-func _on_tree_button_pressed(item, column, button_id):
-	
-	print("pressed button: " + str(item.get_text(0)))
 
 
 
@@ -335,17 +315,57 @@ func getBug(bugID):
 			relevantBug = bug
 	return relevantBug
 
+func deleteBug(bug):
+	# bugs are resources stored in an array.
+	# resources don't have a queue_free() or free()
+	# Resource extends from Reference. As such, when a resource is no longer in use, it will automatically free itself.
+	BugCollection.erase(bug)
+	
+
+func _on_Tree_column_title_pressed(column):
+	var label = $VBoxContainer/HSplitContainer/PanelContainer/LeftHBox/GroupingLabel
+	var text = Columns[column]
+	var enabled = ["category", "priority", "date"]
+	if enabled.has(text):
+		label.set_text(text)
+	BuglistTreeObj.clear()
+	populateTree(BuglistTreeObj, BugCollection, text)
+
+func _on_tree_button_pressed(item, column, button_id):
+	var tooltip = item.get_button_tooltip(column, button_id)
+	#print("pressed button: " + tooltip + " on item: " + item.get_text(Columns.find("title")))
+	print("pressed button: " + tooltip + " on item: " + item.get_text(Columns.find("Title")))
+	
+	var bugID = int(item.get_text(Columns.find("Id")))
+	var bug = getBug(bugID)
+	
+	if tooltip == "Delete":
+		#print(bug.Title + " scheduled for deletion ")
+		deleteBug(bug)
+		item.free()
+	elif tooltip == "Move to top":
+		# not sure how to make this persistent
+		item.move_to_top()
+	elif tooltip == "Move to bottom":
+		# not sure how to make this persistent. Need a DisplayOrderID
+		item.move_to_bottom()
+	elif tooltip == "Edit":
+		var dialog = $Dialogs/EditBugPopup
+		dialog.popup_centered()
+		populateBugDialog(dialog, bugID)
+
+
 func _on_SaveButton_pressed():
-	$SaveDialog.popup_centered()
+	$Dialogs/SaveDialog.popup_centered()
 
 func _on_LoadButton_pressed():
-	$LoadDialog.popup_centered()
+	$Dialogs/LoadDialog.popup_centered()
 
 
 func _on_LoadDialog_file_selected(path):
 	JSONBugList = loadBugList(path)
 	BuglistTreeObj.clear()
-	populateTree(BuglistTreeObj, generateBugCollection(JSONBugList))
+	populateTree(BuglistTreeObj, generateBugCollection(JSONBugList), "category")
 	
 
 
@@ -357,11 +377,54 @@ func _on_Tree_item_edited(): # only fires after user hits return or leaves the c
 	var editedItem = BuglistTreeObj.get_edited()
 	print("edited: " + str(editedItem))
 	
-	var bugID = int(editedItem.get_text(Columns.find("id")))
+	var bugID = int(editedItem.get_text(Columns.find("Id")))
 	var bug = getBug(bugID)
 	
-	bug.Title = editedItem.get_text(Columns.find("title"))
-	bug.Details = editedItem.get_text(Columns.find("details"))
+	bug.Title = editedItem.get_text(Columns.find("Title"))
+	bug.Details = editedItem.get_text(Columns.find("Details"))
 #	print(bug.Title)
 #	print(bug.Details)
 	
+
+func getNewBugID() -> int:
+	var existingIDs = []
+	for bug in BugCollection:
+		existingIDs.push_back(bug.ID)
+	return existingIDs.max()+1
+
+func createBug() -> Resource:
+	var bug = BugResource.duplicate()	
+	bug.ID = getNewBugID()
+	return bug
+	
+func populateBugDialog(dialog, bugID):
+	var tree = dialog.find_node("Tree")
+	var bug
+	
+	if bugID == -1:
+		bug = createBug()
+	else:
+		bug = getBug(bugID)
+	
+	var root = tree.create_item()
+	for property in bug.get_property_list():
+		var newItem = tree.create_item(root)
+		newItem.set_text(0, property["name"])
+		newItem.set_text(1, str(bug.get(property["name"])))
+		newItem.set_editable(1, true)
+		
+	
+	
+
+func _on_NewBugButton_pressed():
+	print("New Bug Button Pressed")
+	var dialog = $Dialogs/EditBugPopup
+	dialog.popup_centered()
+	populateBugDialog(dialog, -1)
+	
+
+
+func _on_DiscardBugBtn_pressed():
+	# close the modal dialog box for creating a new bug or editing an existing bug
+	$Dialogs/EditBugPopup.hide()
+

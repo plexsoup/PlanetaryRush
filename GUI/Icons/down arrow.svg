@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="16" height="16" version="1.1" viewBox="0 0 4 4" xmlns="http://www.w3.org/2000/svg">
- <g transform="translate(-.00452 -.059379)" fill="#fff">
+ <g transform="matrix(1 0 0 .94281 -.00452 .23451)" fill="#fff">
   <path d="m1.4344 0.2202v1.4354h-0.73542l1.3055 1.734 1.3055-1.734h-0.73542v-1.4354z" style="paint-order:markers fill stroke"/>
   <rect x=".14205" y="3.4882" width="3.7249" height=".41037" style="paint-order:markers fill stroke"/>
  </g>
