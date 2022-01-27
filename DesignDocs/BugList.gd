@@ -1,3 +1,7 @@
+# current work effort:
+# fix new/edit bug dialog. It's broken in all kinds of ways
+# fix grouping when you click a column title: messes up the root node
+
 
 extends Node
 
@@ -11,12 +15,16 @@ var BugActionButtonTextures = {}
 
 var DetailTextBox
 var BuglistTreeObj : Tree
+var GroupBy : String
 
 var BugResource = preload("res://DesignDocs/bug_resource.tres")
 
 var BugCollection : Array = [] # resource objects to manipulate bugs
 
 var JSONBugList
+var DefaultSaveFilePath = "saved_buglist.dat"
+
+var TempCounter : int = 0
 
 #var Columns = ["id", "title", "details", "actions"]
 #var ColDetails = {
@@ -26,7 +34,7 @@ var JSONBugList
 #	"actions":{"width":250, "expand":false, "editable":false},
 #}
 
-var BugProperties = ["Category", "Id", "Title", "Details", "Priority", "Dependencies", "DateCreated", "Actions"]
+var BugProperties = ["Category", "Id", "Title", "Details", "Priority", "Dependencies", "DateCreated"]
 var Columns = ["Category", "Id", "Title", "Details", "Priority", "Dependencies", "DateCreated", "Actions"]
 var ColDetails = {
 	"Category":{"width":75, "expand":false, "editable":false},
@@ -50,7 +58,6 @@ func _ready():
 
 func start(callbackObj):
 	BugActionButtonTextures = {
-		"Delete" : DeleteIconTex,
 		"Move to top": UpArrowTex,
 		"Move to bottom": DownArrowTex,
 		"Edit" : PencilTex,
@@ -59,7 +66,7 @@ func start(callbackObj):
 	setPanelSize()
 	
 	
-	var jsonBugList = loadBugList("user://saved_buglist.dat")
+	var jsonBugList = loadBugList("user://" + DefaultSaveFilePath)
 	var buglist = generateBugCollection(jsonBugList)
 	var tree = createTree()
 	populateTree(tree, buglist, "category")
@@ -70,6 +77,8 @@ func setPanelSize():
 	self.rect_size = viewportSize
 
 func populateTree(treeNode : Tree, collectionOfBugs : Array, groupBy : String) -> void:
+	BuglistTreeObj.clear()
+	printerr("BugList.gd populateTree has a bug: grouping is weird after regrouping")
 	find_node("GroupingLabel", true).set_text(groupBy)
 	var rootItem = treeNode.get_root()
 	var groupMembersCollection = []
@@ -158,7 +167,7 @@ func converGroupsToTable(nestedBuglistDict : Dictionary) -> Dictionary:
 		for bug in nestedBuglistDict[categoryName]:
 			tempFlatBuglistDict[id] = bug
 			tempFlatBuglistDict[id]["category"] = categoryName
-			tempFlatBuglistDict[id]["refID"] = id
+			tempFlatBuglistDict[id]["refId"] = id
 			tempFlatBuglistDict[id]["priority"] = "medium"
 			id += 1
 	
@@ -170,25 +179,29 @@ func converGroupsToTable(nestedBuglistDict : Dictionary) -> Dictionary:
 	
 
 func jsonifyBuglist() -> String :
+	print("BugList.gd starting jsonifyBuglist. BugCollection.size() == " + str(BugCollection.size()))
 	var blDict = {}
 	var jsonBuglist = ""
-	#var cols = ["Category", "ID", "Title", "Details", "Priority", "Dependencies", "DateCreated"]
+	#var cols = ["Category", "Id", "Title", "Details", "Priority", "Dependencies", "DateCreated"]
+
 	for bug in BugCollection:
-		blDict[bug.ID] = {
+#		if bug.Id == 0:
+#			bug.Id = getNewBugId()
+		blDict[str(bug.Id)] = {
 			"Category" : bug.Category,
-			"ID" : bug.ID,
+			"Id" : bug.Id,
 			"Title" : bug.Title,
 			"Details" : bug.Details,
 			"Priority" : bug.Priority,
 			"Dependencies" : bug.Dependencies,
 			"DateCreated" : bug.DateCreated,
 		}
+	
 	jsonBuglist = JSON.print(blDict, "\t")
 	return jsonBuglist
 
 
 func saveBugList(path):
-	print("Saving Buglist to JSON file: " + path)
 	var file = File.new()
 	file.open(path, File.WRITE)
 	file.store_string(jsonifyBuglist())
@@ -207,6 +220,9 @@ func loadBugList(path) -> String : # Loads JSON from a file
 func generateBugCollection(jsonBugList:String) -> Array:
 	var bugCollection : Array = []
 	var parseResult : JSONParseResult = JSON.parse(jsonBugList)
+	if parseResult.result == null:
+		return []
+		
 	var tempBuglist : Dictionary = parseResult.result
 	
 	# if the dictionary is multi-level?
@@ -214,22 +230,30 @@ func generateBugCollection(jsonBugList:String) -> Array:
 	
 	var i : int = 0
 	for bugItem in tempBuglist.values():
+		if bugItem.has("ID"):
+			if bugItem["ID"] == null:
+				bugItem["ID"] == getNewBugId()
+		elif bugItem.has("Id"):
+			if bugItem["Id"] == null:
+				bugItem["Id"] == getNewBugId()
 		var bug = BugResource.duplicate()
-		for propertyName in Columns:
+		for propertyName in bugItem.keys(): # was columns
 			if propertyName != "Actions": # buttons don't have properties in the buglist
-				var propertyNamePC = toPythonCase(propertyName)
-				if bugItem.has(propertyName): # lower case?
-					bug.set(toPythonCase(propertyNamePC), bugItem[propertyName])
-				elif bugItem.has(propertyNamePC): # capitalized
-					bug.set(propertyNamePC, bugItem[propertyNamePC])
+				if bugItem.has(propertyName): # most cases. Don't mess with the string's case
+					bug.set(propertyName, bugItem[propertyName])
+				elif bugItem.has(toPythonCase(propertyName)): # Python Case (eg: DateCreated)
+					bug.set(toPythonCase(propertyName), bugItem[propertyName])
+				elif bugItem.has(propertyName.to_upper()): # Upper Case (eg: Id)
+					bug.set(propertyName.to_upper(), bugItem[propertyName])
 				else:
 					printerr("DesignNotes.gd: we have a problem in generateBugCollection")
-					print("propertyName == " + propertyName + ". propertyNamePC == " + propertyNamePC)
+					print("propertyName == " + propertyName + " no PythonCase nor ALLCAPS found in bug_resource.tres/bug.gd")
 			# careful with capitalize(). it'll add spaces. May want to use one-word titles
 		bugCollection.push_back(bug)
 		i += 1
 
 	return bugCollection
+
 
 func toPythonCase(propertyName) -> String :
 	# we want to convert any string to PythonCase so we can reference property varialbes with set/get
@@ -242,17 +266,12 @@ func toPythonCase(propertyName) -> String :
 	return pythonCasifiedString
 
 
+
 func prettyPrintBugs(bugCollection : Array):
 	for bug in bugCollection:
+		for property in bug.get_property_list():
+			print(property["name"] + ": " + bug.get(property["name"]))
 
-		print("ID: " + str(bug.ID))
-		print("Category: " + str(bug.Category))
-		print("Title: " + str(bug.Title))
-		print("Details: " + str(bug.Details))
-		print("Priority: " + str(bug.Priority))
-		print("Dependencies: " + str(bug.Dependencies))
-		print("Date Created: " + str(bug.DateCreated))
-		print("-----------------------------------")
 
 func isDictNested(dict : Dictionary):
 	
@@ -308,10 +327,10 @@ Line-Drawing games
 
 """
 
-func getBug(bugID):
+func getBug(bugId):
 	var relevantBug
 	for bug in BugCollection:
-		if bug.ID == bugID:
+		if int(bug.Id) == int(bugId):
 			relevantBug = bug
 	return relevantBug
 
@@ -323,12 +342,11 @@ func deleteBug(bug):
 	
 
 func _on_Tree_column_title_pressed(column):
-	var label = $VBoxContainer/HSplitContainer/PanelContainer/LeftHBox/GroupingLabel
+	var label = find_node("GroupingLabel")
 	var text = Columns[column]
 	var enabled = ["category", "priority", "date"]
 	if enabled.has(text):
 		label.set_text(text)
-	BuglistTreeObj.clear()
 	populateTree(BuglistTreeObj, BugCollection, text)
 
 func _on_tree_button_pressed(item, column, button_id):
@@ -336,8 +354,8 @@ func _on_tree_button_pressed(item, column, button_id):
 	#print("pressed button: " + tooltip + " on item: " + item.get_text(Columns.find("title")))
 	print("pressed button: " + tooltip + " on item: " + item.get_text(Columns.find("Title")))
 	
-	var bugID = int(item.get_text(Columns.find("Id")))
-	var bug = getBug(bugID)
+	var bugId = int(item.get_text(Columns.find("Id")))
+	var bug = getBug(bugId)
 	
 	if tooltip == "Delete":
 		#print(bug.Title + " scheduled for deletion ")
@@ -347,15 +365,17 @@ func _on_tree_button_pressed(item, column, button_id):
 		# not sure how to make this persistent
 		item.move_to_top()
 	elif tooltip == "Move to bottom":
-		# not sure how to make this persistent. Need a DisplayOrderID
+		# not sure how to make this persistent. Need a DisplayOrderId
 		item.move_to_bottom()
 	elif tooltip == "Edit":
 		var dialog = $Dialogs/EditBugPopup
 		dialog.popup_centered()
-		populateBugDialog(dialog, bugID)
+		populateBugDialog(dialog, bugId)
 
 
 func _on_SaveButton_pressed():
+	var saveDialog = $Dialogs/SaveDialog
+	saveDialog.set_current_file(DefaultSaveFilePath)
 	$Dialogs/SaveDialog.popup_centered()
 
 func _on_LoadButton_pressed():
@@ -364,7 +384,6 @@ func _on_LoadButton_pressed():
 
 func _on_LoadDialog_file_selected(path):
 	JSONBugList = loadBugList(path)
-	BuglistTreeObj.clear()
 	populateTree(BuglistTreeObj, generateBugCollection(JSONBugList), "category")
 	
 
@@ -377,8 +396,8 @@ func _on_Tree_item_edited(): # only fires after user hits return or leaves the c
 	var editedItem = BuglistTreeObj.get_edited()
 	print("edited: " + str(editedItem))
 	
-	var bugID = int(editedItem.get_text(Columns.find("Id")))
-	var bug = getBug(bugID)
+	var bugId = int(editedItem.get_text(Columns.find("Id")))
+	var bug = getBug(bugId)
 	
 	bug.Title = editedItem.get_text(Columns.find("Title"))
 	bug.Details = editedItem.get_text(Columns.find("Details"))
@@ -386,34 +405,75 @@ func _on_Tree_item_edited(): # only fires after user hits return or leaves the c
 #	print(bug.Details)
 	
 
-func getNewBugID() -> int:
-	var existingIDs = []
-	for bug in BugCollection:
-		existingIDs.push_back(bug.ID)
-	return existingIDs.max()+1
+func getNewBugId() -> int:
+	var existingIds = []
+	if BugCollection.size() > 0:
+		for bug in BugCollection:
+			existingIds.push_back(bug.Id)
+		return existingIds.max()+1
+	else:
+		TempCounter += 1
+		return TempCounter
 
-func createBug() -> Resource:
-	var bug = BugResource.duplicate()	
-	bug.ID = getNewBugID()
+
+func createBug(idNum : int = -1) -> Resource:
+	
+	var bug = BugResource.duplicate()
+	if idNum == -1:
+		bug.Id = getNewBugId()
+	else:
+		bug.Id = idNum
 	return bug
 	
-func populateBugDialog(dialog, bugID):
-	var tree = dialog.find_node("Tree")
+func populateBugDialog(dialog, bugId):
+	var tree = dialog.find_node("BugEditTree")
 	var bug
 	
-	if bugID == -1:
+	if bugId == -1:
 		bug = createBug()
 	else:
-		bug = getBug(bugID)
+		bug = getBug(bugId)
 	
 	var root = tree.create_item()
-	for property in bug.get_property_list():
+	tree.set_hide_root(true)
+	for property in BugProperties:
 		var newItem = tree.create_item(root)
-		newItem.set_text(0, property["name"])
-		newItem.set_text(1, str(bug.get(property["name"])))
+		newItem.set_text(0, property)
+		newItem.set_text(1, str(bug.get(property)))
 		newItem.set_editable(1, true)
 		
+func saveBugFromDialog():
+	# read all the items in the table
+	var dialog = $Dialogs/EditBugPopup
+	var tree = dialog.find_node("BugEditTree")
+	var root = tree.get_root()
 	
+	var tempProperties = {}
+	var treeItem = root.get_children()
+	tempProperties[treeItem.get_text(0)] = treeItem.get_text(1) 
+
+	var EoF = false
+	var i = 0
+	var nextItem = root.get_children()
+	while not EoF and i < 100:
+		if nextItem == null:
+			EoF = true
+		else:
+			print("nextItem property = "+nextItem.get_text(0) + " value == "+ nextItem.get_text(1) )
+			tempProperties[str(nextItem.get_text(0))] = nextItem.get_text(1)
+			nextItem = nextItem.get_next()
+		i += 1
+	
+	var bug = getBug(int(tempProperties["Id"]))
+	if bug == null:
+		bug = createBug(int(tempProperties["Id"]))
+	for property in tempProperties.keys():
+		bug.set(property, tempProperties[str(property)])
+	BugCollection.push_back(bug)
+	populateTree(BuglistTreeObj, BugCollection, find_node("GroupingLabel").get_text())
+	dialog.hide()
+	
+
 	
 
 func _on_NewBugButton_pressed():
@@ -428,3 +488,9 @@ func _on_DiscardBugBtn_pressed():
 	# close the modal dialog box for creating a new bug or editing an existing bug
 	$Dialogs/EditBugPopup.hide()
 
+
+
+func _on_SaveBugBtn_pressed(): # for a specific bug, from the new/edit bug dialog
+	saveBugFromDialog()
+	
+	

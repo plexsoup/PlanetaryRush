@@ -3,7 +3,7 @@ extends Reference
 
 # Declare member variables here. Examples:
 export var Category : String = "Bug" # could be MaybeSomeday, Design, etc
-export var ID : int # 
+export var Id : int # 
 export var Title : String
 export var Details : String
 export var Priority : String # high, medium, low
@@ -17,7 +17,7 @@ func _ready():
 
 func start(category, id, title, details, priority, dependencies, dateCreated):
 	Category = category
-	ID = id
+	Id = id
 	Details = details
 	Priority = priority
 	Dependencies = dependencies

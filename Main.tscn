@@ -7,7 +7,7 @@
 [ext_resource path="res://BGMusic/hearts-unraveled.ogg" type="AudioStream" id=5]
 [ext_resource path="res://GUI/Menus/MenuEntry.gd" type="Script" id=6]
 [ext_resource path="res://GUI/Menus/SplashScreen.gd" type="Script" id=7]
-[ext_resource path="res://DesignDocs/DesignNotes.tscn" type="PackedScene" id=8]
+[ext_resource path="res://DesignDocs/BugList.tscn" type="PackedScene" id=8]
 [ext_resource path="res://Scenery/stars.png" type="Texture" id=10]
 [ext_resource path="res://Planets/PlanetBlueprint.tscn" type="PackedScene" id=11]
 [ext_resource path="res://Scenery/VQGAN Art/library.jpg" type="Texture" id=12]

@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource( 1 )
-Category = "Bug"
-ID = 0
+Category = "Bugs"
+Id = -1
 Title = ""
 Details = ""
-Priority = ""
+Priority = "medium"
 Dependencies = [  ]
 DateCreated = 0
