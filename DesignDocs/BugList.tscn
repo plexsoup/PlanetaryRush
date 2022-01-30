@@ -213,5 +213,6 @@ __meta__ = {
 [connection signal="pressed" from="VBoxContainer/HBox/RightHBox/LoadButton" to="." method="_on_LoadButton_pressed"]
 [connection signal="pressed" from="Dialogs/EditBugPopup/MarginContainer/VBoxContainer/Buttons/SaveBugBtn" to="." method="_on_SaveBugBtn_pressed"]
 [connection signal="pressed" from="Dialogs/EditBugPopup/MarginContainer/VBoxContainer/Buttons/CenterContainer/DiscardBugBtn" to="." method="_on_DiscardBugBtn_pressed"]
+[connection signal="pressed" from="Dialogs/EditBugPopup/MarginContainer/VBoxContainer/Buttons/DeleteBugBtn" to="." method="_on_DeleteBugBtn_pressed"]
 [connection signal="file_selected" from="Dialogs/LoadDialog" to="." method="_on_LoadDialog_file_selected"]
 [connection signal="file_selected" from="Dialogs/SaveDialog" to="." method="_on_SaveDialog_file_selected"]

@@ -15,16 +15,22 @@ var BugActionButtonTextures = {}
 
 var DetailTextBox
 var BuglistTreeObj : Tree
-var GroupBy : String
+var GroupBy : String = "Category"
 
 var BugResource = preload("res://DesignDocs/bug_resource.tres")
 
 var BugCollection : Array = [] # resource objects to manipulate bugs
 
+onready var EditBugPopup = $Dialogs/EditBugPopup
+onready var BugEditTreeNode = $Dialogs/EditBugPopup/MarginContainer/VBoxContainer/BugEditTree
+
 var JSONBugList
 var DefaultSaveFilePath = "saved_buglist.dat"
 
 var TempCounter : int = 0
+
+
+
 
 #var Columns = ["id", "title", "details", "actions"]
 #var ColDetails = {
@@ -57,6 +63,10 @@ func _ready():
 		# The main menu will call start when the user requests it
 
 func start(callbackObj):
+	var nodesDict = nodesToDict(self) # before you add any other nodes
+	#print(nodesDict)
+	# print(nodesDictToCode(nodesDict[self.name]))
+
 	BugActionButtonTextures = {
 		"Move to top": UpArrowTex,
 		"Move to bottom": DownArrowTex,
@@ -71,6 +81,84 @@ func start(callbackObj):
 	var tree = createTree()
 	populateTree(tree, buglist, "category")
 	BugCollection = buglist
+	
+	
+func getAllNodes(node) -> String:
+	var returnStr = ""
+	for N in node.get_children():
+		if N.get_child_count() > 0:
+			if not N.get_name().begins_with("@"):
+				returnStr = returnStr + "\n\t["+N.get_name()+"]"
+				returnStr = returnStr + getAllNodes(N)
+		else:
+			# Do something
+			if not N.get_name().begins_with("@"):
+				returnStr = returnStr + "\n\t- "+N.get_name()
+	return returnStr
+
+func nodesToDict(nodes): # may return a dictionary or null
+	if nodes == null:
+		return null
+		
+	var nodeArr = []
+	if typeof(nodes) == TYPE_ARRAY:
+		nodeArr.append_array(nodes)
+	else:
+		nodeArr.push_back(nodes)
+	# recursive function to walk a node tree and return a dictionary
+	# useful for running code to spawn the same nodes procedurally later
+	# like in a plugin
+
+	var nodesDict = {}
+	
+	for node in nodeArr:
+		if not node.get_name().begins_with("@"):
+			nodesDict[node.name] = {
+				"name" : node.name,
+				"type" : node.get_class(),
+				"children" : nodesToDict(node.get_children()),
+			}
+	return nodesDict
+
+func nodesDictToCode(nodesDict, i=0):
+	if i > 100:
+		printerr("BugList.gd: nodesDictToCode(): recursive function getting a bit too large")
+		return
+	var gdScriptCodeStr = ""
+	if typeof(nodesDict) == TYPE_DICTIONARY:
+		for nodeName in nodesDict.keys():
+			gdScriptCodeStr += "\nvar node"+ str(i) +" = " + nodesDict["type"] + ".new()"
+			
+			gdScriptCodeStr += "\nnode"+ str(i) + ".name = " + '"' +nodesDict["name"] + '"'
+
+			gdScriptCodeStr += "\nnode"+ str(i) + ".add_child(node"+ str(i) +")"
+			
+			if typeof(nodesDict["children"]) == TYPE_DICTIONARY:
+				for childName in nodesDict["children"].keys():
+					gdScriptCodeStr += nodesDictToCode(nodesDict["children"][childName], i+1)
+			i += 1
+	elif typeof(nodesDict) == TYPE_STRING:
+		print("nodesDictToCode(): "+ nodesDict )
+		
+
+#	var rootCentreContainer = CenterContainer.new()
+#	add_child(rootVbox)
+#	add_child(rootCentreContainer)
+	
+	
+	
+	return gdScriptCodeStr
+	
+func setupBuglistSceneTree():
+	pass
+	
+#	var rootVbox = VBoxContainer.new()
+#	var rootCentreContainer = CenterContainer.new()
+#	add_child(rootVbox)
+#	add_child(rootCentreContainer)
+#
+#	rootVbox.add_child(HBoxContainer.new())
+	
 
 func setPanelSize():
 	var viewportSize = get_viewport().get_size()
@@ -157,8 +245,8 @@ func createTree() -> Tree:
 
 
 
-
-func converGroupsToTable(nestedBuglistDict : Dictionary) -> Dictionary:
+# appears to be unused?
+func convertGroupsToTable(nestedBuglistDict : Dictionary) -> Dictionary:
 	var tempFlatBuglistDict = {}
 	var categories = []
 	var id = 0
@@ -368,7 +456,7 @@ func _on_tree_button_pressed(item, column, button_id):
 		# not sure how to make this persistent. Need a DisplayOrderId
 		item.move_to_bottom()
 	elif tooltip == "Edit":
-		var dialog = $Dialogs/EditBugPopup
+		var dialog = EditBugPopup
 		dialog.popup_centered()
 		populateBugDialog(dialog, bugId)
 
@@ -426,7 +514,7 @@ func createBug(idNum : int = -1) -> Resource:
 	return bug
 	
 func populateBugDialog(dialog, bugId):
-	var tree = dialog.find_node("BugEditTree")
+	var tree = BugEditTreeNode
 	var bug
 	
 	if bugId == -1:
@@ -438,14 +526,14 @@ func populateBugDialog(dialog, bugId):
 	tree.set_hide_root(true)
 	for property in BugProperties:
 		var newItem = tree.create_item(root)
-		newItem.set_text(0, property)
-		newItem.set_text(1, str(bug.get(property)))
+		newItem.set_text(0, property) # col 0 is the name of the property (aka key, title, label)
+		newItem.set_text(1, str(bug.get(property))) # col 1 is the value of the property
 		newItem.set_editable(1, true)
 		
 func saveBugFromDialog():
 	# read all the items in the table
 	var dialog = $Dialogs/EditBugPopup
-	var tree = dialog.find_node("BugEditTree")
+	var tree = BugEditTreeNode
 	var root = tree.get_root()
 	
 	var tempProperties = {}
@@ -478,7 +566,7 @@ func saveBugFromDialog():
 
 func _on_NewBugButton_pressed():
 	print("New Bug Button Pressed")
-	var dialog = $Dialogs/EditBugPopup
+	var dialog = EditBugPopup
 	dialog.popup_centered()
 	populateBugDialog(dialog, -1)
 	
@@ -486,7 +574,7 @@ func _on_NewBugButton_pressed():
 
 func _on_DiscardBugBtn_pressed():
 	# close the modal dialog box for creating a new bug or editing an existing bug
-	$Dialogs/EditBugPopup.hide()
+	EditBugPopup.hide()
 
 
 
@@ -494,3 +582,35 @@ func _on_SaveBugBtn_pressed(): # for a specific bug, from the new/edit bug dialo
 	saveBugFromDialog()
 	
 	
+
+func treeTableFind(tree, column, text):
+	# return the treeItem (row) with the given text in the given column
+	# walk the tree and return the corresponding field
+	var item = tree.get_root().get_children()
+	var EoF = false
+	var itemFound = false
+	while not EoF and not itemFound:
+		if item == null:
+			EoF = true
+			return null
+		elif item.get_text(column) == text:
+			itemFound = true
+			return item
+		else:
+			item = item.get_next()
+
+func _on_DeleteBugBtn_pressed():
+	# clear the bug edit form, erase the bug from bugcollection, repopulate the tree
+	
+	# get the bugID from the tree/form, then get the bug from the collection
+	var tree = BugEditTreeNode
+	var bugIDRow = treeTableFind(tree, 0, "Id")
+	if bugIDRow != null:
+		var bugID = bugIDRow.get_text(1)
+		var bug = getBug(bugID)
+		tree.clear()
+		BugCollection.erase(bug)
+		populateTree(BuglistTreeObj, BugCollection, GroupBy)
+		EditBugPopup.hide()
+	else:
+		printerr("BugList.gd: problem in _on_DeleteBugBtn_pressed. No valid row for bugID")
