@@ -79,7 +79,7 @@ func start(callbackObj):
 	var jsonBugList = loadBugList("user://" + DefaultSaveFilePath)
 	var buglist = generateBugCollection(jsonBugList)
 	var tree = createTree()
-	populateTree(tree, buglist, "category")
+	populateTree(tree, buglist, GroupBy)
 	BugCollection = buglist
 	
 	
@@ -165,10 +165,12 @@ func setPanelSize():
 	self.rect_size = viewportSize
 
 func populateTree(treeNode : Tree, collectionOfBugs : Array, groupBy : String) -> void:
-	BuglistTreeObj.clear()
-	printerr("BugList.gd populateTree has a bug: grouping is weird after regrouping")
+	printerr("bug in populateTree: if you group by Category, ID doesn't show up")
+	treeNode.clear()
 	find_node("GroupingLabel", true).set_text(groupBy)
-	var rootItem = treeNode.get_root()
+	var rootItem = treeNode.create_item()
+	treeNode.set_hide_root(true)
+	#var rootItem = treeNode.get_root()
 	var groupMembersCollection = []
 	for bug in collectionOfBugs:
 		if not groupMembersCollection.has(bug.get(toPythonCase(groupBy))):
@@ -177,20 +179,26 @@ func populateTree(treeNode : Tree, collectionOfBugs : Array, groupBy : String) -
 	for grouping in groupMembersCollection:
 		var groupItem = treeNode.create_item(rootItem)
 		groupItem.set_text(0, str(grouping))
+		groupItem.set_expand_right(0, true)
 	
 		for bug in collectionOfBugs:
 			if bug.get(groupBy.capitalize()) == grouping:
 				var bugItem = treeNode.create_item(groupItem)
 				
-				var i = 0
+				var colNum = 0
 				for columnName in Columns:
-					if columnName != "Actions":
+					if columnName != "Actions" and columnName != groupBy:
 						var cellText = bug.get(toPythonCase(columnName))
 						if cellText == null:
 							cellText = ""
-						bugItem.set_text(i, str(cellText))
-						bugItem.set_editable(i, ColDetails[columnName]["editable"])
-						i += 1
+						bugItem.set_text(colNum, str(cellText))
+						bugItem.set_editable(colNum, ColDetails[columnName]["editable"])
+						treeNode.set_column_expand(colNum, ColDetails[columnName]["expand"])
+						treeNode.set_column_min_width(colNum, ColDetails[columnName]["width"])
+						treeNode.set_column_title(colNum, columnName)
+
+
+						colNum += 1
 				addButtons(bugItem, 7)
 	
 func addButtons(treeItem, column):
@@ -416,7 +424,7 @@ Line-Drawing games
 """
 
 func getBug(bugId):
-	var relevantBug
+	var relevantBug = null
 	for bug in BugCollection:
 		if int(bug.Id) == int(bugId):
 			relevantBug = bug
@@ -431,10 +439,11 @@ func deleteBug(bug):
 
 func _on_Tree_column_title_pressed(column):
 	var label = find_node("GroupingLabel")
-	var text = Columns[column]
-	var enabled = ["category", "priority", "date"]
+	var text = BuglistTreeObj.get_column_title(column)
+	var enabled = ["Category", "Priority", "Date"]
 	if enabled.has(text):
 		label.set_text(text)
+		GroupBy = text
 	populateTree(BuglistTreeObj, BugCollection, text)
 
 func _on_tree_button_pressed(item, column, button_id):
@@ -558,7 +567,7 @@ func saveBugFromDialog():
 	for property in tempProperties.keys():
 		bug.set(property, tempProperties[str(property)])
 	BugCollection.push_back(bug)
-	populateTree(BuglistTreeObj, BugCollection, find_node("GroupingLabel").get_text())
+	populateTree(BuglistTreeObj, BugCollection, GroupBy)
 	dialog.hide()
 	
 
@@ -586,6 +595,7 @@ func _on_SaveBugBtn_pressed(): # for a specific bug, from the new/edit bug dialo
 func treeTableFind(tree, column, text):
 	# return the treeItem (row) with the given text in the given column
 	# walk the tree and return the corresponding field
+	# Alternative approach would be to use the gdscript built-in call_recursive() function for TreeItems
 	var item = tree.get_root().get_children()
 	var EoF = false
 	var itemFound = false
@@ -608,9 +618,16 @@ func _on_DeleteBugBtn_pressed():
 	if bugIDRow != null:
 		var bugID = bugIDRow.get_text(1)
 		var bug = getBug(bugID)
-		tree.clear()
-		BugCollection.erase(bug)
+		if bug != null: # new bugs won't exist in the Collection until they've been saved
+			BugCollection.erase(bug)
 		populateTree(BuglistTreeObj, BugCollection, GroupBy)
+		tree.clear()
 		EditBugPopup.hide()
 	else:
 		printerr("BugList.gd: problem in _on_DeleteBugBtn_pressed. No valid row for bugID")
+
+
+func _on_Button_pressed():
+	emit_signal("finished", self)
+	call_deferred("queue_free") # means you can never come back, until restart.
+	
