@@ -1,3 +1,11 @@
+# provides a lane for ships to follow.. requires one or more PathFollow nodes
+
+# ideally, shouldn't care which fleets follow it, or how many pathfollow nodes exist.
+# might connect two planets
+# or could be used to direct the path of an existing fleet
+
+
+
 extends Path2D
 
 var last_point : Vector2
@@ -9,7 +17,8 @@ enum States { DRAWING, FINISHED }
 var State = States.DRAWING
 var FactionObj : Node2D
 var CursorObj : Node2D
-var AssignedFleet : Node2D # will this ever be an array instead of a single object?
+#var AssignedFleet : Node2D # will this ever be an array instead of a single object?
+#var AssignedFleets : Array # use weakrefs
 
 var Level
 
@@ -27,20 +36,23 @@ func _ready():
 
 
 func start(planet, factionObj, cursorObj, levelObj):
-	print("ShipPath.gd start() called. Creating a path. hopefully only once per user-draw-action")
+	#print("ShipPath.gd start() called. Creating a path. hopefully only once per user-draw-action")
 	Level = levelObj
 	OriginPlanet = planet
 	CursorObj = cursorObj
 	FactionObj = factionObj
-	warp_to_planet(planet) # why?
+	if factionObj.IsLocalHumanPlayer:
+		warp_mouse_to_planet(planet) # allows player to be sloppy with mouse location
 
-func warp_to_planet(planet): 
+func warp_mouse_to_planet(planet): 
 	# relocate the cursor to the nearest planet, 
 	# so the player can be sloppy with their inputs.
-	if FactionObj.IsLocalHumanPlayer:
-		Input.warp_mouse_position(planet.get_global_transform_with_canvas().get_origin())
+	assert(FactionObj.IsLocalHumanPlayer)
+	Input.warp_mouse_position(planet.get_global_transform_with_canvas().get_origin())
 
-
+func end(): # in case the level object needs us to go away
+	call_deferred("queue_free")
+	
 func die():
 	$DestructionTimer.set_wait_time(0.1)
 	$DestructionTimer.start()
@@ -59,10 +71,11 @@ func initialize_path():
 	var newCurve = Curve2D.new()
 	set_curve(newCurve)
 	
-func createNewPathFollowNode():
+func createNewPathFollowNode(fleet):
 	var pathFollowScene = preload("res://Paths/FleetNavigationMarker.tscn")
 	var pathFollowNode = pathFollowScene.instance()
 	pathFollowNode.set_offset(0.0)
+	pathFollowNode.start(Level, fleet, self)
 	call_deferred("add_child", pathFollowNode)
 
 	return pathFollowNode
@@ -105,6 +118,7 @@ func finish_path(destinationPlanet):
 		else:
 			LinksTwoFriendlyPlanets = false
 
+	# sometimes there's an error: connecting and disconnecting signals
 	notifyPlanetsAndCursorPathIsReady(OriginPlanet, destinationPlanet)
 
 func askOriginPlanetForMoreShips():
@@ -116,9 +130,17 @@ func askOriginPlanetForMoreShips():
 # Outbound Signals
 
 func notifyPlanetsAndCursorPathIsReady(originPlanet, destinationPlanet):
-	connect("finished_drawing", originPlanet, "_on_ShipPath_finished_drawing")
-	connect("finished_drawing", destinationPlanet, "_on_ShipPath_finished_drawing")
-	connect("finished_drawing", CursorObj, "_on_ShipPath_finished_drawing")
+	var originErr = connect("finished_drawing", originPlanet, "_on_ShipPath_finished_drawing")
+	if originErr:
+		print("FleetPath.gd: error in notifyPlanetsAndCursorPathIsReady. originPlanet for " + str(originPlanet.FactionObj))
+
+	var destinationErr = connect("finished_drawing", destinationPlanet, "_on_ShipPath_finished_drawing")
+	if destinationErr:
+		print("FleetPath.gd: error in notifyPlanetsAndCursorPathIsReady. destinationPlanet for " + str(destinationPlanet.FactionObj))
+
+	var cursorErr = connect("finished_drawing", CursorObj, "_on_ShipPath_finished_drawing")
+	if cursorErr:
+		print("FleetPath.gd: error in notifyPlanetsAndCursorPathIsReady. cursorObj for " + str(CursorObj.FactionObj))
 	
 	emit_signal("finished_drawing", self, originPlanet, destinationPlanet)
 
@@ -182,24 +204,11 @@ func _draw():
 
 
 
-
-func _on_FleetDogfightZone_area_entered(area):
-	# found another fleet. "Hey my fleet, go fight the other fleet".	
+func _on_fleet_ready(fleetObj):
+	pass # path has no interest in the safety of the ship.
 	
-	if is_instance_valid(AssignedFleet) and is_instance_valid(area) and is_instance_valid(FactionObj):
-		# verify that it's another ship first.
-		var isFleetPathArea = area.owner.has_method("_on_FleetDogfightZone_area_entered")
-		if isFleetPathArea and area.owner.FactionObj != self.FactionObj:
-			var myFleet = AssignedFleet
-			var enemyFleet = area.owner.AssignedFleet
-			connect("encountered_enemy", myFleet, "_on_ShipPath_encountered_enemy")
-			emit_signal("encountered_enemy", enemyFleet)
-			disconnect("encountered_enemy", myFleet, "_on_ShipPath_encountered_enemy")
-			#print("ShipPath encountered enemy. Signalling to Fleet")
-
-func _on_planet_assigned_fleet(fleetObj):
-	#AssignedFleets.push_back(fleetObj)
-	AssignedFleet = fleetObj
+	#AssignedFleet = fleetObj
+	#AssignedFleets.push_back(weakref(fleetObj)) # probably not necessary
 
 func _on_planet_cannot_send_ships():
 	# oh well, better luck next time. Either the planet has no units or it switched factions before you requested ships.
@@ -218,9 +227,18 @@ func _on_planet_switched_faction(planet, newFaction):
 			LinksTwoFriendlyPlanets = false
 
 
-func _on_fleet_destroyed():
+func noFleetsRemain(dyingFleet = null):
+	# if any fleet navigation markers exist, fleets remain.
+
+	for child in get_children():
+		if child.is_class("PathFollow2D") and child != dyingFleet:
+			return false
+	
+	return true
+
+func _on_fleet_destroyed(fleet):
 	#print("FleetPath.gd _on_fleet_destroyed triggered")
-	if not LinksTwoFriendlyPlanets:
+	if not LinksTwoFriendlyPlanets and noFleetsRemain(fleet):
 		die()
 	else:
 		askOriginPlanetForMoreShips()
@@ -238,7 +256,7 @@ func _on_planet_replaced_path():
 		
 
 func _on_fleet_requests_navigation(callbackFleetObj):
-	var fleetTargetNode = createNewPathFollowNode()
+	var fleetTargetNode = createNewPathFollowNode(callbackFleetObj)
 	connect("navigation_confirmed", callbackFleetObj, "_on_navigation_received")
 	emit_signal("navigation_confirmed", fleetTargetNode)
 	disconnect("navigation_confirmed", callbackFleetObj, "_on_navigation_received")

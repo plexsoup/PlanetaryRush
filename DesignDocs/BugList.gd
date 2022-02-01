@@ -29,28 +29,21 @@ var DefaultSaveFilePath = "saved_buglist.dat"
 
 var TempCounter : int = 0
 
+enum Noises {CLICK, HOVER, ERROR}
 
 
-
-#var Columns = ["id", "title", "details", "actions"]
-#var ColDetails = {
-#	"id":{"width":75, "expand":false, "editable":false},
-#	"title":{"width":225, "expand":false, "editable":true},
-#	"details":{"width":425, "expand":true, "editable":true},
-#	"actions":{"width":250, "expand":false, "editable":false},
-#}
 
 var BugProperties = ["Category", "Id", "Title", "Details", "Priority", "Dependencies", "DateCreated"]
 var Columns = ["Category", "Id", "Title", "Details", "Priority", "Dependencies", "DateCreated", "Actions"]
 var ColDetails = {
-	"Category":{"width":75, "expand":false, "editable":false},
-	"Id":{"width":25, "expand":false, "editable":false},
-	"Title":{"width":150, "expand":false, "editable":true},
-	"Details":{"width":200, "expand":true, "editable":true},
-	"Priority":{"width":75, "expand":false, "editable":true},
-	"Dependencies":{"width":25, "expand":false, "editable":false},
-	"DateCreated":{"width":55, "expand":false, "editable":false},
-	"Actions":{"width":85, "expand":false, "editable":false},
+	"Category":{"width":75, "expand":false, "editable":false, "sortable":true},
+	"Id":{"width":25, "expand":false, "editable":false, "sortable":true},
+	"Title":{"width":150, "expand":false, "editable":true, "sortable":true},
+	"Details":{"width":100, "expand":true, "editable":true, "sortable":false},
+	"Priority":{"width":75, "expand":false, "editable":true, "sortable":true},
+	"Dependencies":{"width":25, "expand":false, "editable":false, "sortable":false},
+	"DateCreated":{"width":55, "expand":false, "editable":false, "sortable":true},
+	"Actions":{"width":85, "expand":false, "editable":false, "sortable":false},
 }
 
 signal finished
@@ -180,26 +173,26 @@ func populateTree(treeNode : Tree, collectionOfBugs : Array, groupBy : String) -
 		var groupItem = treeNode.create_item(rootItem)
 		groupItem.set_text(0, str(grouping))
 		groupItem.set_expand_right(0, true)
-	
-		for bug in collectionOfBugs:
-			if bug.get(groupBy.capitalize()) == grouping:
-				var bugItem = treeNode.create_item(groupItem)
-				
-				var colNum = 0
-				for columnName in Columns:
-					if columnName != "Actions" and columnName != groupBy:
-						var cellText = bug.get(toPythonCase(columnName))
-						if cellText == null:
-							cellText = ""
-						bugItem.set_text(colNum, str(cellText))
-						bugItem.set_editable(colNum, ColDetails[columnName]["editable"])
-						treeNode.set_column_expand(colNum, ColDetails[columnName]["expand"])
-						treeNode.set_column_min_width(colNum, ColDetails[columnName]["width"])
-						treeNode.set_column_title(colNum, columnName)
+		populateGroupRows(treeNode, collectionOfBugs, grouping, groupBy, groupItem)
 
-
-						colNum += 1
-				addButtons(bugItem, 7)
+func populateGroupRows(treeNode, collectionOfBugs, grouping, groupBy, groupItem):
+	for bug in collectionOfBugs:
+		if bug.get(groupBy.capitalize()) == grouping:
+			var bugItem = treeNode.create_item(groupItem)
+			
+			var colNum = 0
+			for columnName in Columns:
+				if columnName != groupBy:
+					var cellText = bug.get(toPythonCase(columnName))
+					if cellText == null:
+						cellText = ""
+					bugItem.set_text(colNum, str(cellText))
+					bugItem.set_editable(colNum, ColDetails[columnName]["editable"])
+					treeNode.set_column_expand(colNum, ColDetails[columnName]["expand"])
+					treeNode.set_column_min_width(colNum, ColDetails[columnName]["width"])
+					treeNode.set_column_title(colNum, columnName)
+				colNum += 1
+			addButtons(bugItem, 7)
 	
 func addButtons(treeItem, column):
 	
@@ -226,14 +219,8 @@ func createTree() -> Tree:
 	
 	tree.set_columns(Columns.size() ) 
 	
-	for colNum in Columns.size():
-		tree.set_column_expand(colNum, ColDetails[Columns[colNum]]["expand"])
-		tree.set_column_min_width(colNum, ColDetails[Columns[colNum]]["width"])
-		tree.set_column_title(colNum, Columns[colNum])
 	tree.set_select_mode(tree.SELECT_SINGLE)
 	tree.set_column_titles_visible(true)
-	
-	
 	
 	tree.connect("button_pressed", self, "_on_tree_button_pressed")
 	tree.connect("item_edited", self, "_on_Tree_item_edited")
@@ -243,9 +230,6 @@ func createTree() -> Tree:
 	BuglistTreeObj = tree
 	var root = tree.create_item()
 	tree.set_hide_root(false)
-	
-
-
 
 	return tree
 
@@ -253,26 +237,23 @@ func createTree() -> Tree:
 
 
 
-# appears to be unused?
-func convertGroupsToTable(nestedBuglistDict : Dictionary) -> Dictionary:
-	var tempFlatBuglistDict = {}
-	var categories = []
-	var id = 0
-	for categoryName in nestedBuglistDict.keys(): # top level categories
-		categories.push_back(categoryName)
-		for bug in nestedBuglistDict[categoryName]:
-			tempFlatBuglistDict[id] = bug
-			tempFlatBuglistDict[id]["category"] = categoryName
-			tempFlatBuglistDict[id]["refId"] = id
-			tempFlatBuglistDict[id]["priority"] = "medium"
-			id += 1
-	
-	return tempFlatBuglistDict
-	
-
+## appears to be unused?
+#func convertGroupsToTable(nestedBuglistDict : Dictionary) -> Dictionary:
+#	var tempFlatBuglistDict = {}
+#	var categories = []
+#	var id = 0
+#	for categoryName in nestedBuglistDict.keys(): # top level categories
+#		categories.push_back(categoryName)
+#		for bug in nestedBuglistDict[categoryName]:
+#			tempFlatBuglistDict[id] = bug
+#			tempFlatBuglistDict[id]["category"] = categoryName
+#			tempFlatBuglistDict[id]["refId"] = id
+#			tempFlatBuglistDict[id]["priority"] = "medium"
+#			id += 1
+#
+#	return tempFlatBuglistDict
 	
 
-	
 
 func jsonifyBuglist() -> String :
 	print("BugList.gd starting jsonifyBuglist. BugCollection.size() == " + str(BugCollection.size()))
@@ -435,72 +416,6 @@ func deleteBug(bug):
 	# resources don't have a queue_free() or free()
 	# Resource extends from Reference. As such, when a resource is no longer in use, it will automatically free itself.
 	BugCollection.erase(bug)
-	
-
-func _on_Tree_column_title_pressed(column):
-	var label = find_node("GroupingLabel")
-	var text = BuglistTreeObj.get_column_title(column)
-	var enabled = ["Category", "Priority", "Date"]
-	if enabled.has(text):
-		label.set_text(text)
-		GroupBy = text
-	populateTree(BuglistTreeObj, BugCollection, text)
-
-func _on_tree_button_pressed(item, column, button_id):
-	var tooltip = item.get_button_tooltip(column, button_id)
-	#print("pressed button: " + tooltip + " on item: " + item.get_text(Columns.find("title")))
-	print("pressed button: " + tooltip + " on item: " + item.get_text(Columns.find("Title")))
-	
-	var bugId = int(item.get_text(Columns.find("Id")))
-	var bug = getBug(bugId)
-	
-	if tooltip == "Delete":
-		#print(bug.Title + " scheduled for deletion ")
-		deleteBug(bug)
-		item.free()
-	elif tooltip == "Move to top":
-		# not sure how to make this persistent
-		item.move_to_top()
-	elif tooltip == "Move to bottom":
-		# not sure how to make this persistent. Need a DisplayOrderId
-		item.move_to_bottom()
-	elif tooltip == "Edit":
-		var dialog = EditBugPopup
-		dialog.popup_centered()
-		populateBugDialog(dialog, bugId)
-
-
-func _on_SaveButton_pressed():
-	var saveDialog = $Dialogs/SaveDialog
-	saveDialog.set_current_file(DefaultSaveFilePath)
-	$Dialogs/SaveDialog.popup_centered()
-
-func _on_LoadButton_pressed():
-	$Dialogs/LoadDialog.popup_centered()
-
-
-func _on_LoadDialog_file_selected(path):
-	JSONBugList = loadBugList(path)
-	populateTree(BuglistTreeObj, generateBugCollection(JSONBugList), "category")
-	
-
-
-func _on_SaveDialog_file_selected(path):
-	saveBugList(path)
-
-
-func _on_Tree_item_edited(): # only fires after user hits return or leaves the cell.
-	var editedItem = BuglistTreeObj.get_edited()
-	print("edited: " + str(editedItem))
-	
-	var bugId = int(editedItem.get_text(Columns.find("Id")))
-	var bug = getBug(bugId)
-	
-	bug.Title = editedItem.get_text(Columns.find("Title"))
-	bug.Details = editedItem.get_text(Columns.find("Details"))
-#	print(bug.Title)
-#	print(bug.Details)
-	
 
 func getNewBugId() -> int:
 	var existingIds = []
@@ -569,28 +484,6 @@ func saveBugFromDialog():
 	BugCollection.push_back(bug)
 	populateTree(BuglistTreeObj, BugCollection, GroupBy)
 	dialog.hide()
-	
-
-	
-
-func _on_NewBugButton_pressed():
-	print("New Bug Button Pressed")
-	var dialog = EditBugPopup
-	dialog.popup_centered()
-	populateBugDialog(dialog, -1)
-	
-
-
-func _on_DiscardBugBtn_pressed():
-	# close the modal dialog box for creating a new bug or editing an existing bug
-	EditBugPopup.hide()
-
-
-
-func _on_SaveBugBtn_pressed(): # for a specific bug, from the new/edit bug dialog
-	saveBugFromDialog()
-	
-	
 
 func treeTableFind(tree, column, text):
 	# return the treeItem (row) with the given text in the given column
@@ -609,7 +502,128 @@ func treeTableFind(tree, column, text):
 		else:
 			item = item.get_next()
 
+func makeNoise(noiseEnum):
+	if noiseEnum == Noises.CLICK:
+		$Audio/ClickNoise.play()
+	elif noiseEnum == Noises.ERROR:
+		$Audio/ErrorNoise.play()
+	elif noiseEnum == Noises.HOVER:
+		$Audio/HoverNoise.play()
+
+
+########################################################################
+# Signals
+
+
+func _on_Tree_column_title_pressed(column):
+	var label = find_node("GroupingLabel")
+	var desiredSortColumnName = BuglistTreeObj.get_column_title(column)
+	#var enabled = ["Category", "Priority", "Date"]
+#	if enabled.has(desiredSortColumnName):
+	if ColDetails[desiredSortColumnName]["sortable"] == true:
+		label.set_text(desiredSortColumnName)
+		GroupBy = desiredSortColumnName
+		populateTree(BuglistTreeObj, BugCollection, desiredSortColumnName)
+		makeNoise(Noises.CLICK)
+	else:
+		makeNoise(Noises.ERROR)
+		printerr("BugList.gd user trying to sort by inappropriate title.. maybe screenshake?")
+
+func _on_tree_button_pressed(item, column, button_id):
+	makeNoise(Noises.CLICK)
+
+	var tooltip = item.get_button_tooltip(column, button_id)
+	#print("pressed button: " + tooltip + " on item: " + item.get_text(Columns.find("title")))
+	print("pressed button: " + tooltip + " on item: " + item.get_text(Columns.find("Title")))
+	
+	var bugId = int(item.get_text(Columns.find("Id")))
+	var bug = getBug(bugId)
+	
+	if tooltip == "Delete":
+		#print(bug.Title + " scheduled for deletion ")
+		deleteBug(bug)
+		item.free()
+	elif tooltip == "Move to top":
+		# not sure how to make this persistent
+		item.move_to_top()
+	elif tooltip == "Move to bottom":
+		# not sure how to make this persistent. Need a DisplayOrderId
+		item.move_to_bottom()
+	elif tooltip == "Edit":
+		var dialog = EditBugPopup
+		dialog.popup_centered()
+		populateBugDialog(dialog, bugId)
+
+
+func _on_SaveButton_pressed():
+	makeNoise(Noises.CLICK)
+	var saveDialog = $Dialogs/SaveDialog
+	saveDialog.set_current_file(DefaultSaveFilePath)
+	$Dialogs/SaveDialog.popup_centered()
+
+func _on_LoadButton_pressed():
+	makeNoise(Noises.CLICK)
+	$Dialogs/LoadDialog.popup_centered()
+
+
+func _on_LoadDialog_file_selected(path):
+	makeNoise(Noises.CLICK)
+	JSONBugList = loadBugList(path)
+	populateTree(BuglistTreeObj, generateBugCollection(JSONBugList), "category")
+	
+
+
+func _on_SaveDialog_file_selected(path):
+	makeNoise(Noises.CLICK)
+	saveBugList(path)
+
+
+func _on_Tree_item_edited(): # only fires after user hits return or leaves the cell.
+	var editedItem = BuglistTreeObj.get_edited()
+	print("edited: " + str(editedItem))
+	
+	var bugId = int(editedItem.get_text(Columns.find("Id")))
+	var bug = getBug(bugId)
+	
+	bug.Title = editedItem.get_text(Columns.find("Title"))
+	bug.Details = editedItem.get_text(Columns.find("Details"))
+#	print(bug.Title)
+#	print(bug.Details)
+	
+
+	
+
+	
+
+func _on_NewBugButton_pressed():
+	makeNoise(Noises.CLICK)
+	print("New Bug Button Pressed")
+	var dialog = EditBugPopup
+	dialog.popup_centered()
+	populateBugDialog(dialog, -1)
+	
+
+
+func _on_DiscardBugBtn_pressed():
+	makeNoise(Noises.CLICK)
+
+	# close the modal dialog box for creating a new bug or editing an existing bug
+	EditBugPopup.hide()
+
+
+
+func _on_SaveBugBtn_pressed(): # for a specific bug, from the new/edit bug dialog
+	makeNoise(Noises.CLICK)
+
+	saveBugFromDialog()
+	
+	
+
+
+
 func _on_DeleteBugBtn_pressed():
+	makeNoise(Noises.CLICK)
+
 	# clear the bug edit form, erase the bug from bugcollection, repopulate the tree
 	
 	# get the bugID from the tree/form, then get the bug from the collection
@@ -627,7 +641,13 @@ func _on_DeleteBugBtn_pressed():
 		printerr("BugList.gd: problem in _on_DeleteBugBtn_pressed. No valid row for bugID")
 
 
-func _on_Button_pressed():
+
+
+
+
+func _on_ReturnButton_pressed():
+	makeNoise(Noises.CLICK)
+	yield(get_tree().create_timer(0.1), "timeout")
 	emit_signal("finished", self)
 	call_deferred("queue_free") # means you can never come back, until restart.
 	

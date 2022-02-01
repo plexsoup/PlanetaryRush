@@ -16,7 +16,7 @@ var Ticks : int = 0
 var TimeElapsed : float = 0
 
 var Debug : bool = false
-var game_speed: float = 1.7 # normal game is 1.0, fast game is 2.0, paused is 0.0. lower is slower (easier)
+var game_speed: float = 1.0 # normal game is 1.0, fast game is 2.0, paused is 0.0. lower is slower (easier)
 var previous_game_speed: float
 var screen_size : Vector2
 

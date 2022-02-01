@@ -45,6 +45,15 @@ func _input(event):
 		print("user requested a soft pause toggle")
 		Level.toggle_soft_pause()
 
+	elif Input.is_action_just_pressed("speed_decrease"):
+		global.game_speed = max(0.1, global.game_speed - 0.1) # prevent divide_by_zero errors
+		print("PlayerController.gd: setting global.game_speed = " + str(global.game_speed))
+		
+	elif Input.is_action_just_pressed("speed_increase"):
+		global.game_speed = min(global.game_speed + 0.1, 50.0)
+		print("PlayerController.gd: setting global.game_speed = " + str(global.game_speed))
+		printerr("Game breaks if you ramp up game_speed too quickly. Maybe AI decision timers fail to restart?")
+	
 
 func isStillDrawing():
 	if Input.is_action_pressed("left_click"):

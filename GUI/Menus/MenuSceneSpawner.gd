@@ -31,7 +31,7 @@ func spawnLevel():
 		level.connect("finished", self, "_on_level_finished")
 	else:
 		printerr("Level has no 'finished' signal to connect")
-	level.start(null, self)
+	level.start(self)
 	
 	#$EndScreen.hide()
 	
@@ -40,7 +40,10 @@ func deactivate():
 	if has_node("Level"):
 		level = get_node("Level")
 	if level and is_instance_valid(level):
-		level.end()
+		if level.has_method("end"):
+			level.end()
+		else:
+			level.call_deferred("queue_free")
 
 
 func _on_level_finished(scene):

@@ -34,7 +34,7 @@ func _process(delta):
 			else: 
 				FactionStatusLabel.set_text("")
 			
-			FactionProgressBar.set_value(float(factionPlanets)/float(totalPlanets)*100)
+			FactionProgressBar.set_value(float(factionPlanets)/max(float(totalPlanets)*100, 1))
 			FactionProgressBar.update()
 		
 

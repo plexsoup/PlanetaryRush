@@ -18,6 +18,7 @@ var State = States.DEPLOYING
 var CurrentShips = []
 
 signal ship_released()
+signal fleet_ready(fleet)
 signal fleet_engaged(enemyFleet)
 signal resumed_moving()
 signal fleet_destroyed()
@@ -26,7 +27,7 @@ signal request_navigation(callbackObj)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	print("ShipFleet.gd _ready() called. Creating a fleet. Hopefully once per user-draw-action")
+	#print("ShipFleet.gd _ready() called. Creating a fleet. Hopefully once per user-draw-action")
 	State = States.DEPLOYING
 	Name = self.name
 
@@ -36,42 +37,41 @@ func start(fleetPath, factionObj, numShips, shipScene, originPlanet, destination
 	Level = levelObj
 	FactionObj = factionObj
 	FleetPath = fleetPath
+	connect("fleet_destroyed", FleetPath, "_on_fleet_destroyed")
 	
-	request_navigation() # ask Path2D for a unique PathFollow2D node
+	request_navigation(fleetPath) # ask Path2D for a unique PathFollow2D node
 	
 	OriginPlanet = originPlanet
 	DestinationPlanet = destinationPlanet
-	spawnShips(factionObj, numShips, shipScene, destinationPlanet)
-
+#	spawnShips(factionObj, numShips, shipScene, destinationPlanet)
+	call_deferred("spawnShips", factionObj, numShips, shipScene, destinationPlanet)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if allShipsAreDead(): # Why is this fleet still alive?
-		State = States.DESTROYED
-		return
 
-		
 	if State == States.MOVING:
+#		if get_ship_count() == 0: # Error: this triggers before ships have been born!
+#			State = States.DESTROYED
+#			return
 		if is_instance_valid(NavTarget):
 			move_fleet_NavTarget(delta)
 		else: # Why is the NavTarget gone?
 			printerr("in Fleet.gd, NavTarget queued free while fleet was still moving.")
 			die()
 	elif State == States.ENGAGING_ENEMY:
-		if allShipsAreDead():
-			die()
 		if battleIsOver(CurrentlyEngagedEnemyFleet):
 			resumeMoving()
+		# note, when ships die we get a signal. Each time one dies, we'll check to see if we're still needed.
 
 
-func allShipsAreDead():
-	return (GetShipCount() == 0)
+#func get_ship_count():
+#	return GetShipCount()
 	
 	
 func battleIsOver(enemyFleet):
 	var battleOver : bool = false
 	if is_instance_valid(enemyFleet):
-		if enemyFleet.allShipsAreDead():
+		if enemyFleet.GetShipCount() == 0:
 			battleOver = true
 	elif not is_instance_valid(enemyFleet):
 		battleOver = true
@@ -80,7 +80,8 @@ func battleIsOver(enemyFleet):
 
 
 func die():
-	notifyPathFleetDestroyed()
+	emit_signal("fleet_destroyed", self)
+	#notifyPathFleetDestroyed()
 	State = States.FINISHED
 	call_deferred("queue_free")
 	
@@ -177,6 +178,8 @@ func get_closest_friendly_planet(pos):
 
 func spawnShips(factionObj, numShips, shipScene, destinationPlanet):
 	# this needs a state check. Level may be ending
+	assert(Level.State == Level.States.PLAYING) # this will halt execution if ships are supposed to spawn after the level is finished.
+
 	for i in range(numShips):
 		var shipNode = shipScene.instance()
 		$ShipsContainer.add_child(shipNode) # why does this give errors sometimes?
@@ -191,13 +194,17 @@ func spawnShips(factionObj, numShips, shipScene, destinationPlanet):
 		shipNode.set_rotation(shipNode.get_angle_to(factionObj.CursorObj.get_global_position()))
 		CurrentShips.push_back(shipNode)
 
-func countAliveShips(): # may not need this anymore.. we maintain an array of live ships: CurrentShips
-	var numAlive = 0
-	var ships = GetShips()
-	for ship in ships:
-		if is_instance_valid(ship) and ship.IsAlive():
-			numAlive += 1
-	return numAlive
+	notifyPathFleetReady()
+
+
+
+#func countAliveShips(): # may not need this anymore.. we maintain an array of live ships: CurrentShips
+#	var numAlive = 0
+#	var ships = GetShips()
+#	for ship in ships:
+#		if is_instance_valid(ship) and ship.IsAlive():
+#			numAlive += 1
+#	return numAlive
 	
 
 ####################################################
@@ -208,6 +215,7 @@ func GetShips():
 
 func GetShipCount():
 	return GetShips().size()
+	# consider checking ship.IsAlive() before you assume it's alive.
 
 
 
@@ -220,11 +228,21 @@ func notifyShipItsReleased(shipObj, nearestPlanet):
 		emit_signal("ship_released", nearestPlanet)
 		disconnect("ship_released", shipObj, "_on_fleet_released_ship")
 
-func notifyPathFleetDestroyed():
-	if is_instance_valid(FleetPath):
-		connect("fleet_destroyed", FleetPath, "_on_fleet_destroyed")
-		emit_signal("fleet_destroyed")
-		disconnect("fleet_destroyed", FleetPath, "_on_fleet_destroyed")
+func notifyPathFleetReady():
+	return # path doesn't care
+	
+#	connect( "fleet_ready", FleetPath, "_on_fleet_ready")
+#	emit_signal("fleet_ready", self)
+#	disconnect( "fleet_ready", FleetPath, "_on_fleet_ready")
+
+#func notifyPathFleetDestroyed():
+#	if is_instance_valid(FleetPath):
+#		connect("fleet_destroyed", FleetPath, "_on_fleet_destroyed")
+#		emit_signal("fleet_destroyed")
+#		disconnect("fleet_destroyed", FleetPath, "_on_fleet_destroyed")
+
+
+
 
 func notifyPathFleetReleased():
 	if is_instance_valid(FleetPath):
@@ -232,39 +250,31 @@ func notifyPathFleetReleased():
 		emit_signal("fleet_released", self, self.FleetPathFollowNode)
 		disconnect("fleet_released", FleetPath, "_on_fleet_released")
 
-func request_navigation():
-	connect("request_navigation", FleetPath, "_on_fleet_requests_navigation")
+func request_navigation(path):
+	connect("request_navigation", path, "_on_fleet_requests_navigation")
 	emit_signal("request_navigation", self)
-	disconnect("request_navigation", FleetPath, "_on_fleet_requests_navigation")
+	disconnect("request_navigation", path, "_on_fleet_requests_navigation")
 
 
 #################################################
 # Incoming Signals
 
 func _on_navigation_received(pathFollowNode : PathFollow2D):
-	if is_instance_valid(pathFollowNode):
-		FleetPathFollowNode = pathFollowNode
-		NavTarget = pathFollowNode.get_node("FleetTarget")
-		State = States.MOVING
+	FleetPathFollowNode = pathFollowNode
+	NavTarget = pathFollowNode.get_node("FleetTarget")
+	connect("fleet_destroyed", FleetPathFollowNode, "_on_fleet_destroyed")
+	State = States.MOVING
 	
-
-#func _on_ship_created(shipObj):
-#	printerr("Fleet.gd _on_ship_created isn't necessary because we create the ship.")
-#	return
-#
-#	if not CurrentShips.has(shipObj):
-#		CurrentShips.push_back(shipObj)
-#	else:
-#		printerr("Ship is trying to register itself with fleet, but it's already registered.")
 	
 func _on_ship_destroyed(shipObj):
 	CurrentShips.erase(shipObj)
 	if CurrentShips.size() == 0:
 		die()
 
-func _on_ShipPath_encountered_enemy(enemyFleetObj):
-	if is_instance_valid(enemyFleetObj):
-		initiateDogfight(enemyFleetObj)
+func _on_NavMarker_encountered_enemy(enemyFleet):
+	# where does this signal originate?
+	if is_instance_valid(enemyFleet):
+		initiateDogfight(enemyFleet)
 	
 #func _on_ship_destroyed(shipObj):
 #	# if we have no ships left, we have no reason to live.

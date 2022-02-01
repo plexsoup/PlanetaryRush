@@ -38,7 +38,7 @@ var OutboundPath : Path2D = null
 #var InboundPaths : Array = []
 
 signal switched_faction(planetObj, newFactionObj)
-signal assigned_fleet(fleetObj)
+#signal assigned_fleet(fleetObj)
 signal no_ships_available()
 signal path_replaced()
 
@@ -252,15 +252,13 @@ func spawn_fleet(numShips, path, destinationPlanet): # coming from Planet
 	var shipScene = load("res://Ships/Ship.tscn")
 	var fleetScene = load("res://Ships/Fleet.tscn")
 
+
+
 	var fleet = fleetScene.instance()
 	Level.FleetContainer.add_child(fleet)
 	fleet.set_global_position(get_global_position())
 	fleet.start(path, FactionObj, numShips, shipScene, originPlanet, destinationPlanet, Level)
 
-	connect( "assigned_fleet", path, "_on_planet_assigned_fleet")
-	emit_signal("assigned_fleet", fleet)
-	disconnect( "assigned_fleet", path, "_on_planet_assigned_fleet")
-	
 
 
 func celebrate():

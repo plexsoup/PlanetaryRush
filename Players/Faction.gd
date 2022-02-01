@@ -54,7 +54,7 @@ func spawnCursor(isLocalHumanPlayer):
 
 
 func registerFleet(fleetObj):
-	CurrentFleetList.push_back(weakref(fleetObj))
+	CurrentFleetList.push_back(fleetObj)
 	
 func deregisterFleet(fleetObj):
 	CurrentFleetList.erase(fleetObj)

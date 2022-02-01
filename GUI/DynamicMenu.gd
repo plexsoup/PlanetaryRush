@@ -84,17 +84,10 @@ func verifyContainers():
 	
 
 func hide_all_scenes(scenesContainer):
-	printerr("DynamicMenu.gd - hide_all_scenes needs attention")
-
-	printerr("DynamicMenu.gd: hide_all_scenes: Beware: We're hiding menuEffects, but we probably never unhide them.")
 	for scene in scenesContainer.get_children():
 		# hide menu effects or whatever else we put in the menu
 		if scene != scenesContainer:
 			scene.hide()
-#		else:
-#			for subScene in scenesContainer.get_children():
-#				subScene.hide()
-			
 
 func setTitle(titleString):
 	var labelNode = find_node("MenuTitle")
@@ -115,7 +108,6 @@ func createReturnButton(buttonsContainer, callBackObj):
 		newButton.name = "Return" # not sure if we should escape slashes for this or convert to camel case
 		newButton.set_text(newButton.name)
 		buttonsContainer.add_child(newButton)
-		print("DynamicMenu.gd creating new button: " + newButton.name)
 		if callBackObj.has_method("_on_menu_finished"):
 			newButton.connect("pressed", callBackObj, "_on_menu_finished", [self])
 		else:
@@ -123,7 +115,6 @@ func createReturnButton(buttonsContainer, callBackObj):
 
 
 func createButton(scene, buttonsContainer):
-	print("DynamicMenu " + self.name + " creating button: " + scene.name)
 	# create the button and connect the signals
 	
 	if not is_instance_valid(buttonsContainer):

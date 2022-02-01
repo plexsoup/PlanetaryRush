@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=2]
+[gd_scene load_steps=24 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://Scenery/AnimatedSpaceships.tscn" type="PackedScene" id=2]
@@ -8,14 +8,16 @@
 [ext_resource path="res://GUI/Menus/MenuEntry.gd" type="Script" id=6]
 [ext_resource path="res://GUI/Menus/SplashScreen.gd" type="Script" id=7]
 [ext_resource path="res://DesignDocs/BugList.tscn" type="PackedScene" id=8]
+[ext_resource path="res://Levels/Level.tscn" type="PackedScene" id=9]
 [ext_resource path="res://Scenery/stars.png" type="Texture" id=10]
 [ext_resource path="res://Planets/PlanetBlueprint.tscn" type="PackedScene" id=11]
 [ext_resource path="res://Scenery/VQGAN Art/library.jpg" type="Texture" id=12]
 [ext_resource path="res://Levels/QuickCampaign.tscn" type="PackedScene" id=13]
 [ext_resource path="res://Levels/LevelBlueprint.gd" type="Script" id=14]
-[ext_resource path="res://Levels/QuickPlay.gd" type="Script" id=15]
+[ext_resource path="res://GUI/Menus/MenuSceneSpawner.gd" type="Script" id=15]
 [ext_resource path="res://Tutorial/TutorialStage.gd" type="Script" id=16]
 [ext_resource path="res://GUI/Icons/PlexSoup.png" type="Texture" id=17]
+[ext_resource path="res://Levels/QuickPlay.gd" type="Script" id=18]
 [ext_resource path="res://effects/536104__eminyildirim__sword-hit-heavy.wav" type="AudioStream" id=19]
 [ext_resource path="res://GUI/Themes/CyberTheme.tres" type="Theme" id=20]
 
@@ -247,7 +249,8 @@ NumFactions = 3
 [node name="QuickCampaign" parent="Game/GameModes" instance=ExtResource( 13 )]
 
 [node name="QuickPlay" type="Node2D" parent="Game/GameModes"]
-script = ExtResource( 15 )
+script = ExtResource( 18 )
+levelScene = ExtResource( 9 )
 
 [node name="Campaign" type="Node2D" parent="Game/GameModes"]
 
@@ -315,9 +318,9 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="DesignNotes" parent="Game/GameModes" instance=ExtResource( 8 )]
-size_flags_horizontal = 3
-size_flags_vertical = 3
+[node name="Buglist" type="Node2D" parent="Game/GameModes"]
+script = ExtResource( 15 )
+levelScene = ExtResource( 8 )
 
 [node name="MainCamera" type="Camera2D" parent="." groups=["cameras"]]
 position = Vector2( 512, 303 )

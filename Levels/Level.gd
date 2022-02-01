@@ -50,7 +50,14 @@ func _ready():
 	#start()
 
 func start(blueprintContainer : Node2D = null, callbackObj = get_parent(), desiredNumPlanets = null, desiredNumFactions = null):
+	printerr("Level.gd bugs:")
+	printerr("restart() fails to clean up properly")
+	printerr("Quick campaign shows too many planets")
+
 	call_deferred("delayedStart", [blueprintContainer, callbackObj, desiredNumPlanets, desiredNumFactions])
+
+
+
 
 func delayedStart(blueprintContainer : Node2D = null, callbackObj = get_parent(), desiredNumPlanets = null, desiredNumFactions = null):
 
@@ -216,7 +223,9 @@ func remove_entities():
 	
 	var containers = [PlanetContainer, FleetContainer, PathContainer, FactionContainer]
 	for container in containers:
+		print("Level.gd remove_entities() clearing " + container.name)
 		for entity in container.get_children():
+			print("\t - clearing " + entity.name)
 			if entity.has_method("end"):
 				entity.end()
 			else:
@@ -228,13 +237,15 @@ func toggle_soft_pause():
 	
 func end():
 	$ActionCamera._set_current(false)
-	print("Level " + self.name + " is ending. Hiding the gui (GUI has to be in a canvas layer, but they can't be hidden, so you have to hide the stuff inside.)")
-	pass # I don't know why this isn't working
-	#call_deferred("queue_free")
 	$Foreground/InLevelGUI.end()
 	remove_entities()
 	emit_signal("finished", self) # to whoever connected it on level spawn. Presumably Main.gd
 	call_deferred("queue_free")
+
+func restart():
+	$Foreground/InLevelGUI.end()
+	remove_entities()
+	start()
 
 func count_player_planets():
 	var count = 0
@@ -364,3 +375,7 @@ func _on_BackButton_pressed():
 	
 	end()
 	
+
+
+func _on_RetryButton_pressed():
+	restart()

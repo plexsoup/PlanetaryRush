@@ -121,9 +121,9 @@ margin_bottom = 590.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Foreground/LoseScreen/PanelContainer/CenterContainer"]
 margin_left = 378.0
-margin_top = 247.0
+margin_top = 230.0
 margin_right = 626.0
-margin_bottom = 333.0
+margin_bottom = 349.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -140,6 +140,13 @@ margin_top = 57.0
 margin_right = 248.0
 margin_bottom = 86.0
 text = "Back"
+
+[node name="RetryButton" type="Button" parent="Foreground/LoseScreen/PanelContainer/CenterContainer/VBoxContainer"]
+margin_top = 90.0
+margin_right = 248.0
+margin_bottom = 119.0
+disabled = true
+text = "Retry"
 
 [node name="Paths" type="Node2D" parent="."]
 
@@ -178,6 +185,7 @@ script = ExtResource( 6 )
 
 [connection signal="pressed" from="Foreground/WinScreen/PanelContainer/CenterContainer/VBoxContainer/BackButton" to="." method="_on_BackButton_pressed"]
 [connection signal="pressed" from="Foreground/LoseScreen/PanelContainer/CenterContainer/VBoxContainer/BackButton" to="." method="_on_BackButton_pressed"]
+[connection signal="pressed" from="Foreground/LoseScreen/PanelContainer/CenterContainer/VBoxContainer/RetryButton" to="." method="_on_RetryButton_pressed"]
 [connection signal="timeout" from="CelebrationTimer" to="." method="_on_CelebrationDuration_timeout"]
 [connection signal="timeout" from="LamentationTimer" to="." method="_on_LamentationTimer_timeout"]
 [connection signal="timeout" from="Referee/InspectionTimer" to="Referee" method="_on_InspectionTimer_timeout"]
