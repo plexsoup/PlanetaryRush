@@ -6,6 +6,12 @@
 
 
 
+# Feb 2, 2022: Refactor opportunity. Paths shouldn't necessarily have to connect planets.
+# start and destination should be more object agnostic.
+
+# warp_mouse_to_planet should move into PlayerController.gd
+
+
 extends Path2D
 
 var last_point : Vector2
@@ -41,6 +47,17 @@ func start(planet, factionObj, cursorObj, levelObj):
 	OriginPlanet = planet
 	CursorObj = cursorObj
 	FactionObj = factionObj
+	
+	# connect signals
+	var originErr = connect("finished_drawing", OriginPlanet, "_on_ShipPath_finished_drawing")
+	if originErr:
+		print("FleetPath.gd: error in notifyPlanetsAndCursorPathIsReady. originPlanet for " + str(OriginPlanet.FactionObj))
+
+	var cursorErr = connect("finished_drawing", CursorObj, "_on_ShipPath_finished_drawing")
+	if cursorErr:
+		print("FleetPath.gd: error in notifyPlanetsAndCursorPathIsReady. cursorObj for " + str(CursorObj.FactionObj))
+
+	
 	if factionObj.IsLocalHumanPlayer:
 		warp_mouse_to_planet(planet) # allows player to be sloppy with mouse location
 
@@ -118,7 +135,11 @@ func finish_path(destinationPlanet):
 		else:
 			LinksTwoFriendlyPlanets = false
 
-	# sometimes there's an error: connecting and disconnecting signals
+	if destinationPlanet != OriginPlanet:
+		var destinationErr = connect("finished_drawing", destinationPlanet, "_on_ShipPath_finished_drawing")
+		if destinationErr:
+			print("FleetPath.gd: error in notifyPlanetsAndCursorPathIsReady. destinationPlanet for " + str(destinationPlanet.FactionObj))
+
 	notifyPlanetsAndCursorPathIsReady(OriginPlanet, destinationPlanet)
 
 func askOriginPlanetForMoreShips():
@@ -130,23 +151,12 @@ func askOriginPlanetForMoreShips():
 # Outbound Signals
 
 func notifyPlanetsAndCursorPathIsReady(originPlanet, destinationPlanet):
-	var originErr = connect("finished_drawing", originPlanet, "_on_ShipPath_finished_drawing")
-	if originErr:
-		print("FleetPath.gd: error in notifyPlanetsAndCursorPathIsReady. originPlanet for " + str(originPlanet.FactionObj))
 
-	var destinationErr = connect("finished_drawing", destinationPlanet, "_on_ShipPath_finished_drawing")
-	if destinationErr:
-		print("FleetPath.gd: error in notifyPlanetsAndCursorPathIsReady. destinationPlanet for " + str(destinationPlanet.FactionObj))
-
-	var cursorErr = connect("finished_drawing", CursorObj, "_on_ShipPath_finished_drawing")
-	if cursorErr:
-		print("FleetPath.gd: error in notifyPlanetsAndCursorPathIsReady. cursorObj for " + str(CursorObj.FactionObj))
-	
 	emit_signal("finished_drawing", self, originPlanet, destinationPlanet)
 
-	disconnect("finished_drawing", originPlanet, "_on_ShipPath_finished_drawing")
-	disconnect("finished_drawing", destinationPlanet, "_on_ShipPath_finished_drawing")
-	disconnect("finished_drawing", CursorObj, "_on_ShipPath_finished_drawing")
+#	disconnect("finished_drawing", originPlanet, "_on_ShipPath_finished_drawing")
+#	disconnect("finished_drawing", destinationPlanet, "_on_ShipPath_finished_drawing")
+#	disconnect("finished_drawing", CursorObj, "_on_ShipPath_finished_drawing")
 
 ###############################################################################
 # Incoming Signals

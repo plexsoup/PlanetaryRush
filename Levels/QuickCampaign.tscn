@@ -15,7 +15,6 @@ MenuName = "Tutorial"
 BackgroundImage = ExtResource( 7 )
 
 [node name="Stage 1" type="Node2D" parent="."]
-visible = false
 script = ExtResource( 5 )
 
 [node name="blueprint" type="Node2D" parent="Stage 1"]
@@ -23,6 +22,7 @@ script = ExtResource( 4 )
 
 [node name="PlanetBlueprint" parent="Stage 1/blueprint" instance=ExtResource( 2 )]
 position = Vector2( -504, 151 )
+FactionNum = 2
 Size = 2.0
 
 [node name="PlanetBlueprint2" parent="Stage 1/blueprint" instance=ExtResource( 2 )]
@@ -55,40 +55,42 @@ position = Vector2( -552, 529 )
 FactionNum = -1
 
 [node name="Stage 2" type="Node2D" parent="."]
+visible = false
+position = Vector2( 0, 7 )
 script = ExtResource( 5 )
 
 [node name="blueprint" type="Node2D" parent="Stage 2"]
 script = ExtResource( 4 )
 
 [node name="PlanetBlueprint" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
-position = Vector2( -504, 151 )
+position = Vector2( 239, 214 )
 Size = 2.0
 
 [node name="PlanetBlueprint2" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
-position = Vector2( 2268, 245 )
-FactionNum = -1
+position = Vector2( 1449, 321 )
+FactionNum = 1
 Size = 2.0
 
 [node name="PlanetBlueprint3" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
-position = Vector2( 1569, 879 )
+position = Vector2( 1759, 206 )
 FactionNum = -1
 
 [node name="PlanetBlueprint4" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
-position = Vector2( 1842, 866 )
+position = Vector2( 2039, 320 )
 FactionNum = -1
 
 [node name="PlanetBlueprint5" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
-position = Vector2( 1785, 663 )
+position = Vector2( 2325, 269 )
 FactionNum = -1
 
 [node name="PlanetBlueprint6" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
-position = Vector2( -209, 758 )
+position = Vector2( -742, 460 )
 
 [node name="PlanetBlueprint7" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
 position = Vector2( -241, 415 )
 
 [node name="PlanetBlueprint8" parent="Stage 2/blueprint" instance=ExtResource( 2 )]
-position = Vector2( -552, 529 )
+position = Vector2( -539, 262 )
 
 [node name="Stage 3" type="Node2D" parent="."]
 visible = false

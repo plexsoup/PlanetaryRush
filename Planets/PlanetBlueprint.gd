@@ -1,3 +1,4 @@
+tool
 extends Node2D
 
 
@@ -8,7 +9,22 @@ export var Size : float = 1.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	if Engine.editor_hint:
+		var factionColors : PoolColorArray = [
+			Color.blue, 
+			Color.orangered, 
+			Color.greenyellow, 
+			Color.orange, 
+			Color.lightseagreen, 
+			Color.chocolate,
+			Color.purple,
+			Color.red, 
+		]
+		
+		if FactionNum > -1:
+			$Sprite.set_self_modulate(factionColors[FactionNum])
+	else:
+		pass
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

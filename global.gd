@@ -22,8 +22,6 @@ var screen_size : Vector2
 
 var Main : Node2D
 var level : Node2D
-var BulletContainer : Node2D
-#var planet_container : Node2D
 
 
 var NumFactions : int = 4 # active factions only.. neutral doesn't count.

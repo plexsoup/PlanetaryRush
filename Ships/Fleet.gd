@@ -178,23 +178,22 @@ func get_closest_friendly_planet(pos):
 
 func spawnShips(factionObj, numShips, shipScene, destinationPlanet):
 	# this needs a state check. Level may be ending
-	assert(Level.State == Level.States.PLAYING) # this will halt execution if ships are supposed to spawn after the level is finished.
+	if Level.State != Level.States.PLAYING:
+		return
+	else:
+		for i in range(numShips):
+			var shipNode = shipScene.instance()
+			$ShipsContainer.add_child(shipNode) # why does this give errors sometimes?
+			
+			shipNode.start(self, factionObj, NavTarget, OriginPlanet, destinationPlanet, Level)
+			# stick to local coords for this
+			shipNode.set_position(Vector2(rand_range(-50, 50), rand_range(-50, 50)))
 
-	for i in range(numShips):
-		var shipNode = shipScene.instance()
-		$ShipsContainer.add_child(shipNode) # why does this give errors sometimes?
-		
-		
-		
-		shipNode.start(self, factionObj, NavTarget, OriginPlanet, destinationPlanet, Level)
-		# stick to local coords for this
-		shipNode.set_position(Vector2(rand_range(-50, 50), rand_range(-50, 50)))
+			# added the next line so ships orient themselves toward the cursor.
+			shipNode.set_rotation(shipNode.get_angle_to(factionObj.CursorObj.get_global_position()))
+			CurrentShips.push_back(shipNode)
 
-		# added the next line so ships orient themselves toward the cursor.
-		shipNode.set_rotation(shipNode.get_angle_to(factionObj.CursorObj.get_global_position()))
-		CurrentShips.push_back(shipNode)
-
-	notifyPathFleetReady()
+		notifyPathFleetReady()
 
 
 

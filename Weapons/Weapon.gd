@@ -37,7 +37,7 @@ func spawnLaser(pos):
 	var rotDeviation = rand_range(-PI/16, PI/16)
 	var vel = Vector2(1,0).rotated(rot) * BulletSpeed
 	var newBullet = BulletScene.instance()
-	global.BulletContainer.add_child(newBullet)
+	MyShip.Level.BulletContainer.add_child(newBullet)
 	newBullet.start(pos, rot + rotDeviation, vel, MyShip.FactionObj)
 
 func fire():

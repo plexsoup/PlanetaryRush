@@ -18,14 +18,7 @@ func start(callbackObj):
 
 	spawnLevel(NumPlanets, NumFactions)
 
-	# if it's a blueprint level, import the blueprint
-#	if self.has_node("blueprint") and self.has_node("Level"):
-#		$Level.start($blueprint)
-#		$blueprint.hide()
-#	elif self.has_node("Level") and is_instance_valid($Level):
-#			$Level.start() # no blueprint
-#	else: # probably just a regular menu
-#		pass
+
 
 func spawnLevel(numPlanets, numFactions):
 	var levelScene = preload("res://Levels/Level.tscn")
@@ -37,7 +30,8 @@ func spawnLevel(numPlanets, numFactions):
 	else:
 		printerr("Level requires a finished signal.")
 	if has_node("blueprint"):
-		level.start($blueprint, self, numPlanets, numFactions)
+		var blueprintContainer = $blueprint
+		level.start(blueprintContainer, self, numPlanets, numFactions)
 	else:
 		level.start(null, self, numPlanets, numFactions)
 	Level = level

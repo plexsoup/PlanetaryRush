@@ -54,38 +54,22 @@ func start(blueprintContainer : Node2D = null, callbackObj = get_parent(), desir
 	printerr("restart() fails to clean up properly")
 	printerr("Quick campaign shows too many planets")
 
-	call_deferred("delayedStart", [blueprintContainer, callbackObj, desiredNumPlanets, desiredNumFactions])
+#	call_deferred("delayedStart", [blueprintContainer, callbackObj, desiredNumPlanets, desiredNumFactions])
+#
+#
+#
+#
+#func delayedStart(blueprintContainer : Node2D = null, callbackObj = get_parent(), desiredNumPlanets = null, desiredNumFactions = null):
 
 
+	if blueprintContainer == null:
+		build_level_without_blueprint(desiredNumPlanets, desiredNumFactions)
+		
 
-
-func delayedStart(blueprintContainer : Node2D = null, callbackObj = get_parent(), desiredNumPlanets = null, desiredNumFactions = null):
-
-
-	#Note: since we're now spawning levels dynamically, we should add numplanets and numfactions to the start function (pseudo constructor)
-	
-	global.BulletContainer = $Bullets # why? Who uses this? Need to refactor weapons.gd
-	printerr("Level.gd should not require registering a BulletContainer with global.")
-
-	if desiredNumFactions != null:
-		DesiredNumFactions = desiredNumFactions
-	if desiredNumPlanets != null:
-		DesiredNumPlanets = desiredNumPlanets
-
-	
-	# spawn a bunch of neutral planets, then change NumFactions to their unique faction.
-	if not is_instance_valid(blueprintContainer):
-		NumPlanets = DesiredNumPlanets
-		NumFactions = DesiredNumFactions
-		spawn_factions(DesiredNumFactions)  # produces factionObj's in FactionContainer
-		spawn_planets(NumPlanets)
-		for faction in FactionContainer.get_children():
-			var randomPlanet = PlanetContainer.get_random_neutral_planet()
-			if is_instance_valid(randomPlanet):
-				randomPlanet.switch_faction(self, faction)
-				randomPlanet.set_initial_population(4.0)
-	else:
+	elif blueprintContainer != null:
 		build_level_from_blueprint(blueprintContainer)
+	else:
+		printerr("Level.gd: delayedStart: something wrong building level from blueprint. blueprintContainer is not valid.")
 
 	spawn_in_level_GUI()
 	hide_end_scenes()
@@ -176,15 +160,31 @@ func spawn_path(planet, factionObj, cursorObj):
 	PathContainer.add_child(pathFollowNode)
 	pathFollowNode.start(planet, factionObj, cursorObj, self)
 
+func build_level_without_blueprint(desiredNumPlanets, desiredNumFactions):
+	# spawn a bunch of neutral planets, then change NumFactions to their unique faction.
+	DesiredNumFactions = desiredNumFactions
+	DesiredNumPlanets = desiredNumPlanets
+	NumPlanets = desiredNumPlanets
+	NumFactions = desiredNumFactions
+
+	spawn_factions(desiredNumFactions)  # produces factionObj's in FactionContainer
+	spawn_planets(desiredNumPlanets)
+	for faction in FactionContainer.get_children():
+		var randomPlanet = PlanetContainer.get_random_neutral_planet()
+		if is_instance_valid(randomPlanet):
+			randomPlanet.switch_faction(self, faction)
+			randomPlanet.set_initial_population(4.0)
+
 func build_level_from_blueprint(blueprintContainer):
 	DesiredNumFactions = 0
 	DesiredNumPlanets = 0
 	
 	# look at the blueprint and identify existing planets, factions, etc.
 	# make sure they get catalogued and initialized correctly
-	print("Level.gd is identifying objects placed manually in the level designer.")
+	
 	# enumerate all the planets in the blueprint node
 	# then spawn factions accordingly
+	
 	# then move the planets into the PlanetContainer
 	
 	#NumFactions = blueprintContainer.NumFactions

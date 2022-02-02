@@ -24,8 +24,14 @@ func start(levelObj, planetsObj):
 	#return
 	# zoom extents to capture all the planets.
 	
+	call_deferred("delayed_start", planetsObj)
+	
+func delayed_start(planetsObj):
 	var extents = calculatePlanetViewRect(planetsObj)
-	setupCameraViewport(extents)
+	if extents != null:
+		setupCameraViewport(extents)
+	else:
+		printerr("ActionCamera2D.gd. Something wrong in delayed_start: calculatePlanetViewRect can't get extents.")
 
 
 func setupCameraViewport(extents):
