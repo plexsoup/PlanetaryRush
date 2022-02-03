@@ -307,7 +307,7 @@ func notify_path_PlanetCannotSendShips(path):
 
 
 func notify_path_replaced(path):
-	printerr("bug: if the destination planet changes hands, no one notifies the path")
+	# printerr("possible bug: if the destination planet changes hands, no one notifies the path")
 	
 	# used to tell an old path it's no longer needed, since the planet has a new path.
 	# each planet only gets one OutboundPath.

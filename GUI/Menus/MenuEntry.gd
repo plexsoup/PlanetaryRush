@@ -15,14 +15,19 @@ func start(callBackObj):
 	# note: callBackObj is responsible for connecting the signal.
 	
 	if has_node("AnimationPlayer"):
-		$AnimationPlayer.play(AnimationName)
-	else:
+		var animPlayer = $AnimationPlayer
+		animPlayer.play(AnimationName)
+		if not animPlayer.is_connected("animation_finished", self, "_on_animation_finished"):
+			animPlayer.connect("animation_finished", self, "_on_animation_finished")
+	elif not has_node("AnimationPlayer"):
 		printerr("Consider putting an AnimationPlayer node in your scene to handle the entry transition: " + self.name)
 
-	if has_node("Timer"):
-		$Timer.start()
-	else:
-		_on_Timer_timeout()
+		if has_node("Timer"):
+			$Timer.start() # hmm. why not use a signal from AnimationPlayer instead?
+		else:
+			launch_menu() # no animationPlayer or Timer? Just launch the damn menu.
+
+
 
 
 func launch_menu():
@@ -32,7 +37,9 @@ func launch_menu():
 	else:
 		menu = find_node("*Menu")
 	print("MenuEntry.gd in launch_menu() found menu: " + str(menu) + " " + menu.name)
-	menu.connect("finished", self, "_on_menu_finished")
+	
+	if menu.has_signal("finished") and not menu.is_connected("finished", self, "_on_menu_finished"):
+		menu.connect("finished", self, "_on_menu_finished")
 	menu.start(self)
 	menu.show()
 	
@@ -47,5 +54,16 @@ func end():
 func _on_Timer_timeout():
 	launch_menu()
 
+func _on_animation_finished(animationName):
+	print("MenuEntry.gd: Animation Finished: " + animationName)
+	if animationName == "Enter":
+		launch_menu()
+	elif animationName == "Exit":
+		end()
+
 func _on_menu_finished(sceneFinishing):
-	end()
+	if has_node("AnimationPlayer") and $AnimationPlayer.has_animation("exit"):
+		$AnimationPlayer.play("exit")
+
+	else:
+		end()

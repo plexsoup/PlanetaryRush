@@ -49,7 +49,7 @@ var ColDetails = {
 signal finished
 
 func _ready():
-	if get_tree().get_root().get_children().has(self): # running scene solo
+	if runningSceneSolo():
 		call_deferred("start", [null])
 	else: # running scene in the game
 		pass
@@ -88,6 +88,10 @@ func getAllNodes(node) -> String:
 			if not N.get_name().begins_with("@"):
 				returnStr = returnStr + "\n\t- "+N.get_name()
 	return returnStr
+
+func runningSceneSolo():
+	# determine if the scene is running alone (play scene), or within the context of a full game.
+	return get_tree().get_root().get_children().has(self)
 
 func nodesToDict(nodes): # may return a dictionary or null
 	if nodes == null:
@@ -134,23 +138,8 @@ func nodesDictToCode(nodesDict, i=0):
 		print("nodesDictToCode(): "+ nodesDict )
 		
 
-#	var rootCentreContainer = CenterContainer.new()
-#	add_child(rootVbox)
-#	add_child(rootCentreContainer)
-	
-	
 	
 	return gdScriptCodeStr
-	
-func setupBuglistSceneTree():
-	pass
-	
-#	var rootVbox = VBoxContainer.new()
-#	var rootCentreContainer = CenterContainer.new()
-#	add_child(rootVbox)
-#	add_child(rootCentreContainer)
-#
-#	rootVbox.add_child(HBoxContainer.new())
 	
 
 func setPanelSize():

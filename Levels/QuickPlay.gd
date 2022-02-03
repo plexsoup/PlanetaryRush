@@ -2,6 +2,9 @@ extends Node2D
 
 export var levelScene : PackedScene
 
+export var DesiredNumPlanets : int = 15
+export var DesiredNumFactions : int = 4
+
 var CallBackObj
 
 signal finished
@@ -31,7 +34,7 @@ func spawnLevel():
 		level.connect("finished", self, "_on_level_finished")
 	else:
 		printerr("Level has no 'finished' signal to connect")
-	level.start(null, self)
+	level.start(null, self, DesiredNumPlanets, DesiredNumFactions)
 	
 	#$EndScreen.hide()
 	

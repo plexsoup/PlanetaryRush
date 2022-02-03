@@ -87,7 +87,10 @@ func hide_all_scenes(scenesContainer):
 	for scene in scenesContainer.get_children():
 		# hide menu effects or whatever else we put in the menu
 		if scene != scenesContainer:
-			scene.hide()
+			if scene.has_method("hide"):
+				scene.hide()
+			else:
+				printerr("DynamicMenu.gd encountered a scene ("+ scene.name +") which can't be hidden in " + self.name)
 
 func setTitle(titleString):
 	var labelNode = find_node("MenuTitle")
