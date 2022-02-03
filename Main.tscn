@@ -175,11 +175,9 @@ script = ExtResource( 14 )
 
 [node name="PlanetBlueprint" parent="Game/GameModes/Tutorial/TutorialStages/Stage 1/blueprint" instance=ExtResource( 11 )]
 position = Vector2( 710, 1781 )
-Size = 3.0
 
 [node name="PlanetBlueprint2" parent="Game/GameModes/Tutorial/TutorialStages/Stage 1/blueprint" instance=ExtResource( 11 )]
 position = Vector2( 1600, 1800 )
-FactionNum = -1
 
 [node name="Instructions" type="Node2D" parent="Game/GameModes/Tutorial/TutorialStages/Stage 1"]
 
