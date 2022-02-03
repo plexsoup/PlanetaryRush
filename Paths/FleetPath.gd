@@ -36,6 +36,9 @@ signal requested_ships(path, destinationPlanet)
 signal navigation_confirmed(pathFollowNode)
 
 func _ready():
+	printerr("FleetPath.gd: needs refactoring. Store start and end positions instead of objects?")
+	print("Change LinksTwoFriendlyPlanets to a function, so we can retest planet ownership.")
+	
 	State = States.DRAWING
 	last_point = Vector2.ZERO
 	initialize_path()
@@ -122,6 +125,11 @@ func withinDistanceTolerance(sourceObj, targetObj):
 	else:
 		return false
 
+func getStartPosition():
+	return get_curve().get_point_position(0)
+
+func getEndPosition():
+	return get_curve().get_point_position(get_curve().get_point_count()-1) # careful: maybe off-by-one error
 
 func finish_path(destinationPlanet):
 	DestinationPlanet = destinationPlanet
@@ -154,9 +162,6 @@ func notifyPlanetsAndCursorPathIsReady(originPlanet, destinationPlanet):
 
 	emit_signal("finished_drawing", self, originPlanet, destinationPlanet)
 
-#	disconnect("finished_drawing", originPlanet, "_on_ShipPath_finished_drawing")
-#	disconnect("finished_drawing", destinationPlanet, "_on_ShipPath_finished_drawing")
-#	disconnect("finished_drawing", CursorObj, "_on_ShipPath_finished_drawing")
 
 ###############################################################################
 # Incoming Signals
@@ -167,7 +172,7 @@ func _on_MousePolling_timeout():
 		add_point()
 	else:
 		var nearestDestinationPlanet = Level.PlanetContainer.get_nearest_planet(CursorObj.get_global_position())
-		finish_path(nearestDestinationPlanet)
+		finish_path(nearestDestinationPlanet) # why does path care about a destination planet? Just dump the ships when they reach the end.
 		
 		
 func _draw():
@@ -176,7 +181,7 @@ func _draw():
 
 #	printerr("ShipPath shouldn't care where the fleet is?")
 #	printerr("ShipPath might have multiple fleets, each with their own pathfollow node")
-	#var pathFollowNode = get_node("PathFollow2D")
+	
 	var myCurve = self.get_curve()
 	var lineLength = myCurve.get_baked_length()
 	var points = myCurve.get_baked_points()
@@ -214,11 +219,12 @@ func _draw():
 
 
 
-func _on_fleet_ready(fleetObj):
-	pass # path has no interest in the safety of the ship.
-	
-	#AssignedFleet = fleetObj
-	#AssignedFleets.push_back(weakref(fleetObj)) # probably not necessary
+#func _on_fleet_ready(fleetObj):
+#	pass # path has no interest in the safety of the ship.
+#
+#	#AssignedFleet = fleetObj
+#	#AssignedFleets.push_back(weakref(fleetObj)) # probably not necessary
+
 
 func _on_planet_cannot_send_ships():
 	# oh well, better luck next time. Either the planet has no units or it switched factions before you requested ships.
